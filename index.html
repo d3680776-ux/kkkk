@@ -3,266 +3,174 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Кератин и Ботокс | Мастер Александра</title>
+  <title>Пойдёшь гулять?</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Montserrat', 'Segoe UI', Roboto, sans-serif;
     }
 
     body {
-      background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 50%, #e1bee7 100%);
-      background-attachment: fixed;
-      color: #333333;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    header {
-      background: rgba(255, 255, 255, 0.4);
-      backdrop-filter: blur(10px);
-      text-align: center;
-      padding: 40px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-    }
-
-    header h1 {
-      font-size: 2.2rem;
-      color: #6a1b9a;
-      margin-bottom: 5px;
-      text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-    }
-
-    .master-name {
-      font-size: 1.3rem;
-      color: #8e24aa;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    header p {
-      font-size: 1rem;
-      color: #555;
-    }
-
-    .profile-photo {
-      text-align: center;
-      margin-top: -30px;
-      margin-bottom: 10px;
-    }
-
-    .profile-photo img {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid #ffffff;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      background-color: #f8bbd0;
-    }
-
-    .container {
-      max-width: 750px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .section {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(8px);
-      margin: 20px 0;
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-    }
-
-    h2 {
-      color: #6a1b9a;
-      margin-bottom: 15px;
-      text-align: center;
-      font-size: 1.6rem;
-      border-bottom: 2px solid #ab47bc;
-      padding-bottom: 8px;
-    }
-
-    .info-card {
-      margin-bottom: 20px;
-    }
-
-    .info-card:last-child {
-      margin-bottom: 0;
-    }
-
-    .info-card h3 {
-      color: #8e24aa;
-      font-size: 1.25rem;
-      margin-bottom: 8px;
-    }
-
-    .info-card p {
-      font-size: 1rem;
-      color: #444;
-      margin-bottom: 8px;
-    }
-
-    .info-card ul {
-      padding-left: 20px;
-      color: #555;
-    }
-
-    .info-card li {
-      margin-bottom: 4px;
-    }
-
-    .price-list {
-      list-style: none;
-    }
-
-    .price-item {
+      background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%);
+      height: 100vh;
       display: flex;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px dashed #d1c4e9;
-      font-size: 1.1rem;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: #ffffff;
     }
 
-    .price-item:last-child {
-      border-bottom: none;
-    }
-
-    .price-name {
-      font-weight: 500;
-    }
-
-    .price-val {
-      font-weight: bold;
-      color: #8e24aa;
-    }
-
-    .contact-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    .card {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 40px 30px;
+      border-radius: 24px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
       max-width: 400px;
-      margin: 0 auto;
+      width: 90%;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 30px;
+      letter-spacing: 1px;
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .buttons-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      min-height: 60px;
+      position: relative;
     }
 
     .btn {
-      display: block;
-      text-align: center;
-      padding: 14px 20px;
-      border-radius: 25px;
-      text-decoration: none;
+      padding: 14px 32px;
+      font-size: 1.2rem;
       font-weight: bold;
-      font-size: 1.1rem;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
+      outline: none;
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
+    .btn-yes {
+      background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(0, 176, 155, 0.4);
     }
 
-    .btn-phone {
-      background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(142, 36, 170, 0.3);
+    .btn-yes:hover {
+      transform: scale(1.08);
+      box-shadow: 0 10px 25px rgba(0, 176, 155, 0.6);
     }
 
-    .btn-wa {
-      background-color: #25d366;
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    .btn-no {
+      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(255, 65, 108, 0.4);
+      position: absolute;
+      /* Начальное положение возле кнопки "Да" */
+      right: 20px; 
+      transition: top 0.2s ease, left 0.2s ease;
     }
 
-    footer {
+    /* Модальное окно победы */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      color: #222;
+      padding: 40px;
+      border-radius: 20px;
       text-align: center;
-      padding: 20px;
-      color: #6a1b9a;
-      font-size: 0.9rem;
-      font-weight: 500;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-content h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #2e7d32;
+    }
+
+    .modal-content p {
+      font-size: 1.2rem;
+      color: #555;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Кератиновое выпрямление & Ботокс</h1>
-    <div class="master-name">Мастер Александра</div>
-    <p>Идеальная гладкость, блеск и уход для ваших волос</p>
-  </header>
-
-  <!-- Фото мастера (загрузи master.jpg в репозиторий GitHub) -->
-  <div class="profile-photo">
-    <img src="master.jpg" alt="Мастер Александра" onerror="this.style.display='none'">
+  <div class="card">
+    <h1>Пойдёшь гулять?</h1>
+    <div class="buttons-container">
+      <button class="btn btn-yes" onclick="acceptInvitation()">Да!</button>
+      <button class="btn btn-no" id="noBtn">Нет</button>
+    </div>
   </div>
 
-  <div class="container">
-
-    <!-- Запись и контакты -->
-    <div class="section">
-      <h2>Записаться на процедуру</h2>
-      <div class="contact-buttons">
-        <a href="tel:+79330255501" class="btn btn-phone">📞 Позвонить: +7 (933) 025-55-01</a>
-        <a href="https://wa.me/79330255501" target="_blank" class="btn btn-wa">💬 Написать в WhatsApp</a>
-      </div>
+  <!-- Сообщение при согласии -->
+  <div class="modal" id="winModal">
+    <div class="modal-content">
+      <h2>Отлично! 🎉</h2>
+      <p>Я знал, что ты согласишься! Собирайся, выходим! 🚀</p>
     </div>
-
-    <!-- Описание процедур -->
-    <div class="section">
-      <h2>О процедурах</h2>
-      
-      <div class="info-card">
-        <h3>✨ Что такое Кератиновое выпрямление?</h3>
-        <p>Это процедура интенсивного восстановления и выпрямления волос. Кератин заполняет поврежденную структуру волоса, убирает пушистость и делает пряди идеально ровными.</p>
-        <ul>
-          <li>Полностью выпрямляет даже кудрявые и непослушные волосы</li>
-          <li>Придаёт глянцевый блеск и шелковистость</li>
-          <li>Защищает от влажности и облегчает ежедневную укладку</li>
-          <li>Эффект сохраняется от 3 до 6 месяцев</li>
-        </ul>
-      </div>
-
-      <hr style="border: none; border-top: 1px dashed #d1c4e9; margin: 20px 0;">
-
-      <div class="info-card">
-        <h3>💧 Что такое Ботокс для волос?</h3>
-        <p>Процедура глубокого питания и реконструкции. В отличие от кератина, ботокс больше направлен на оздоровление и уплотнение структуры, а не на сильное выпрямление.</p>
-        <ul>
-          <li>Убирает пушистость и разглаживает лёгкую волну</li>
-          <li>Питает сухие и повреждённые кончики</li>
-          <li>Возвращает эластичность и плотность</li>
-          <li>Эффект сохраняется от 1,5 до 3 месяцев</li>
-        </ul>
-      </div>
-    </div>
-    
-    <!-- Прайс-лист -->
-    <div class="section">
-      <h2>Услуги и цены</h2>
-      <ul class="price-list">
-        <li class="price-item">
-          <span class="price-name">Кератиновое выпрямление</span>
-          <span class="price-val">5 000 ₽</span>
-        </li>
-        <li class="price-item">
-          <span class="price-name">Ботокс для волос</span>
-          <span class="price-val">5 000 ₽</span>
-        </li>
-        <li class="price-item">
-          <span class="price-name">Комплексный уход и восстановление</span>
-          <span class="price-val">5 000 ₽</span>
-        </li>
-      </ul>
-    </div>
-
   </div>
 
-  <footer>
-    <p>© 2026 Мастер Александра | Кератин и Ботокс</p>
-  </footer>
+  <script>
+    const noBtn = document.getElementById('noBtn');
+    const winModal = document.getElementById('winModal');
+
+    // Функция убегания кнопки "Нет"
+    function moveButton() {
+      // Вычисляем случайные координаты внутри экрана
+      const maxX = window.innerWidth - noBtn.offsetWidth - 30;
+      const maxY = window.innerHeight - noBtn.offsetHeight - 30;
+
+      const randomX = Math.max(30, Math.floor(Math.random() * maxX));
+      const randomY = Math.max(30, Math.floor(Math.random() * maxY));
+
+      // Фиксируем позицию absolute по всему экрану
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = randomX + 'px';
+      noBtn.style.top = randomY + 'px';
+    }
+
+    // Реакция на клик, касание (для телефонов) или наведение мыши
+    noBtn.addEventListener('mouseenter', moveButton);
+    noBtn.addEventListener('touchstart', moveButton);
+    noBtn.addEventListener('click', moveButton);
+
+    // Функция при нажатии на "Да"
+    function acceptInvitation() {
+      winModal.style.display = 'flex';
+    }
+  </script>
 
 </body>
 </html>
