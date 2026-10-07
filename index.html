@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Кератин и Ботокс | Шушенское</title>
+  <title>Кератин и Ботокс | Мастер Александра</title>
   <style>
     * {
       box-sizing: border-box;
@@ -31,14 +31,20 @@
     header h1 {
       font-size: 2.2rem;
       color: #6a1b9a;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
       text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
     }
 
-    header p {
-      font-size: 1.1rem;
+    .master-name {
+      font-size: 1.3rem;
       color: #8e24aa;
-      font-weight: 500;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 1rem;
+      color: #555;
     }
 
     .profile-photo {
@@ -80,35 +86,6 @@
       font-size: 1.6rem;
       border-bottom: 2px solid #ab47bc;
       padding-bottom: 8px;
-    }
-
-    .music-player {
-      text-align: center;
-    }
-
-    .music-player p {
-      font-size: 1rem;
-      color: #4a148c;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .music-btn {
-      display: inline-block;
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%);
-      color: white;
-      border-radius: 25px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1rem;
-      box-shadow: 0 4px 12px rgba(142, 36, 170, 0.3);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .music-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(142, 36, 170, 0.4);
     }
 
     .info-card {
@@ -165,9 +142,39 @@
       color: #8e24aa;
     }
 
-    .location-info {
+    .contact-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .btn {
+      display: block;
       text-align: center;
+      padding: 14px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
       font-size: 1.1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-phone {
+      background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(142, 36, 170, 0.3);
+    }
+
+    .btn-wa {
+      background-color: #25d366;
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
     }
 
     footer {
@@ -183,19 +190,24 @@
 
   <header>
     <h1>Кератиновое выпрямление & Ботокс</h1>
+    <div class="master-name">Мастер Александра</div>
     <p>Идеальная гладкость, блеск и уход для ваших волос</p>
   </header>
 
   <!-- Фото мастера (загрузи master.jpg в репозиторий GitHub) -->
   <div class="profile-photo">
-    <img src="master.jpg" alt="Мастер" onerror="this.style.display='none'">
+    <img src="master.jpg" alt="Мастер Александра" onerror="this.style.display='none'">
   </div>
-    <!-- Кнопка с песней -->
-    <div class="section music-player">
-      <p>🎵 Любимый трек мастера</p>
-      <a href="https://music.yandex.ru/album/223631/track/2038782" target="_blank" class="music-btn">
-        ▶ Слушать: Баста — Обернись
-      </a>
+
+  <div class="container">
+
+    <!-- Запись и контакты -->
+    <div class="section">
+      <h2>Записаться на процедуру</h2>
+      <div class="contact-buttons">
+        <a href="tel:+79330255501" class="btn btn-phone">📞 Позвонить: +7 (933) 025-55-01</a>
+        <a href="https://wa.me/79330255501" target="_blank" class="btn btn-wa">💬 Написать в WhatsApp</a>
+      </div>
     </div>
 
     <!-- Описание процедур -->
@@ -246,23 +258,11 @@
       </ul>
     </div>
 
-    <!-- Адрес -->
-    <div class="section">
-      <h2>Место приема</h2>
-      <div class="location-info">
-        <p><strong>Посёлок городского типа Шушенское</strong></p>
-        <p>2-й микрорайон, дом 59, квартира 1</p>
-        <p style="margin-top: 10px; color: #666; font-size: 0.95rem;">Приём ведётся по предварительной записи</p>
-      </div>
-    </div>
-
   </div>
 
   <footer>
-    <p>© 2026 Красота и уход за волосами | Шушенское</p>
+    <p>© 2026 Мастер Александра | Кератин и Ботокс</p>
   </footer>
 
 </body>
 </html>
-
-  <div class="container">
