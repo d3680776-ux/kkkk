@@ -15,7 +15,6 @@
         }
 
         body {
-            /* Премиальная светлая текстура шёлковых волн на фоне */
             background: url('https://unsplash.com') no-repeat center center fixed;
             background-size: cover;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -68,7 +67,6 @@
             z-index: 5;
         }
 
-        /* КАРТОЧКИ С ЭФФЕКТОМ ДОРОГОГО МАТОВОГО СТЕКЛА */
         .glass-card {
             background: var(--card-bg);
             backdrop-filter: blur(15px);
@@ -86,7 +84,6 @@
             border-color: rgba(197, 168, 80, 0.5);
         }
 
-        /* КАРТОЧКА МАСТЕРА */
         .master-card {
             text-align: center;
             padding: 30px 25px;
@@ -94,7 +91,7 @@
 
         .photo-wrapper {
             width: 150px;
-            height: 150px;
+            height: 140px;
             border-radius: 50%;
             margin: 0 auto 18px auto;
             border: 3px solid var(--accent-gold);
@@ -143,9 +140,8 @@
             font-weight: 800;
         }
 
-        /* ГИД ПО ПРОЦЕДУРАМ */
         .guide-item {
-            text-align: left;
+        text-align: left;
         }
         .guide-heading {
             font-size: 16px;
@@ -179,7 +175,6 @@
         .badge-purple { background: rgba(155, 89, 182, 0.1); color: #8e44ad; border: 1px solid rgba(155, 89, 182, 0.25); }
         .badge-gold { background: rgba(212, 172, 13, 0.1); color: #b7950b; border: 1px solid rgba(212, 172, 13, 0.25); }
 
-        /* ПРАЙС-ЛИСТ */
         .service-item {
             display: flex;
             justify-content: space-between;
@@ -213,7 +208,6 @@
             margin-left: 15px;
         }
 
-        /* АДРЕС И КАРТА */
         .address-card {
             text-align: left;
         }
@@ -243,27 +237,47 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* КНОПКА WHATSAPP */
+        /* КНОПКИ СВЯЗИ */
+        .buttons-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
         .cta-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             text-decoration: none;
-            padding: 18px 20px;
+            padding: 16px 20px;
             border-radius: 35px;
             font-size: 15px;
             font-weight: bold;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-transform: uppercase;
             letter-spacing: 1px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .btn-wa {
             background: linear-gradient(135deg, #25d366 0%, #075e54 100%);
             box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
         }
-        .cta-btn:hover {
+        .btn-wa:hover {
             box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5);
             transform: translateY(-3px);
         }
+
+        .btn-phone {
+            background: linear-gradient(135deg, #54a0ff 0%, #2e86de 100%);
+            box-shadow: 0 6px 20px rgba(84, 160, 255, 0.3);
+        }
+        .btn-phone:hover {
+        box-shadow: 0 10px 25px rgba(84, 160, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
         .btn-icon {
             margin-right: 10px;
             font-size: 20px;
@@ -295,11 +309,10 @@
             <div class="master-bio">Сертифицированный топ-мастер премиального ухода. Преображаю сложные, тусклые и поврежденные волосы. Моя цель — не просто визуальный эффект, а полное восстановление здоровья, плотности и эластичности каждого волоска. Работаю исключительно на люксовых безопасных составах.</div>
         </div>
 
-        <!-- ГИД ПО ПРОЦЕДУРАМ (ЭНЦИКЛОПЕДИЯ ДЛЯ КЛИЕНТОВ) -->
+        <!-- ГИД ПО ПРОЦЕДУРАМ -->
         <div class="section-title">Гид по процедурам</div>
         <div class="procedures-guide">
             
             <!-- Холодное восстановление -->
             <div class="glass-card guide-item">
                 <div class="guide-heading"><span>🧪</span>Холодное восстановление</div>
-                <p class="guide-text">Глубокая терапия на молекулярном уровне для экстремально поврежденных волос. Процедура проводится <b>абсолютно без использования горячего утюжка</b>, поэтому она на 100% безопасна и лечит структуру. Состав проникает глубоко внутрь волоса (в кортекс) и реконструирует разорванные химические связи, восполняя дефицит аминокислот, влаги и липидов. Спасает «убитый» блонд, останавливает ломкость и возвращает природную эластичность.</p>
