@@ -3,385 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Игра на Three.js</title>
+    <title>3D Horror Maze: First Person</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #1a1a1a;
-            font-family: sans-serif;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            user-select: none;
         }
-        #info {
+        #ui {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
             color: #fff;
-            background: rgba(0,0,0,0.6);
-            padding: 10px 15px;
-            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 5px;
             pointer-events: none;
         }
+        .bar-container {
+            width: 160px;
+            height: 12px;
+            background: #222;
+            border: 1px solid #555;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .bar-fill {
+            height: 100%;
+            width: 100%;
+            background: #a00;
+            transition: width 0.1s;
+        }
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: none;
+        }
+        #blocker {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            text-align: center;
+            z-index: 20;
+            cursor: pointer;
+        }
+        #instructions {
+            font-size: 24px;
+        }
     </style>
-    <!-- Подключаем Three.js через CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-<div id="info">Управление: <b>WASD</b> или <b>Стрелочки</b></div>
+<div id="blocker">
+    <div id="instructions">
+        <span style="font-size:40px; color: #ff3333;">ПОБЕГ ИЗ ТЕМНОТЫ</span><br><br>
+        Кликни по экрану, чтобы начать<br>
+        <span style="font-size:16px; color: #aaa;">(WASD — Перемещение | Мышь — Оглядеться)</span>
+    </div>
+</div>
+
+<div id="crosshair"></div>
+
+<div id="ui">
+    <div>ЗДОРОВЬЕ:</div>
+    <div class="bar-container"><div id="hp-bar" class="bar-fill"></div></div>
+    <div id="status">КЛЮЧ: <span id="has-key" style="color: #888;">НЕТ</span></div>
+</div>
 
 <script>
-// --- 1. СЦЕНА, КАМЕРА И РЕНДЕРЕР ---
+// --- 1. СЦЕНА, КАМЕРА И ТУМАН ---
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb); // Небо (голубой цвет)
+scene.background = new THREE.Color(0x020202);
+scene.fog = new THREE.FogExp2(0x020202, 0.15); // Густой туман хоррора
 
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true; // Включаем тени
+renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
-// --- 2. ОСВЕЩЕНИЕ ---
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-scene.add(ambientLight);
-
-const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-dirLight.position.set(20, 40, 20);
-dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = 2048;
-dirLight.shadow.mapSize.height = 2048;
-scene.add(dirLight);
-
-// --- 3. 3D-КАРТА ---
-const CUBE_SIZE = 2;
-const map3D = [
-    [1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,1,0,0,0,2,1],
-    [1,0,1,1,1,0,1,0,1,1,0,1],
-    [1,0,1,0,0,0,0,0,0,1,0,1],
-    [1,0,1,0,1,1,1,1,0,1,0,1],
-    [1,0,0,0,1,0,0,0,0,1,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1]
+// --- 2. КАРТА (1: Стена, 0: Проход, 2: Выход, 3: Ключ) ---
+const CUBE_SIZE = 4;
+const map = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,3,1],
+    [1,0,1,0,1,0,1,1,1,1,0,1,0,1,0,1],
+    [1,0,1,0,0,0,0,0,0,1,0,0,0,1,0,1],
+    [1,0,1,1,1,1,0,1,0,1,1,1,0,1,0,1],
+    [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1],
+    [1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
+    [1,0,0,0,0,1,0,0,0,1,0,0,0,0,2,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
-const walls = []; // Для проверки столкновений
+const walls = [];
+let keyMesh = null;
+let exitMesh = null;
 
-function buildMap() {
+function buildMaze() {
     const wallGeo = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x7f8c8d });
-    const finishMat = new THREE.MeshStandardMaterial({ color: 0xf1c40f });
-
-    // Пол
-    const floorWidth = map3D[0].length * CUBE_SIZE;
-    const floorHeight = map3D.length * CUBE_SIZE;
-    const floorGeo = new THREE.PlaneGeometry(floorWidth, floorHeight);
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x27ae60 });
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x222225, roughness: 0.9 });
+    
+    // Пол и Потолок
+    const width = map[0].length * CUBE_SIZE;
+    const height = map.length * CUBE_SIZE;
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x111113, roughness: 0.8 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.set(floorWidth / 2 - CUBE_SIZE / 2, 0, floorHeight / 2 - CUBE_SIZE / 2);
-    floor.receiveShadow = true;
+    floor.position.set(width / 2 - CUBE_SIZE / 2, 0, height / 2 - CUBE_SIZE / 2);
     scene.add(floor);
 
-    // Стены
-    for (let r = 0; r < map3D.length; r++) {
-        for (let c = 0; c < map3D[r].length; c++) {
-            const tile = map3D[r][c];
-            if (tile === 1 || tile === 2) {
-                const mat = (tile === 1) ? wallMat : finishMat;
-                const cube = new THREE.Mesh(wallGeo, mat);
-                cube.position.set(c * CUBE_SIZE, CUBE_SIZE / 2, r * CUBE_SIZE);
-                cube.castShadow = true;
-                cube.receiveShadow = true;
-                scene.add(cube);
+    const ceiling = new THREE.Mesh(floorGeo, floorMat);
+    ceiling.rotation.x = Math.PI / 2;
+    ceiling.position.set(width / 2 - CUBE_SIZE / 2, CUBE_SIZE, height / 2 - CUBE_SIZE / 2);
+    scene.add(ceiling);
 
-                if (tile === 1) {
-                    walls.push(cube); // Сохраняем стену для коллизий
-                }
+    // Стены и объекты
+    for (let r = 0; r < map.length; r++) {
+        for (let c = 0; c < map[r].length; c++) {
+            const tile = map[r][c];
+            const x = c * CUBE_SIZE;
+            const z = r * CUBE_SIZE;
+
+            if (tile === 1) {
+                const wall = new THREE.Mesh(wallGeo, wallMat);
+                wall.position.set(x, CUBE_SIZE / 2, z);
+                scene.add(wall);
+                walls.push(wall);
+            } else if (tile === 3) {
+                // Золотой ключ
+                const keyGeo = new THREE.OctahedronGeometry(0.4);
+                const keyMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+                keyMesh = new THREE.Mesh(keyGeo, keyMat);
+                keyMesh.position.set(x, 1.5, z);
+                scene.add(keyMesh);
+            } else if (tile === 2) {
+                // Выход
+                const exitGeo = new THREE.BoxGeometry(CUBE_SIZE * 0.8, CUBE_SIZE * 0.8, 0.2);
+                const exitMat = new THREE.MeshBasicMaterial({ color: 0xaa0000 });
+                exitMesh = new THREE.Mesh(exitGeo, exitMat);
+                exitMesh.position.set(x, CUBE_SIZE / 2, z);
+                scene.add(exitMesh);
             }
         }
     }
 }
-buildMap();
+buildMaze();
 
-// --- 4. СОЗДАНИЕ 3D-ЧЕЛОВЕЧКА ---
-function createCharacter(colorHex) {
+// --- 3. ИГРОК И ФОНАРИК ---
+const player = {
+    hp: 100,
+    hasKey: false,
+    height: 1.6,
+    speed: 0.08
+};
+
+camera.position.set(CUBE_SIZE, player.height, CUBE_SIZE);
+
+// Фонарик игрока (SpotLight)
+const flashlight = new THREE.SpotLight(0xffeedd, 2, 20, Math.PI / 6, 0.5, 1);
+camera.add(flashlight);
+flashlight.position.set(0, 0, 0);
+flashlight.target.position.set(0, 0, -1);
+camera.add(flashlight.target);
+scene.add(camera);
+
+// Тусклый свет вокруг для видимости близких деталей
+const ambientLight = new THREE.AmbientLight(0x111118, 0.2);
+scene.add(ambientLight);
+
+// --- 4. МАКЕТ МОНСТРА ---
+function createMonster() {
     const group = new THREE.Group();
 
-    // Голова
-    const headGeo = new THREE.SphereGeometry(0.35, 16, 16);
-    const headMat = new THREE.MeshStandardMaterial({ color: 0xffe0bd });
-    const head = new THREE.Mesh(headGeo, headMat);
-    head.position.y = 1.6;
-    head.castShadow = true;
-    group.add(head);
-
-    // Глаза (чтобы видеть направление)
-    const eyeGeo = new THREE.BoxGeometry(0.08, 0.08, 0.08);
-    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-  const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-    leftEye.position.set(-0.12, 1.65, 0.3);
-    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-    rightEye.position.set(0.12, 1.65, 0.3);
-    group.add(leftEye, rightEye);
-
     // Тело
-    const bodyGeo = new THREE.BoxGeometry(0.5, 0.7, 0.3);
-    const bodyMat = new THREE.MeshStandardMaterial({ color: colorHex });
+    const bodyGeo = new THREE.CylinderGeometry(0.4, 0.2, 2.2, 8);
+    const bodyMat = new THREE.MeshBasicMaterial({ color: 0x880000 });
     const body = new THREE.Mesh(bodyGeo, bodyMat);
-    body.position.y = 1.05;
-    body.castShadow = true;
+    body.position.y = 1.1;
     group.add(body);
 
-    // Руки
-    const armGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.6);
-    const armMat = new THREE.MeshStandardMaterial({ color: colorHex });
-    const leftArm = new THREE.Mesh(armGeo, armMat);
-    leftArm.position.set(-0.35, 1.05, 0);
-    leftArm.castShadow = true;
-    const rightArm = new THREE.Mesh(armGeo, armMat);
-    rightArm.position.set(0.35, 1.05, 0);
-    rightArm.castShadow = true;
-    group.add(leftArm, rightArm);
+    // Горящие глаза
+    const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    
+    const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+    leftEye.position.set(-0.15, 1.8, -0.35);
 
-    // Ноги
-    const legGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.7);
-    const legMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50 });
-    const leftLeg = new THREE.Mesh(legGeo, legMat);
-    leftLeg.position.set(-0.15, 0.35, 0);
-    leftLeg.castShadow = true;
-    const rightLeg = new THREE.Mesh(legGeo, legMat);
-    rightLeg.position.set(0.15, 0.35, 0);
-    rightLeg.castShadow = true;
-    group.add(leftLeg, rightLeg);
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    rightEye.position.set(0.15, 1.8, -0.35);
 
+    group.add(leftEye, rightEye);
+
+    group.position.set(14 * CUBE_SIZE, 0, 7 * CUBE_SIZE);
     return group;
 }
+const monster = createMonster();
+scene.add(monster);
 
-// Игрок (синий)
-const player = createCharacter(0x3498db);
-player.position.set(2, 0, 2);
-scene.add(player);
+// --- 5. УПРАВЛЕНИЕ КАМЕРОЙ (Pointer Lock) ---
+const blocker = document.getElementById('blocker');
+let isLocked = false;
 
-// Враг / NPC (красный)
-const npc = createCharacter(0xe74c3c);
-npc.position.set(14, 0, 2);
-scene.add(npc);
+blocker.addEventListener('click', () => {
+    document.body.requestPointerLock();
+});
 
-// --- 5. УПРАВЛЕНИЕ И ФИЗИКА ---
+document.addEventListener('pointerlockchange', () => {
+    if (document.pointerLockElement === document.body) {
+        isLocked = true;
+        blocker.style.display = 'none';
+    } else {
+        isLocked = false;
+        blocker.style.display = 'flex';
+    }
+});
+
+let yaw = 0;
+let pitch = 0;
+
+document.addEventListener('mousemove', (e) => {
+    if (!isLocked) return;
+
+    yaw -= e.movementX * 0.002;
+    pitch -= e.movementY * 0.002;
+
+    // Ограничение наклона головы вверх/вниз
+    pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, pitch));
+
+    camera.rotation.order = "YXZ";
+    camera.rotation.y = yaw;
+    camera.rotation.x = pitch;
+});
+
+// WASD
 const keys = {};
 window.addEventListener('keydown', e => keys[e.code] = true);
 window.addEventListener('keyup', e => keys[e.code] = false);
 
-const speed = 0.08;
+// --- 6. ИГРОВАЯ ЛОГИКА И ЦИКЛ ---
+let isGameOver = false;
 
-function updatePlayer() {
-    let dx = 0;
-    let dz = 0;
+function update() {
+    if (!isLocked || isGameOver) return;
 
-    if (keys['KeyW'] || keys['ArrowUp']) dz -= speed;
-    if (keys['KeyS'] || keys['ArrowDown']) dz += speed;
-    if (keys['KeyA'] || keys['ArrowLeft']) dx -= speed;
-    if (keys['KeyD'] || keys['ArrowRight']) dx += speed;
+    // 1. Движение игрока
+    const moveVector = new THREE.Vector3();
+    if (keys['KeyW']) moveVector.z -= 1;
+    if (keys['KeyS']) moveVector.z += 1;
+    if (keys['KeyA']) moveVector.x -= 1;
+    if (keys['KeyD']) moveVector.x += 1;
 
-    if (dx !== 0 || dz !== 0) {
-        // Поворот человечка в сторону движения
-        const angle = Math.atan2(dx, dz);
-        player.rotation.y = angle;
+    moveVector.normalize();
+    moveVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
 
-        // Новая позиция
-        const nextX = player.position.x + dx;
-        const nextZ = player.position.z + dz;
+    const nextX = camera.position.x + moveVector.x * player.speed;
+    const nextZ = camera.position.z + moveVector.z * player.speed;
 
-        // Простая коллизия со стенами (радиус игрока = 0.4)
-        let collide = false;
-        for (let wall of walls) {
-            const box = new THREE.Box3().setFromObject(wall);
-            const playerBox = new THREE.Box3(
-                new THREE.Vector3(nextX - 0.3, 0, nextZ - 0.3),
-                new THREE.Vector3(nextX + 0.3, 2, nextZ + 0.3)
-            );
-            if (box.intersectsBox(playerBox)) {
-                collide = true;
-                break;
-            }
+    // Столкновение со стенами (простая коллизия по радиусу)
+    let collideX = false;
+    let collideZ = false;
+
+    for (let wall of walls) {
+        const box = new THREE.Box3().setFromObject(wall);
+        
+        if (box.intersectsSphere(new THREE.Sphere(new THREE.Vector3(nextX, player.height, camera.position.z), 0.5))) {
+            collideX = true;
         }
-
-        if (!collide) {
-            player.position.x = nextX;
-            player.position.z = nextZ;
+        if (box.intersectsSphere(new THREE.Sphere(new THREE.Vector3(camera.position.x, player.height, nextZ), 0.5))) {
+            collideZ = true;
         }
     }
 
-    // Камера следит за игроком
-    camera.position.x = player.position.x;
-    camera.position.y = player.position.y + 7;
-    camera.position.z = player.position.z + 8;
-    camera.lookAt(player.position);
+    if (!collideX) camera.position.x = nextX;
+    if (!collideZ) camera.position.z = nextZ;
+
+    // 2. Вращение ключа и подбор
+    if (keyMesh) {
+        keyMesh.rotation.y += 0.02;
+        if (camera.position.distanceTo(keyMesh.position) < 1.5) {
+            scene.remove(keyMesh);
+            keyMesh = null;
+            player.hasKey = true;
+            document.getElementById('has-key').innerText = "ЕСТЬ!";
+            document.getElementById('has-key').style.color = "#00ff00";
+            exitMesh.material.color.setHex(0x00ff00);
+        }
+    }
+
+    // 3. Побег через выход
+    if (exitMesh && camera.position.distanceTo(exitMesh.position) < 2.0) {
+        if (player.hasKey) {
+            isGameOver = true;
+            alert("ВЫ ВЫЖИЛИ И ВЫБРАЛИСЬ ИЗ ЛАБИРИНТА!");
+            document.exitPointerLock();
+        }
+    }
+
+    // 4. Движение Монстра
+    const distToMonster = camera.position.distanceTo(monster.position);
+    monster.lookAt(camera.position.x, 0, camera.position.z);
+
+    if (distToMonster < 25) { // Агро-радиус
+        const mSpeed = 0.045;
+        monster.translateZ(mSpeed);
+
+        // Урон игроку при касании
+        if (distToMonster < 1.8) {
+            player.hp -= 1.0;
+            document.getElementById('hp-bar').style.width = Math.max(0, player.hp) + '%';
+
+            // Эффект тряски при получении урона
+            camera.position.y = player.height + (Math.random() - 0.5) * 0.1;
+
+            if (player.hp <= 0) {
+                isGameOver = true;
+                alert("МОНСТР ПОЙМАЛ ВАС...");
+                document.exitPointerLock();
+            }
+        } else {
+            camera.position.y = player.height;
+        }
+    }
+
+    // Мерцание фонарика от страха
+    flashlight.intensity = 2 + (Math.random() < 0.05 ? (Math.random() - 0.5) * 1.5 : 0);
 }
 
-// Изменение размера окна
+function animate() {
+    requestAnimationFrame(animate);
+    update();
+    renderer.render(scene, camera);
+}
+
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// --- 6. ИГРОВОЙ ЦИКЛ ---
-function animate() {
-    requestAnimationFrame(animate);
-    updatePlayer();
-    renderer.render(scene, camera);
-}
-
 animate();
 </script>
 
-// Переменные для прыжка и гравитации
-let vy = 0;              // Текущая вертикальная скорость
-const gravity = -0.015;  // Сила гравитации (притягивает вниз)
-const jumpForce = 0.35;  // Сила импульса при прыжке
-let isGrounded = true;   // Находится ли персонаж на земле
-
-// При нажатии Пробела, если игрок на земле — задаем импульс вверх
-window.addEventListener('keydown', e => {
-    keys[e.code] = true;
-    
-    if (e.code === 'Space' && isGrounded) {
-        vy = jumpForce;
-        isGrounded = false;
-    }
-});
-
-function updatePlayer() {
-    let dx = 0;
-    let dz = 0;
-
-    // Горизонтальное движение (WASD / Стрелочки)
-    if (keys['KeyW'] || keys['ArrowUp']) dz -= speed;
-    if (keys['KeyS'] || keys['ArrowDown']) dz += speed;
-    if (keys['KeyA'] || keys['ArrowLeft']) dx -= speed;
-    if (keys['KeyD'] || keys['ArrowRight']) dx += speed;
-
-    if (dx !== 0 || dz !== 0) {
-        // Поворот человечка в сторону движения
-        const angle = Math.atan2(dx, dz);
-        player.rotation.y = angle;
-
-        // Новые координаты X и Z
-        const nextX = player.position.x + dx;
-        const nextZ = player.position.z + dz;
-
-        // Проверка столкновений со стенами
-        let collide = false;
-        for (let wall of walls) {
-            const box = new THREE.Box3().setFromObject(wall);
-            const playerBox = new THREE.Box3(
-                new THREE.Vector3(nextX - 0.3, player.position.y, nextZ - 0.3),
-                new THREE.Vector3(nextX + 0.3, player.position.y + 2, nextZ + 0.3)
-            );
-            if (box.intersectsBox(playerBox)) {
-                collide = true;
-                break;
-            }
-        }
-
-        if (!collide) {
-            player.position.x = nextX;
-            player.position.z = nextZ;
-        }
-    }
-
-    // --- ФИЗИКА ПРЫЖКА И ГРАВИТАЦИИ ---
-    player.position.y += vy; // Применяем скорость к Y
-    vy += gravity;           // Гравитация тянет скорость вниз
-
-    // Проверка приземления на пол (высота Y = 0)
-    if (player.position.y <= 0) {
-        player.position.y = 0;
-        vy = 0;
-        isGrounded = true; // Игрок снова на земле и может прыгать
-    }
-
-    // Слежение камеры за игроком с учетом высоты
-    camera.position.x = player.position.x;
-    camera.position.y = player.position.y + 7;
-    camera.position.z = player.position.z + 8;
-    camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
-}
-
-function updatePlayer() {
-    let dx = 0;
-    let dz = 0;
-
-    // 1. Управление (WASD / Стрелочки)
-    if (keys['KeyW'] || keys['ArrowUp']) dz -= speed;
-    if (keys['KeyS'] || keys['ArrowDown']) dz += speed;
-    if (keys['KeyA'] || keys['ArrowLeft']) dx -= speed;
-    if (keys['KeyD'] || keys['ArrowRight']) dx += speed;
-
-    if (dx !== 0 || dz !== 0) {
-        // Поворот человечка в сторону движения
-        const angle = Math.atan2(dx, dz);
-        player.rotation.y = angle;
-
-        const nextX = player.position.x + dx;
-        const nextZ = player.position.z + dz;
-
-        // 2. Проверка боковых столкновений со стенами
-        let collide = false;
-        for (let wall of walls) {
-            const box = new THREE.Box3().setFromObject(wall);
-            
-            // Если игрок находиться НИЖЕ вершины стены, проверяем врезание в бок
-            if (player.position.y < CUBE_SIZE - 0.2) {
-                const playerBox = new THREE.Box3(
-                    new THREE.Vector3(nextX - 0.3, player.position.y, nextZ - 0.3),
-                    new THREE.Vector3(nextX + 0.3, player.position.y + 2, nextZ + 0.3)
-                );
-                if (box.intersectsBox(playerBox)) {
-                    collide = true;
-                    break;
-                }
-            }
-        }
-
-        if (!collide) {
-            player.position.x = nextX;
-            player.position.z = nextZ;
-        }
-    }
-
-    // 3. Расчет уровня земли под ногами
-    // Определяем текущую ячейку карты под игроком
-    const tileCol = Math.round(player.position.x / CUBE_SIZE);
-    const tileRow = Math.round(player.position.z / CUBE_SIZE);
-
-    let groundY = 0; // По умолчанию пол на Y = 0
-
-    // Проверяем, есть ли под нами блок стены
-    if (map3D[tileRow] && map3D[tileRow][tileCol] === 1) {
-        groundY = CUBE_SIZE; // Верхняя грань блока на Y = 2
-    }
-
-    // 4. Физика падения и приземления
-    player.position.y += vy;
-    vy += gravity;
-
-    // Приземление на рассчитанную высоту (на пол или на блок)
-    if (player.position.y <= groundY) {
-        player.position.y = groundY;
-        vy = 0;
-        isGrounded = true;
-    } else {
-        isGrounded = false; // Если спрыгнули с блока, игрок начинает падать
-    }
-
-    // 5. Слежение камеры за игроком
-    camera.position.x = player.position.x;
-    camera.position.y = player.position.y + 7;
-    camera.position.z = player.position.z + 8;
-    camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
-}
-
 </body>
 </html>
+
+    const floorGeo = new THREE.PlaneGeometry(width, height);
