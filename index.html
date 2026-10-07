@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кератин и Ботокс волос в Шушенском | Александра</title>
+    <title>Александра | Экспертная реконструкция волос Шушенское</title>
     <style>
         :root {
-            --bg-color: #0d0e15;
-            --card-bg: #161922;
-            --accent-gold: #e5c158;
-            --accent-pink: #ff7597;
-            --text-main: #ffffff;
-            --text-muted: #a4b0be;
+            --accent-gold: #c5a850;
+            --accent-dark: #2c2512;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #1e2229;
+            --text-muted: #57606f;
+            --border-glow: rgba(197, 168, 80, 0.25);
         }
 
         body {
-            background-color: var(--bg-color);
+            /* Премиальная светлая текстура шёлковых волн на фоне */
+            background: url('https://unsplash.com') no-repeat center center fixed;
+            background-size: cover;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-main);
             margin: 0;
@@ -31,147 +33,197 @@
             text-align: center;
             padding: 40px 20px 20px 20px;
             box-sizing: border-box;
+            z-index: 5;
         }
 
         .logo-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-            animation: heartBeat 2.5s infinite ease-in-out;
+            font-size: 35px;
+            margin-bottom: 8px;
+            animation: floatAnim 3s infinite ease-in-out;
         }
 
         h1 {
             font-size: 28px;
-            font-weight: 700;
+            font-weight: 800;
             margin: 0;
-            letter-spacing: 1px;
-            background: linear-gradient(to right, var(--accent-gold), var(--accent-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            color: var(--accent-dark);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .subtitle {
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-muted);
             margin-top: 8px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            font-weight: 600;
         }
 
         .main-container {
             width: 100%;
-            max-width: 450px;
-            padding: 0 20px 40px 20px;
+            max-width: 460px;
+            padding: 0 20px 50px 20px;
             box-sizing: border-box;
             z-index: 5;
         }
 
-        /* КАРТОЧКА МАСТЕРА */
-        .master-card {
+        /* КАРТОЧКИ С ЭФФЕКТОМ ДОРОГОГО МАТОВОГО СТЕКЛА */
+        .glass-card {
             background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-radius: 24px;
             padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(165, 140, 70, 0.1), 0 4px 12px rgba(0,0,0,0.03);
             margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            box-shadow: 0 15px 35px rgba(165, 140, 70, 0.15);
+            border-color: rgba(197, 168, 80, 0.5);
         }
 
-        /* Фото вашей сестры */
+        /* КАРТОЧКА МАСТЕРА */
+        .master-card {
+            text-align: center;
+            padding: 30px 25px;
+        }
+
         .photo-wrapper {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
-            margin: 0 auto 15px auto;
+            margin: 0 auto 18px auto;
             border: 3px solid var(--accent-gold);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 25px rgba(165, 140, 70, 0.3);
             overflow: hidden;
+            background: #fff;
         }
         .photo-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center 20%;
+            object-position: center 25%;
         }
 
         .master-name {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: var(--text-main);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            color: var(--accent-dark);
+        }
+
+        .master-status {
+            font-size: 12px;
+            color: var(--accent-gold);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
         }
 
         .master-bio {
             font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.5;
+            color: #333333;
+            line-height: 1.6;
+            font-weight: 500;
         }
 
-        /* БЛОК УСЛУГ */
         .section-title {
-            font-size: 15px;
-            color: var(--accent-gold);
+            font-size: 13px;
+            color: var(--accent-dark);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin: 25px 0 12px 5px;
+            letter-spacing: 2px;
+            margin: 35px 0 12px 5px;
             text-align: left;
-            font-weight: bold;
+            font-weight: 800;
         }
 
-        .services-list {
-            background: var(--card-bg);
+        /* ГИД ПО ПРОЦЕДУРАМ */
+        .guide-item {
+            text-align: left;
+        }
+        .guide-heading {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .guide-heading span {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        .guide-text {
+            font-size: 14px;
+            color: #2c3e50;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .guide-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 12px;
             border-radius: 20px;
-            padding: 10px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            margin-bottom: 25px;
+            margin-top: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+        .badge-blue { background: rgba(52, 152, 219, 0.1); color: #2980b9; border: 1px solid rgba(52, 152, 219, 0.25); }
+        .badge-purple { background: rgba(155, 89, 182, 0.1); color: #8e44ad; border: 1px solid rgba(155, 89, 182, 0.25); }
+        .badge-gold { background: rgba(212, 172, 13, 0.1); color: #b7950b; border: 1px solid rgba(212, 172, 13, 0.25); }
 
+        /* ПРАЙС-ЛИСТ */
         .service-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
         .service-item:last-child {
             border-bottom: none;
         }
-
         .service-info {
             text-align: left;
         }
         .service-name {
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--accent-dark);
         }
         .service-desc {
-        font-size: 12px;
+            font-size: 12.5px;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 5px;
+            line-height: 1.4;
+            font-weight: 500;
         }
         .service-price {
-            font-size: 15px;
-            font-weight: bold;
-            color: var(--accent-pink);
+            font-size: 16px;
+            font-weight: 800;
+            color: #c0392b;
             white-space: nowrap;
-            margin-left: 10px;
+            margin-left: 15px;
         }
 
-        /* БЛОК АДРЕСА */
+        /* АДРЕС И КАРТА */
         .address-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
             text-align: left;
-            margin-bottom: 25px;
         }
-
         .address-line {
             display: flex;
             align-items: flex-start;
             margin-bottom: 15px;
             font-size: 14px;
             line-height: 1.4;
+            color: #2c3e50;
         }
         .address-line:last-of-type {
             margin-bottom: 0;
@@ -181,130 +233,73 @@
             margin-right: 12px;
             margin-top: 2px;
         }
-
         .map-wrapper {
             width: 100%;
             height: 220px;
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: hidden;
             margin-top: 15px;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* КНОПКИ СВЯЗИ */
-        .buttons-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
+        /* КНОПКА WHATSAPP */
         .cta-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             text-decoration: none;
-            padding: 16px 20px;
-            border-radius: 30px;
+            padding: 18px 20px;
+            border-radius: 35px;
             font-size: 15px;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .btn-wa {
+            letter-spacing: 1px;
             background: linear-gradient(135deg, #25d366 0%, #075e54 100%);
-            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
         }
-        .btn-wa:hover {
-            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
-            transform: translateY(-2px);
+        .cta-btn:hover {
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5);
+            transform: translateY(-3px);
         }
-
-        .btn-phone {
-            background: linear-gradient(135deg, #54a0ff 0%, #2e86de 100%);
-            box-shadow: 0 5px 15px rgba(84, 160, 255, 0.2);
-        }
-        .btn-phone:hover {
-            box-shadow: 0 8px 20px rgba(84, 160, 255, 0.4);
-            transform: translateY(-2px);
-        }
-
         .btn-icon {
-            margin-right: 8px;
-            font-size: 18px;
+            margin-right: 10px;
+            font-size: 20px;
         }
 
-        @keyframes heartBeat {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-icon">✨</div>
-        <h1>Кератин & Ботокс</h1>
-        <div class="subtitle">Идеальные волосы • Шушенское</div>
+        <div class="logo-icon">👑</div>
+        <h1>АЛЕКСАНДРА</h1>
+        <div class="subtitle">Premium Реконструкция Волос • Шушенское</div>
     </header>
 
     <div class="main-container">
         
         <!-- Карточка мастера Александра -->
-        <div class="master-card">
+        <div class="glass-card master-card">
             <div class="photo-wrapper">
-                <img src="https://oneme.ru" alt="Мастер Александра">
+                <img src="https://oneme.ru" alt="Александра">
             </div>
-            <div class="master-name">Мастер Александра</div>
-            <div class="master-bio">Сертифицированный мастер реконструкции волос. Подарю вашим волосам зеркальный блеск, невероятную гладкость и избавлю от пушка на срок до 6 месяцев! Работаю только на составах премиум-класса.</div>
+            <div class="master-name">Александра</div>
+            <div class="master-status">Top Expert Hair Reconstruction</div>
+            <div class="master-bio">Сертифицированный топ-мастер премиального ухода. Преображаю сложные, тусклые и поврежденные волосы. Моя цель — не просто визуальный эффект, а полное восстановление здоровья, плотности и эластичности каждого волоска. Работаю исключительно на люксовых безопасных составах.</div>
         </div>
 
-        <!-- Прайс-лист -->
-        <div class="section-title">Услуги и цены</div>
-        <div class="services-list">
-            <div class="service-item">
-                <div class="service-info">
-                    <div class="service-name">Кератиновое выпрямление</div>
-                    <div class="service-desc">Выпрямление завитков любого типа, глянцевый блеск и гладкость.</div>
-                </div>
-                <div class="service-price">от 2 500 ₽</div>
-            </div>
-            <div class="service-item">
-                <div class="service-info">
-                    <div class="service-name">Ботокс для волос</div>
-                    <div class="service-desc">Глубокое питание, увлажнение структуры и устранение пушистости.</div>
-                </div>
-                <div class="service-price">от 2 000 ₽</div>
-            </div>
-            <div class="service-item">
-                <div class="service-info">
-                    <div class="service-name">Холодное восстановление</div>
-                    <div class="service-desc">Интенсивная реанимация поврежденных и ломких волос без утюжка.</div>
-                </div>
-                <div class="service-price">от 1 500 ₽</div>
-            </div>
-        </div>
-
-        <!-- Контакты и местоположение -->
-        <div class="section-title">Контакты и адрес</div>
-        <div class="address-card">
-            <div class="address-line">
-                <span class="address-icon">📍</span>
-                <span><b>Адрес:</b><br>пгт. Шушенское, 2-й микрорайон, дом 59</span>
-            </div>
-            <div class="address-line">
-                <span class="address-icon">🏢</span>
-                <span><b>Ориентир:</b><br>Рядом находится известное кафе «Садко» (Первомайская, 1). От него до студии всего 2 минуты ходьбы!</span>
-            </div>
+        <!-- ГИД ПО ПРОЦЕДУРАМ (ЭНЦИКЛОПЕДИЯ ДЛЯ КЛИЕНТОВ) -->
+        <div class="section-title">Гид по процедурам</div>
+        <div class="procedures-guide">
             
-            <!-- Интерактивная карта Яндекс -->
-            <div class="map-wrapper">
-                <iframe src="https://yandex.ru" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
-            </div>
-        </div>
-        
+            <!-- Холодное восстановление -->
+            <div class="glass-card guide-item">
+                <div class="guide-heading"><span>🧪</span>Холодное восстановление</div>
+                <p class="guide-text">Глубокая терапия на молекулярном уровне для экстремально поврежденных волос. Процедура проводится <b>абсолютно без использования горячего утюжка</b>, поэтому она на 100% безопасна и лечит структуру. Состав проникает глубоко внутрь волоса (в кортекс) и реконструирует разорванные химические связи, восполняя дефицит аминокислот, влаги и липидов. Спасает «убитый» блонд, останавливает ломкость и возвращает природную эластичность.</p>
