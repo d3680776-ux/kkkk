@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ru">
+>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -163,6 +162,47 @@
     }
 
     // Если музыка доиграла до конца, выключаем анимацию
+    audio.addEventListener('ended', () => {
+        card.classList.remove('playing');
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        mainBtn.classList.remove('paused-style');
+    });
+</script>
+</body>
+</html>
+<svg class="btn-svg" id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg class="btn-svg" id="icon-pause" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+        </div>
+    </div>
+
+<script>
+    const audio = document.getElementById('custom-audio');
+    const playIcon = document.getElementById('icon-play');
+    const pauseIcon = document.getElementById('icon-pause');
+    const mainBtn = document.getElementById('music-btn-trigger');
+    const card = document.getElementById('main-player-card');
+
+    function handlePlayPause() {
+        if (audio.paused) {
+            audio.play().then(() => {
+                card.classList.add('playing'); 
+                playIcon.style.display = 'none'; 
+                pauseIcon.style.display = 'block'; 
+                mainBtn.classList.add('paused-style');
+            }).catch((err) => {
+                console.log("Требуется клик по экрану");
+            });
+        } else {
+            audio.pause(); 
+            card.classList.remove('playing'); 
+            playIcon.style.display = 'block'; 
+            pauseIcon.style.display = 'none'; 
+            mainBtn.classList.remove('paused-style');
+        }
+    }
+
     audio.addEventListener('ended', () => {
         card.classList.remove('playing');
         playIcon.style.display = 'block';
