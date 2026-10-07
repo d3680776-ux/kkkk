@@ -3,430 +3,474 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Игровой Портал | 4 в 1</title>
+  <title>3D Стрелялка | 2 Оружия</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     body {
-      background: #0f172a;
-      color: #f8fafc;
-      min-height: 100vh;
+      overflow: hidden;
+      background-color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: none;
+    }
+
+    /* Прицел */
+    #crosshair {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      margin-top: -5px;
+      margin-left: -5px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 2px solid rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Интерфейс (HUD) */
+    #hud {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      pointer-events: none;
+      z-index: 10;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding-bottom: 30px;
+      gap: 8px;
     }
 
-    header {
-      text-align: center;
-      padding: 20px 20px 10px 20px;
+    .hud-item {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    header h1 {
-      font-size: 2rem;
-      color: #38bdf8;
-      margin-bottom: 10px;
-    }
-
-    /* Блок с музыкой VK / Mail.ru */
-    .music-container {
-      background: #1e293b;
-      border: 1px solid #334155;
-      padding: 15px 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      text-align: center;
-      width: 90%;
-      max-width: 450px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-
-    .music-container p {
-      font-size: 0.95rem;
-      color: #38bdf8;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-
-    .music-btn {
-      display: inline-block;
-      padding: 8px 18px;
-      background: linear-gradient(135deg, #0077ff 0%, #0055b8 100%);
-      color: white;
-      border-radius: 20px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 0.9rem;
-      transition: background 0.2s;
-    }
-
-    .music-btn:hover {
-      background: #0055b8;
-    }
-
-    audio {
+    /* Стартовый экран */
+    #blocker {
+      position: absolute;
       width: 100%;
-      height: 36px;
-      margin-top: 10px;
-    }
-
-    /* Меню переключения игр */
-    .nav-tabs {
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75);
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      flex-direction: column;
       justify-content: center;
-      padding: 0 10px;
-    }
-
-    .tab-btn {
-      background: #1e293b;
-      color: #94a3b8;
-      border: 2px solid #334155;
-      padding: 10px 18px;
-      border-radius: 12px;
+      align-items: center;
+      color: #fff;
+      z-index: 20;
       cursor: pointer;
-      font-weight: bold;
-      transition: all 0.2s;
     }
 
-    .tab-btn.active, .tab-btn:hover {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #38bdf8;
-    }
-
-    /* Игровой контейнер */
-    .game-container {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px;
-      width: 90%;
-      max-width: 450px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 420px;
-    }
-
-    .game-panel {
-      display: none;
-      width: 100%;
-      flex-direction: column;
-      align-items: center;
+    #instructions {
       text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .game-panel.active {
-      display: flex;
-    }
-
-    h2 {
+    #instructions h1 {
+      font-size: 2.5rem;
       margin-bottom: 15px;
       color: #38bdf8;
     }
 
-    button.btn {
-      background: #0284c7;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.2s;
-    }
-
-    button.btn:hover {
-      background: #0369a1;
-    }
-
-    /* 1. Змейка */
-    #snakeCanvas {
-      background: #0f172a;
-      border: 2px solid #334155;
-      border-radius: 8px;
-    }
-
-    /* 2. Крестики-нолики */
-    .tic-board {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      width: 240px;
-      height: 240px;
-      margin: 15px 0;
-    }
-
-    .tic-cell {
-      background: #0f172a;
-      border: 2px solid #334155;
-      border-radius: 8px;
-      font-size: 2.5rem;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      color: #f8fafc;
-    }
-
-    /* 3. Кликер */
-    .clicker-btn {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #e11d48, #be123c);
-      color: white;
-      font-size: 1.5rem;
-      font-weight: bold;
-      border: 4px solid #fda4af;
-      box-shadow: 0 6px 15px rgba(225, 29, 72, 0.4);
-      cursor: pointer;
-      margin: 20px 0;
-      transition: transform 0.1s;
-    }
-
-    .clicker-btn:active {
-      transform: scale(0.92);
-    }
-
-    /* 4. Угадай число */
-    .guess-input {
-      padding: 10px;
-      border-radius: 8px;
-      border: 2px solid #334155;
-      background: #0f172a;
-      color: white;
-      font-size: 1.2rem;
-      width: 120px;
-      text-align: center;
-      margin: 15px 0;
+    #instructions p {
+      font-size: 1.1rem;
+      margin: 8px 0;
+      color: #cbd5e1;
     }
   </style>
+
+  <!-- Подключаем Three.js и PointerLockControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
 </head>
 <body>
 
-  <header>
-    <h1>🎮 Мини-игры</h1>
-  </header>
+  <div id="crosshair"></div>
 
-  <!-- Блок фоновой музыки Mail.ru / VK -->
-  <div class="music-container">
-    <p>🎵 Музыка: Баста — Осень</p>
-    <a href="https://vk.com/audio" target="_blank" class="music-btn">
-      ▶ Открыть в VK Музыке (Mail.ru)
-    </a>
-    <audio controls>
-      <source src="song.mp3" type="audio/mpeg">
-      Ваш браузер не поддерживает аудиоплеер.
-    </audio>
+  <div id="hud">
+    <div class="hud-item">❤️ Здоровье: <span id="health">100</span></div>
+    <div class="hud-item">💥 Счёт: <span id="score">0</span></div>
+    <div class="hud-item">🔫 Оружие: <span id="weaponName">Пистолет</span></div>
+    <div class="hud-item">📦 Патроны: <span id="ammo">12 / 12</span></div>
   </div>
 
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchGame('snake')">🐍 Змейка</button>
-    <button class="tab-btn" onclick="switchGame('ticTacToe')">❌⭕ Крестики</button>
-    <button class="tab-btn" onclick="switchGame('clicker')">💥 Кликер</button>
-    <button class="tab-btn" onclick="switchGame('guess')">🔢 Угадай число</button>
-  </div>
-
-  <div class="game-container">
-    
-    <!-- ИГРА 1: Змейка -->
-    <div id="snake" class="game-panel active">
-      <h2>Змейка</h2>
-      <p style="margin-bottom: 10px;">Счёт: <span id="snakeScore">0</span></p>
-      <canvas id="snakeCanvas" width="300" height="300"></canvas>
-      <button class="btn" onclick="resetSnake()">Перезапустить</button>
+  <div id="blocker">
+    <div id="instructions">
+      <h1>3D ШУТЕР</h1>
+      <p>Кликни мышкой по экрану, чтобы начать игру</p>
+      <br>
+      <p><b>W, A, S, D</b> — Движение</p>
+      <p><b>Пробел</b> — Прыжок</p>
+      <p><b>1 / 2</b> — Выбор оружия (1: Пистолет, 2: Автомат)</p>
+      <p><b>ЛКМ</b> — Стрелять (Автомат стреляет при зажатии!)</p>
+      <p><b>R</b> — Перезарядка</p>
     </div>
-
-    <!-- ИГРА 2: Крестики-Нолики -->
-    <div id="ticTacToe" class="game-panel">
-      <h2>Крестики-Нолики</h2>
-      <p id="ticStatus">Ход игрока X</p>
-      <div class="tic-board" id="ticBoard"></div>
-      <button class="btn" onclick="resetTic()">Сбросить игру</button>
-    </div>
-
-    <!-- ИГРА 3: Кликер -->
-    <div id="clicker" class="game-panel">
-      <h2>Кликер</h2>
-      <p style="font-size: 1.2rem;">Кликов: <span id="clickCount">0</span></p>
-      <button class="clicker-btn" onclick="addClick()">КЛИК!</button>
-      <button class="btn" onclick="resetClicker()">Сбросить</button>
-    </div>
-
-    <!-- ИГРА 4: Угадай число -->
-    <div id="guess" class="game-panel">
-      <h2>Угадай число (1-100)</h2>
-      <p id="guessHint">Загадано число от 1 до 100.</p>
-      <input type="number" id="guessInput" class="guess-input" min="1" max="100" placeholder="?" />
-      <button class="btn" onclick="checkGuess()">Проверить</button>
-    </div>
-
   </div>
 
   <script>
-    // Переключение между играми
-    function switchGame(gameId) {
-      document.querySelectorAll('.game-panel').forEach(panel => panel.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      
-      document.getElementById(gameId).classList.add('active');
-      event.currentTarget.classList.add('active');
-    }
+    let camera, scene, renderer, controls;
+    let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false, canJump = false;
+    let prevTime = performance.now();
+    const velocity = new THREE.Vector3();
+    const direction = new THREE.Vector3();
 
-    /* --- 1. ЛОГИКА ЗМЕЙКИ --- */
-    const canvas = document.getElementById("snakeCanvas");
-    const ctx = canvas.getContext("2d");
-    const grid = 15;
-    let snake = [{x: 150, y: 150}];
-    let dx = grid, dy = 0;
-    let food = {x: 60, y: 60};
-    let snakeScore = 0;
+    // Игровые параметры
+    let health = 100;
+    let score = 0;
 
-    function gameLoopSnake() {
-      const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-
-      if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
-        return resetSnake();
+    // Конфигурации оружия
+    const weapons = {
+      1: {
+        name: 'Пистолет',
+        maxAmmo: 12,
+        ammo: 12,
+        reloadTime: 1500,
+        fireRate: 250, // мс между выстрелами
+        automatic: false,
+        damage: 10
+      },
+      2: {
+        name: 'Автомат',
+        maxAmmo: 30,
+        ammo: 30,
+        reloadTime: 2500,
+        fireRate: 100, // мс между выстрелами (высокий темп)
+        automatic: true,
+        damage: 10
       }
+    };
 
-      for (let segment of snake) {
-        if (head.x === segment.x && head.y === segment.y) return resetSnake();
-      }
+    let currentWeaponId = 1;
+    let isReloading = false;
+    let isMouseDown = false;
+    let lastShootTime = 0;
 
-      snake.unshift(head);
+    // Враги и пули
+    const enemies = [];
+    const raycaster = new THREE.Raycaster();
+    
+    // Модели оружия
+    let pistolGroup, rifleGroup;
+    let pistolFlash, rifleFlash;
 
-      if (head.x === food.x && head.y === food.y) {
-        snakeScore += 10;
-        document.getElementById('snakeScore').textContent = snakeScore;
-        food = {
-          x: Math.floor(Math.random() * (canvas.width / grid)) * grid,
-          y: Math.floor(Math.random() * (canvas.height / grid)) * grid
-        };
-      } else {
-      snake.pop();
-      }
+    init();
+    animate();
 
-      ctx.fillStyle = "#0f172a";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function init() {
+      // 1. Сцена и камера
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0f172a);
+      scene.fog = new THREE.Fog(0x0f172a, 0, 75);
 
-      ctx.fillStyle = "#ef4444";
-      ctx.fillRect(food.x, food.y, grid - 2, grid - 2);
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.y = 1.6;
 
-      ctx.fillStyle = "#22c55e";
-      snake.forEach(segment => ctx.fillRect(segment.x, segment.y, grid - 2, grid - 2));
-    }
+      // 2. Освещение
+      const light = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+      light.position.set(0.5, 1, 0.75);
+      scene.add(light);
 
-    function resetSnake() {
-      snake = [{x: 150, y: 150}];
-      dx = grid; dy = 0;
-      snakeScore = 0;
-      document.getElementById('snakeScore').textContent = snakeScore;
-    }
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      dirLight.position.set(10, 20, 10);
+      scene.add(dirLight);
 
-    document.addEventListener("keydown", e => {
-      if (e.key === "ArrowUp" && dy === 0) { dx = 0; dy = -grid; }
-      if (e.key === "ArrowDown" && dy === 0) { dx = 0; dy = grid; }
-      if (e.key === "ArrowLeft" && dx === 0) { dx = -grid; dy = 0; }
-      if (e.key === "ArrowRight" && dx === 0) { dx = grid; dy = 0; }
-    });
+      // 3. Управление (Pointer Lock)
+      controls = new THREE.PointerLockControls(camera, document.body);
 
-    setInterval(gameLoopSnake, 100);
+      const blocker = document.getElementById('blocker');
+      blocker.addEventListener('click', () => controls.lock());
 
-    /* --- 2. ЛОГИКА КРЕСТИКОВ-НОЛИКОВ --- */
-    let ticBoardState = ["", "", "", "", "", "", "", "", ""];
-    let currentPlayer = "X";
-    let ticActive = true;
-    const ticBoard = document.getElementById("ticBoard");
+      controls.addEventListener('lock', () => blocker.style.display = 'none');
+      controls.addEventListener('unlock', () => blocker.style.display = 'flex');
 
-    function initTic() {
-      ticBoard.innerHTML = "";
-      ticBoardState.forEach((val, index) => {
-        const cell = document.createElement("div");
-        cell.classList.add("tic-cell");
-        cell.textContent = val;
-        cell.addEventListener("click", () => handleTicClick(index));
-        ticBoard.appendChild(cell);
-      });
-    }
+      scene.add(controls.getObject());
 
-    function handleTicClick(index) {
-      if (ticBoardState[index] !== "" || !ticActive) return;
-      ticBoardState[index] = currentPlayer;
-      checkTicWinner();
-      if (ticActive) {
-        currentPlayer = currentPlayer === "X" ? "O" : "X";
-        document.getElementById("ticStatus").textContent = `Ход игрока ${currentPlayer}`;
-      }
-      initTic();
-    }
-
-    function checkTicWinner() {
-      const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-      for (let win of wins) {
-        let [a, b, c] = win;
-        if (ticBoardState[a] && ticBoardState[a] === ticBoardState[b] && ticBoardState[a] === ticBoardState[c]) {
-          document.getElementById("ticStatus").textContent = `Победил ${ticBoardState[a]}! 🎉`;
-          ticActive = false;
-          return;
+      // Клавиши
+      const onKeyDown = function (event) {
+        switch (event.code) {
+          case 'KeyW': case 'ArrowUp': moveForward = true; break;
+          case 'KeyA': case 'ArrowLeft': moveLeft = true; break;
+          case 'KeyS': case 'ArrowDown': moveBackward = true; break;
+          case 'KeyD': case 'ArrowRight': moveRight = true; break;
+          case 'Space': if (canJump === true) velocity.y += 12; canJump = false; break;
+          case 'KeyR': reload(); break;
+          case 'Digit1': switchWeapon(1); break;
+          case 'Digit2': switchWeapon(2); break;
         }
-      }
-      if (!ticBoardState.includes("")) {
-        document.getElementById("ticStatus").textContent = "Ничья! 🤝";
-        ticActive = false;
-      }
+      };
+
+      const onKeyUp = function (event) {
+        switch (event.code) {
+          case 'KeyW': case 'ArrowUp': moveForward = false; break;
+          case 'KeyA': case 'ArrowLeft': moveLeft = false; break;
+          case 'KeyS': case 'ArrowDown': moveBackward = false; break;
+          case 'KeyD': case 'ArrowRight': moveRight = false; break;
+        }
+      };
+
+      document.addEventListener('keydown', onKeyDown);
+      document.addEventListener('keyup', onKeyUp);
+
+      // Обработка зажатия/отпускания мыши для автомата
+      document.addEventListener('mousedown', (e) => {
+        if (e.button === 0) {
+          isMouseDown = true;
+          tryShoot();
+        }
+      });
+      document.addEventListener('mouseup', (e) => {
+        if (e.button === 0) isMouseDown = false;
+      });
+
+      // 4. Пол
+      const floorGeometry = new THREE.PlaneGeometry(200, 200, 20, 20);
+      const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+      const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+      floor.rotation.x = -Math.PI / 2;
+      scene.add(floor);
+
+      const grid = new THREE.GridHelper(200, 40, 0x38bdf8, 0x334155);
+      grid.position.y = 0.01;
+      scene.add(grid);
+
+      // 5. Создание 3D моделей оружия
+      createWeapons();
+
+      // 6. Спавн врагов
+      setInterval(spawnEnemy, 2500);
+
+      // 7. Рендерер
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      window.addEventListener('resize', onWindowResize);
+      updateHUD();
     }
 
-    function resetTic() {
-      ticBoardState = ["", "", "", "", "", "", "", "", ""];
-      currentPlayer = "X";
-      ticActive = true;
-      document.getElementById("ticStatus").textContent = "Ход игрока X";
-      initTic();
-    }
-    initTic();
+    // Создание моделей 1) Пистолета и 2) Автомата
+    function createWeapons() {
+      // --- 1. Пистолет ---
+      pistolGroup = new THREE.Group();
+      const gunMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
 
-    /* --- 3. ЛОГИКА КЛИКЕРА --- */
-    let clicks = 0;
-    function addClick() {
-      clicks++;
-      document.getElementById('clickCount').textContent = clicks;
-    }
-    function resetClicker() {
-      clicks = 0;
-      document.getElementById('clickCount').textContent = clicks;
+      const pBarrel = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.4), gunMat);
+      const pHandle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.2, 0.1), gunMat);
+      pHandle.position.set(0, -0.1, 0.1);
+      pistolGroup.add(pBarrel, pHandle);
+
+      const flashGeo = new THREE.SphereGeometry(0.08, 8, 8);
+      const flashMat = new THREE.MeshBasicMaterial({ color: 0xffcb00, visible: false });
+      pistolFlash = new THREE.Mesh(flashGeo, flashMat);
+      pistolFlash.position.set(0, 0, -0.25);
+      pistolGroup.add(pistolFlash);
+
+      pistolGroup.position.set(0.2, -0.15, -0.4);
+      camera.add(pistolGroup);
+
+      // --- 2. Автомат ---
+      rifleGroup = new THREE.Group();
+      const rifleMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+      const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f });
+
+      // Длинный ствол
+      const rBarrel = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.12, 0.8), rifleMat);
+      // Магазин
+      const rMag = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.3, 0.12), gunMat);
+      rMag.position.set(0, -0.15, -0.1);
+      rMag.rotation.x = 0.3;
+      // Приклад
+      const rStock = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.15, 0.3), woodMat);
+      rStock.position.set(0, -0.05, 0.4);
+
+      rifleGroup.add(rBarrel, rMag, rStock);
+
+      rifleFlash = new THREE.Mesh(flashGeo, flashMat);
+      rifleFlash.position.set(0, 0, -0.45);
+      rifleGroup.add(rifleFlash);
+
+      rifleGroup.position.set(0.22, -0.18, -0.45);
+      rifleGroup.visible = false; // По умолчанию скрыт
+      camera.add(rifleGroup);
     }
 
-    /* --- 4. ЛОГИКА УГАДАЙ ЧИСЛО --- */
-    let targetNumber = Math.floor(Math.random() * 100) + 1;
-    function checkGuess() {
-      const input = parseInt(document.getElementById('guessInput').value);
-      const hint = document.getElementById('guessHint');
-      
-      if (!input) return;
-      if (input === targetNumber) {
-        hint.textContent = `🎯 Браво! Загаданное число: ${targetNumber}!`;
-        hint.style.color = '#22c55e';
-      } else if (input < targetNumber) {
-        hint.textContent = "Загаданное число БОЛЬШЕ ⬆️";
-        hint.style.color = '#f59e0b';
+    // Переключение оружия
+    function switchWeapon(id) {
+      if (currentWeaponId === id || isReloading) return;
+
+      currentWeaponId = id;
+      if (id === 1) {
+        pistolGroup.visible = true;
+        rifleGroup.visible = false;
       } else {
-        hint.textContent = "Загаданное число МЕНЬШЕ ⬇️";
-        hint.style.color = '#f59e0b';
+        pistolGroup.visible = false;
+        rifleGroup.visible = true;
       }
+      updateHUD();
+    }
+
+    // Попытка произвести выстрел
+    function tryShoot() {
+      if (!controls.isLocked || isReloading) return;
+
+      const w = weapons[currentWeaponId];
+      const now = performance.now();
+
+      if (now - lastShootTime < w.fireRate) return;
+
+      if (w.ammo <= 0) {
+        reload();
+        return;
+      }
+
+      w.ammo--;
+      lastShootTime = now;
+      updateHUD();
+
+      // Вспышка и отдача
+      const flash = currentWeaponId === 1 ? pistolFlash : rifleFlash;
+      flash.material.visible = true;
+      setTimeout(() => flash.material.visible = false, 40);
+
+      camera.rotation.x += 0.015;
+
+      // Проверка попадания
+      raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+      const intersects = raycaster.intersectObjects(enemies);
+
+      if (intersects.length > 0) {
+        const hitEnemy = intersects[0].object;
+        scene.remove(hitEnemy);
+        enemies.splice(enemies.indexOf(hitEnemy), 1);
+        score += 10;
+        updateHUD();
+      }
+    }
+
+    // Перезарядка
+    function reload() {
+      if (isReloading) return;
+
+      const w = weapons[currentWeaponId];
+      if (w.ammo === w.maxAmmo) return;
+
+      isReloading = true;
+      document.getElementById('ammo').textContent = 'Перезарядка...';
+
+      setTimeout(() => {
+        w.ammo = w.maxAmmo;
+        isReloading = false;
+        updateHUD();
+      }, w.reloadTime);
+    }
+
+    // Спавн врагов
+    function spawnEnemy() {
+      if (!controls.isLocked || enemies.length >= 15) return;
+
+      const geometry = new THREE.BoxGeometry(1.2, 2, 1.2);
+      const material = new THREE.MeshStandardMaterial({ color: 0xef4444 });
+      const enemy = new THREE.Mesh(geometry, material);
+
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 25 + Math.random() * 15;
+      
+      enemy.position.x = camera.position.x + Math.cos(angle) * distance;
+      enemy.position.z = camera.position.z + Math.sin(angle) * distance;
+      enemy.position.y = 1;
+
+      scene.add(enemy);
+      enemies.push(enemy);
+    }
+
+    function updateHUD() {
+      const w = weapons[currentWeaponId];
+      document.getElementById('health').textContent = health;
+      document.getElementById('score').textContent = score;
+      document.getElementById('weaponName').textContent = w.name;
+
+      if (!isReloading) {
+        document.getElementById('ammo').textContent = `${w.ammo} / ${w.maxAmmo}`;
+      }
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // Анимационный цикл
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const time = performance.now();
+
+      if (controls.isLocked) {
+        // Если зажата кнопка и выбрано автоматическое оружие
+        if (isMouseDown && weapons[currentWeaponId].automatic) {
+          tryShoot();
+        }
+
+        const delta = (time - prevTime) / 1000;
+
+        velocity.x -= velocity.x * 10.0 * delta;
+        velocity.z -= velocity.z * 10.0 * delta;
+        velocity.y -= 9.8 * 30.0 * delta;
+
+        direction.z = Number(moveForward) - Number(moveBackward);
+        direction.x = Number(moveRight) - Number(moveLeft);
+        direction.normalize();
+
+        if (moveForward || moveBackward) velocity.z -= direction.z * 100.0 * delta;
+        if (moveLeft || moveRight) velocity.x -= direction.x * 100.0 * delta;
+
+        controls.moveRight(-velocity.x * delta);
+        controls.moveForward(-velocity.z * delta);
+
+        controls.getObject().position.y += (velocity.y * delta);
+
+        if (controls.getObject().position.y < 1.6) {
+          velocity.y = 0;
+          controls.getObject().position.y = 1.6;
+          canJump = true;
+        }
+
+        // Движение врагов к игроку
+        const playerPos = controls.getObject().position;
+        enemies.forEach((enemy) => {
+          enemy.lookAt(playerPos.x, 1, playerPos.z);
+          enemy.translateZ(3.5 * delta);
+
+          if (enemy.position.distanceTo(playerPos) < 1.5) {
+            health -= 1;
+            updateHUD();
+            if (health <= 0) {
+              alert('Игра окончена! Твой счёт: ' + score);
+              location.reload();
+            }
+          }
+        });
+      }
+
+      prevTime = time;
+      renderer.render(scene, camera);
     }
   </script>
-
 </body>
 </html>
