@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Музыкальный подарок для друга</title>
+    <style>
+        body {
+            background: #0d0e15;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* НЕОНОВЫЙ ПЛЕЕР БАСТЫ */
+        .player-card {
+            background: #11141a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 30px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 340px;
+            border: 2px solid #202736;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            transition: all 0.5s ease;
+        }
+        
+        /* Свечение карточки при проигрывании */
+        .player-card.playing {
+            border-color: #00f0ff;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+        
+        .player-info-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            z-index: 2;
+        }
+        .song-name { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #fff; 
+            transition: color 0.3s;
+        }
+        .player-card.playing .song-name { 
+            color: #00f0ff; 
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); 
+        }
+        .artist-name { 
+            font-size: 14px; 
+            color: #a4b0be; 
+            margin-top: 4px; 
+        }
+
+        .btn-wrapper { 
+            position: relative; 
+            width: 50px; 
+            height: 50px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .music-btn { 
+            width: 50px; 
+            height: 50px; 
+            background: #00f0ff; 
+            border: none; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.5); 
+            z-index: 3; 
+            outline: none; 
+            transition: all 0.3s ease;
+        }
+        .music-btn:hover {
+            transform: scale(1.05);
+        }
+        .music-btn.paused-style { 
+            background: #ff007f; 
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.5); 
+        }
+        
+        .btn-svg { 
+            fill: #fff; 
+            width: 22px; 
+            height: 22px; 
+        }
+        
+        /* НЕОНОВЫЕ ВОЛНЫ */
+        .neon-wave { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            border: 2px solid #00f0ff; 
+            opacity: 0; 
+            z-index: 1; 
+        }
+        .player-card.playing .wave-1 { animation: neonPulse 2s infinite linear; }
+        .player-card.playing .wave-2 { animation: neonPulse 2s infinite linear; animation-delay: 0.6s; }
+        
+        @keyframes neonPulse { 
+            0% { transform: scale(1); opacity: 0.8; } 
+            100% { transform: scale(2.2); opacity: 0; } 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ПЛЕЕР С РАБОЧИМ АУДИОПОТОКОМ БАСТЫ -->
+    <div class="player-card" id="main-player-card">
+        <audio id="custom-audio" src="https://publiccat.org" preload="auto" crossorigin="anonymous"></audio>
+        
+        <div class="player-info-text">
+            <span class="song-name">Обернись</span>
+            <span class="artist-name">Баста feat. Город 312</span>
+        </div>
+        
+        <div class="btn-wrapper">
+            <div class="neon-wave wave-1"></div>
+            <div class="neon-wave wave-2"></div>
+            <button class="music-btn" id="music-btn-trigger" onclick="handlePlayPause()">
+                <svg class="btn-svg" id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg class="btn-svg" id="icon-pause" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+        </div>
+    </div>
+
+<script>
+    const audio = document.getElementById('custom-audio');
+    const playIcon = document.getElementById('icon-play');
+    const pauseIcon = document.getElementById('icon-pause');
+    const mainBtn = document.getElementById('music-btn-trigger');
+    const card = document.getElementById('main-player-card');
+
+    function handlePlayPause() {
+        if (audio.paused) {
+            audio.play().then(() => {
+                card.classList.add('playing'); 
+                playIcon.style.display = 'none'; 
+                pauseIcon.style.display = 'block'; 
+                mainBtn.classList.add('paused-style');
+            }).catch(() => alert("Пожалуйста, сначала кликните в любом месте экрана ноутбука, а затем нажмите кнопку музыки!"));
+        } else {
+            audio.pause(); 
+            card.classList.remove('playing'); 
+            playIcon.style.display = 'block'; 
+            pauseIcon.style.display = 'none'; 
+            mainBtn.classList.remove('paused-style');
+        }
+    }
+
+    // Если музыка доиграла до конца, выключаем анимацию
+    audio.addEventListener('ended', () => {
+        card.classList.remove('playing');
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        mainBtn.classList.remove('paused-style');
+    });
+</script>
+</body>
+</html>
