@@ -1,427 +1,310 @@
->
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Музыкальный подарок для друга</title>
-    <style>
-        body {
-            background: #0d0e15;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* НЕОНОВЫЙ ПЛЕЕР БАСТЫ */
-        .player-card {
-            background: #11141a;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 30px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 340px;
-            border: 2px solid #202736;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            transition: all 0.5s ease;
-        }
-        
-        /* Свечение карточки при проигрывании */
-        .player-card.playing {
-            border-color: #00f0ff;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
-        }
-        
-        .player-info-text {
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-            z-index: 2;
-        }
-        .song-name { 
-            font-size: 18px; 
-            font-weight: bold; 
-            color: #fff; 
-            transition: color 0.3s;
-        }
-        .player-card.playing .song-name { 
-            color: #00f0ff; 
-            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); 
-        }
-        .artist-name { 
-            font-size: 14px; 
-            color: #a4b0be; 
-            margin-top: 4px; 
-        }
-
-        .btn-wrapper { 
-            position: relative; 
-            width: 50px; 
-            height: 50px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        
-        .music-btn { 
-            width: 50px; 
-            height: 50px; 
-            background: #00f0ff; 
-            border: none; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.5); 
-            z-index: 3; 
-            outline: none; 
-            transition: all 0.3s ease;
-        }
-        .music-btn:hover {
-            transform: scale(1.05);
-        }
-        .music-btn.paused-style { 
-            background: #ff007f; 
-            box-shadow: 0 0 12px rgba(255, 0, 127, 0.5); 
-        }
-        
-        .btn-svg { 
-            fill: #fff; 
-            width: 22px; 
-            height: 22px; 
-        }
-        
-        /* НЕОНОВЫЕ ВОЛНЫ */
-        .neon-wave { 
-            position: absolute; 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            border: 2px solid #00f0ff; 
-            opacity: 0; 
-            z-index: 1; 
-        }
-        .player-card.playing .wave-1 { animation: neonPulse 2s infinite linear; }
-        .player-card.playing .wave-2 { animation: neonPulse 2s infinite linear; animation-delay: 0.6s; }
-        
-        @keyframes neonPulse { 
-            0% { transform: scale(1); opacity: 0.8; } 
-            100% { transform: scale(2.2); opacity: 0; } 
-        }
-    </style>
-</head>
-<body>
-
-    <!-- ПЛЕЕР С РАБОЧИМ АУДИОПОТОКОМ БАСТЫ -->
-    <div class="player-card" id="main-player-card">
-        <audio id="custom-audio" src="https://publiccat.org" preload="auto" crossorigin="anonymous"></audio>
-        
-        <div class="player-info-text">
-            <span class="song-name">Обернись</span>
-            <span class="artist-name">Баста feat. Город 312</span>
-        </div>
-        
-        <div class="btn-wrapper">
-            <div class="neon-wave wave-1"></div>
-            <div class="neon-wave wave-2"></div>
-            <button class="music-btn" id="music-btn-trigger" onclick="handlePlayPause()">
-                <svg class="btn-svg" id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg class="btn-svg" id="icon-pause" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
-        </div>
-    </div>
-
-<script>
-    const audio = document.getElementById('custom-audio');
-    const playIcon = document.getElementById('icon-play');
-    const pauseIcon = document.getElementById('icon-pause');
-    const mainBtn = document.getElementById('music-btn-trigger');
-    const card = document.getElementById('main-player-card');
-
-    function handlePlayPause() {
-        if (audio.paused) {
-            audio.play().then(() => {
-                card.classList.add('playing'); 
-                playIcon.style.display = 'none'; 
-                pauseIcon.style.display = 'block'; 
-                mainBtn.classList.add('paused-style');
-            }).catch(() => alert("Пожалуйста, сначала кликните в любом месте экрана ноутбука, а затем нажмите кнопку музыки!"));
-        } else {
-            audio.pause(); 
-            card.classList.remove('playing'); 
-            playIcon.style.display = 'block'; 
-            pauseIcon.style.display = 'none'; 
-            mainBtn.classList.remove('paused-style');
-        }
-    }
-
-    // Если музыка доиграла до конца, выключаем анимацию
-    audio.addEventListener('ended', () => {
-        card.classList.remove('playing');
-        playIcon.style.display = 'block';
-        pauseIcon.style.display = 'none';
-        mainBtn.classList.remove('paused-style');
-    });
-</script>
-</body>
-</html>
-<svg class="btn-svg" id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg class="btn-svg" id="icon-pause" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
-        </div>
-    </div>
-
-<script>
-    const audio = document.getElementById('custom-audio');
-    const playIcon = document.getElementById('icon-play');
-    const pauseIcon = document.getElementById('icon-pause');
-    const mainBtn = document.getElementById('music-btn-trigger');
-    const card = document.getElementById('main-player-card');
-
-    function handlePlayPause() {
-        if (audio.paused) {
-            audio.play().then(() => {
-                card.classList.add('playing'); 
-                playIcon.style.display = 'none'; 
-                pauseIcon.style.display = 'block'; 
-                mainBtn.classList.add('paused-style');
-            }).catch((err) => {
-                console.log("Требуется клик по экрану");
-            });
-        } else {
-            audio.pause(); 
-            card.classList.remove('playing'); 
-            playIcon.style.display = 'block'; 
-            pauseIcon.style.display = 'none'; 
-            mainBtn.classList.remove('paused-style');
-        }
-    }
-
-    audio.addEventListener('ended', () => {
-        card.classList.remove('playing');
-        playIcon.style.display = 'block';
-        pauseIcon.style.display = 'none';
-        mainBtn.classList.remove('paused-style');
-    });
-</script>
-</body>
-</html>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Музыкальный подарок для друга</title>
+    <title>Кератин и Ботокс волос в Шушенском | Александра</title>
     <style>
+        :root {
+            --bg-color: #0d0e15;
+            --card-bg: #161922;
+            --accent-gold: #e5c158;
+            --accent-pink: #ff7597;
+            --text-main: #ffffff;
+            --text-muted: #a4b0be;
+        }
+
         body {
-            background: #090a0f;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            color: #fff;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
             margin: 0;
             padding: 0;
-            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            padding: 40px 20px 20px 20px;
+            box-sizing: border-box;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            animation: heartBeat 2.5s infinite ease-in-out;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, var(--accent-gold), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 0 20px 40px 20px;
+            box-sizing: border-box;
+            z-index: 5;
+        }
+
+        /* КАРТОЧКА МАСТЕРА */
+        .master-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Фото вашей сестры */
+        .photo-wrapper {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            border: 3px solid var(--accent-gold);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+        .photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+        }
+
+        .master-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .master-bio {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* БЛОК УСЛУГ */
+        .section-title {
+            font-size: 15px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 25px 0 12px 5px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .services-list {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            margin-bottom: 25px;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .service-item:last-child {
+            border-bottom: none;
+        }
+
+        .service-info {
+            text-align: left;
+        }
+        .service-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .service-desc {
+        font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .service-price {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--accent-pink);
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        /* БЛОК АДРЕСА */
+        .address-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        .address-line {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .address-line:last-of-type {
+            margin-bottom: 0;
+        }
+        .address-icon {
+            font-size: 18px;
+            margin-right: 12px;
+            margin-top: 2px;
+        }
+
+        .map-wrapper {
+            width: 100%;
+            height: 220px;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-top: 15px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* КНОПКИ СВЯЗИ */
+        .buttons-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .cta-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* СОЗДАНИЕ КРАСИВОГО НЕОНОВОГО ФОНА С КРУГАМИ */
-        .bg-glow-1 {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
-            top: -10%;
-            left: -10%;
-            z-index: 1;
-            animation: floatGlow 10s infinite alternate ease-in-out;
-        }
-
-        .bg-glow-2 {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 0, 127, 0.12) 0%, rgba(0,0,0,0) 70%);
-            bottom: -20%;
-            right: -10%;
-            z-index: 1;
-            animation: floatGlow 12s infinite alternate-reverse ease-in-out;
-        }
-
-        /* КАРТОЧКА ПЛЕЕРА С ЭФФЕКТОМ СТЕКЛА */
-        .player-card {
-            background: rgba(17, 20, 26, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 30px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 340px;
-            border: 2px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 5;
-        }
-        
-        /* Свечение рамки при включении музыки */
-        .player-card.playing {
-            border-color: rgba(0, 240, 255, 0.5);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3), 0 15px 35px rgba(0,0,0,0.6);
-        }
-        
-        .player-info-text {
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-            z-index: 2;
-        }
-        .song-name { 
-            font-size: 18px; 
-            font-weight: bold; 
-            color: #fff; 
-            transition: color 0.3s;
-        }
-        .player-card.playing .song-name { 
-            color: #00f0ff; 
-            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); 
-        }
-        .artist-name { 
-            font-size: 14px; 
-            color: #a4b0be; 
-            margin-top: 4px; 
-        }
-
-        .btn-wrapper { 
-            position: relative; 
-            width: 50px; 
-            height: 50px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        
-        .music-btn { 
-            width: 50px; 
-            height: 50px; 
-            background: #00f0ff; 
-            border: none; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.5); 
-            z-index: 3; 
-            outline: none; 
+            color: #fff;
+            text-decoration: none;
+            padding: 16px 20px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
-        }
-        .music-btn:hover {
-            transform: scale(1.05);
-        }
-        .music-btn.paused-style { 
-            background: #ff007f; 
-            box-shadow: 0 0 12px rgba(255, 0, 127, 0.5); 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .btn-svg { 
-            fill: #fff; 
-            width: 22px; 
-            height: 22px; 
+        .btn-wa {
+            background: linear-gradient(135deg, #25d366 0%, #075e54 100%);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2);
         }
-        
-        /* НЕОНОВЫЕ ВОЛНЫ ОТ КНОПКИ */
-        .neon-wave { 
-            position: absolute; 
-            width: 100%; 
-            height: 100%;
-            border-radius: 50%; 
-            border: 2px solid #00f0ff; 
-            opacity: 0; 
-            z-index: 1; 
-        }
-        .player-card.playing .wave-1 { animation: neonPulse 2s infinite linear; }
-        .player-card.playing .wave-2 { animation: neonPulse 2s infinite linear; animation-delay: 0.6s; }
-        
-        @keyframes neonPulse { 
-            0% { transform: scale(1); opacity: 0.8; } 
-            100% { transform: scale(2.2); opacity: 0; } 
+        .btn-wa:hover {
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+            transform: translateY(-2px);
         }
 
-        /* МЯГКАЯ АНИМАЦИЯ ФОНОВЫХ ПЯТЕН */
-        @keyframes floatGlow {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(40px, 30px) scale(1.15); }
+        .btn-phone {
+            background: linear-gradient(135deg, #54a0ff 0%, #2e86de 100%);
+            box-shadow: 0 5px 15px rgba(84, 160, 255, 0.2);
+        }
+        .btn-phone:hover {
+            box-shadow: 0 8px 20px rgba(84, 160, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <!-- ФОНОВЫЕ НЕОНОВЫЕ КАРТИНКИ-ПЯТНА -->
-    <div class="bg-glow-1"></div>
-    <div class="bg-glow-2"></div>
+    <header>
+        <div class="logo-icon">✨</div>
+        <h1>Кератин & Ботокс</h1>
+        <div class="subtitle">Идеальные волосы • Шушенское</div>
+    </header>
 
-    <!-- ПЛЕЕР С РАБОЧИМ АУДИОПОТОКОМ БАСТЫ -->
-    <div class="player-card" id="main-player-card">
-        <audio id="custom-audio" src="https://publiccat.org" preload="auto" crossorigin="anonymous"></audio>
+    <div class="main-container">
         
-        <div class="player-info-text">
-            <span class="song-name">Обернись</span>
-            <span class="artist-name">Баста feat. Город 312</span>
+        <!-- Карточка мастера Александра -->
+        <div class="master-card">
+            <div class="photo-wrapper">
+                <img src="https://oneme.ru" alt="Мастер Александра">
+            </div>
+            <div class="master-name">Мастер Александра</div>
+            <div class="master-bio">Сертифицированный мастер реконструкции волос. Подарю вашим волосам зеркальный блеск, невероятную гладкость и избавлю от пушка на срок до 6 месяцев! Работаю только на составах премиум-класса.</div>
+        </div>
+
+        <!-- Прайс-лист -->
+        <div class="section-title">Услуги и цены</div>
+        <div class="services-list">
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Кератиновое выпрямление</div>
+                    <div class="service-desc">Выпрямление завитков любого типа, глянцевый блеск и гладкость.</div>
+                </div>
+                <div class="service-price">от 2 500 ₽</div>
+            </div>
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Ботокс для волос</div>
+                    <div class="service-desc">Глубокое питание, увлажнение структуры и устранение пушистости.</div>
+                </div>
+                <div class="service-price">от 2 000 ₽</div>
+            </div>
+            <div class="service-item">
+                <div class="service-info">
+                    <div class="service-name">Холодное восстановление</div>
+                    <div class="service-desc">Интенсивная реанимация поврежденных и ломких волос без утюжка.</div>
+                </div>
+                <div class="service-price">от 1 500 ₽</div>
+            </div>
+        </div>
+
+        <!-- Контакты и местоположение -->
+        <div class="section-title">Контакты и адрес</div>
+        <div class="address-card">
+            <div class="address-line">
+                <span class="address-icon">📍</span>
+                <span><b>Адрес:</b><br>пгт. Шушенское, 2-й микрорайон, дом 59</span>
+            </div>
+            <div class="address-line">
+                <span class="address-icon">🏢</span>
+                <span><b>Ориентир:</b><br>Рядом находится известное кафе «Садко» (Первомайская, 1). От него до студии всего 2 минуты ходьбы!</span>
+            </div>
+            
+            <!-- Интерактивная карта Яндекс -->
+            <div class="map-wrapper">
+                <iframe src="https://yandex.ru" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
+            </div>
         </div>
         
-        <div class="btn-wrapper">
-            <div class="neon-wave wave-1"></div>
-            <div class="neon-wave wave-2"></div>
-            <button class="music-btn" id="music-btn-trigger" onclick="handlePlayPause()">
-                <svg class="btn-svg" id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg class="btn-svg" id="icon-pause" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
-        </div>
-    </div>
-
-<script>
-    const audio = document.getElementById('custom-audio');
-    const playIcon = document.getElementById('icon-play');
-    const pauseIcon = document.getElementById('icon-pause');
-    const mainBtn = document.getElementById('music-btn-trigger');
-    const card = document.getElementById('main-player-card');
-
-    function handlePlayPause() {
-        if (audio.paused) {
-            audio.play().then(() => {
-                card.classList.add('playing'); 
-                playIcon.style.display = 'none'; 
-                pauseIcon.style.display = 'block'; 
-                mainBtn.classList.add('paused-style');
-            }).catch((err) => {
-                console.log("Требуется клик");
-            });
-        } else {
-            audio.pause(); 
-            card.classList.remove('playing'); 
-            playIcon.style.display = 'block'; 
-            pauseIcon.style.display = 'none'; 
-            mainBtn.classList.remove('paused-style');
-        }
-    }
-
-    audio.addEventListener('ended', () => {
-        card.classList.remove('playing');
-        playIcon.style.display = 'block';
-        pauseIcon.style.display = 'none';
-        mainBtn.classList.remove('paused-style');
-    });
-</script>
-</body>
-</html>
