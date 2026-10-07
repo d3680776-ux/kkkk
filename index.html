@@ -474,3 +474,85 @@
   </script>
 </body>
 </html>
+// Размеры блока (тайла) в пикселях
+const tileSize = 40;
+
+// Массив карты: 0 — пусто, 1 — стена, 2 — финиш
+const map = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,1],
+    [1,0,1,1,1,0,1,0,1,1,1,1,1,1,0,1,1,1,0,1],
+    [1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1],
+    [1,0,1,0,1,1,1,1,1,1,1,1,0,1,0,1,0,1,1,1],
+    [1,0,0,0,1,0,0,0,0,0,0,1,0,1,0,1,0,0,0,1],
+    [1,1,1,0,1,0,1,1,1,1,0,1,0,1,0,1,1,1,0,1],
+    [1,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,1,0,1],
+    [1,0,1,1,1,1,1,0,0,1,1,1,1,1,1,1,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+// Функция отрисовки карты (вызывай в своем игровом цикле)
+function drawMap(ctx) {
+    for (let row = 0; row < map.length; row++) {
+        for (let col = 0; col < map[row].length; col++) {
+            const tile = map[row][col];
+            if (tile === 1) {
+                // Стена
+                ctx.fillStyle = '#7f8c8d';
+                ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+                ctx.strokeStyle = '#34495e';
+                ctx.strokeRect(col * tileSize, row * tileSize, tileSize, tileSize);
+            } else if (tile === 2) {
+                // Финиш / Выход
+                ctx.fillStyle = '#f1c40f';
+                ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+            }
+        }
+    }
+}
+
+      function drawCharacter(ctx, x, y, color = '#3498db') {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Голова
+    ctx.fillStyle = '#ffe0bd';
+    ctx.beginPath();
+    ctx.arc(0, -12, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Глаза
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(-3, -14, 2, 2);
+    ctx.fillRect(1, -14, 2, 2);
+
+    // Торс / Кофта
+    ctx.fillStyle = color;
+    ctx.fillRect(-6, -4, 12, 14);
+
+    // Руки
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-6, -2);
+    ctx.lineTo(-10, 6);
+    ctx.moveTo(6, -2);
+    ctx.lineTo(10, 6);
+    ctx.stroke();
+
+    // Ноги
+    ctx.strokeStyle = '#2c3e50';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-3, 10);
+    ctx.lineTo(-4, 18);
+    ctx.moveTo(3, 10);
+    ctx.lineTo(4, 18);
+    ctx.stroke();
+
+    ctx.restore();
+}
