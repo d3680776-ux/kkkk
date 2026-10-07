@@ -19,16 +19,60 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding-bottom: 30px;
     }
 
     header {
       text-align: center;
-      padding: 20px;
+      padding: 20px 20px 10px 20px;
     }
 
     header h1 {
       font-size: 2rem;
       color: #38bdf8;
+      margin-bottom: 10px;
+    }
+
+    /* Блок с музыкой VK / Mail.ru */
+    .music-container {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .music-container p {
+      font-size: 0.95rem;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .music-btn {
+      display: inline-block;
+      padding: 8px 18px;
+      background: linear-gradient(135deg, #0077ff 0%, #0055b8 100%);
+      color: white;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .music-btn:hover {
+      background: #0055b8;
+    }
+
+    audio {
+      width: 100%;
+      height: 36px;
+      margin-top: 10px;
     }
 
     /* Меню переключения игр */
@@ -176,6 +220,18 @@
     <h1>🎮 Мини-игры</h1>
   </header>
 
+  <!-- Блок фоновой музыки Mail.ru / VK -->
+  <div class="music-container">
+    <p>🎵 Музыка: Баста — Осень</p>
+    <a href="https://vk.com/audio" target="_blank" class="music-btn">
+      ▶ Открыть в VK Музыке (Mail.ru)
+    </a>
+    <audio controls>
+      <source src="song.mp3" type="audio/mpeg">
+      Ваш браузер не поддерживает аудиоплеер.
+    </audio>
+  </div>
+
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchGame('snake')">🐍 Змейка</button>
     <button class="tab-btn" onclick="switchGame('ticTacToe')">❌⭕ Крестики</button>
@@ -237,24 +293,20 @@
     let dx = grid, dy = 0;
     let food = {x: 60, y: 60};
     let snakeScore = 0;
-    let snakeLoop;
 
     function gameLoopSnake() {
       const head = {x: snake[0].x + dx, y: snake[0].y + dy};
 
-      // Проверка врезания в стены
       if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
         return resetSnake();
       }
 
-      // Проверка врезания в себя
       for (let segment of snake) {
         if (head.x === segment.x && head.y === segment.y) return resetSnake();
       }
 
       snake.unshift(head);
 
-      // Съедание еды
       if (head.x === food.x && head.y === food.y) {
         snakeScore += 10;
         document.getElementById('snakeScore').textContent = snakeScore;
@@ -263,10 +315,9 @@
           y: Math.floor(Math.random() * (canvas.height / grid)) * grid
         };
       } else {
-        snake.pop();
+      snake.pop();
       }
 
-      // Отрисовка
       ctx.fillStyle = "#0f172a";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -302,7 +353,7 @@
     function initTic() {
       ticBoard.innerHTML = "";
       ticBoardState.forEach((val, index) => {
-      const cell = document.createElement("div");
+        const cell = document.createElement("div");
         cell.classList.add("tic-cell");
         cell.textContent = val;
         cell.addEventListener("click", () => handleTicClick(index));
