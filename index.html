@@ -1,558 +1,240 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Стрелялка | 2 Оружия</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      overflow: hidden;
-      background-color: #000;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      user-select: none;
-    }
-
-    /* Прицел */
-    #crosshair {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 10px;
-      height: 10px;
-      margin-top: -5px;
-      margin-left: -5px;
-      background-color: rgba(255, 255, 255, 0.8);
-      border: 2px solid rgba(0, 0, 0, 0.5);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    /* Интерфейс (HUD) */
-    #hud {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-      pointer-events: none;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .hud-item {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    /* Стартовый экран */
-    #blocker {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.75);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #fff;
-      z-index: 20;
-      cursor: pointer;
-    }
-
-    #instructions {
-      text-align: center;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 40px;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    #instructions h1 {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-      color: #38bdf8;
-    }
-
-    #instructions p {
-      font-size: 1.1rem;
-      margin: 8px 0;
-      color: #cbd5e1;
-    }
-  </style>
-
-  <!-- Подключаем Three.js и PointerLockControls -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Игра на Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            font-family: sans-serif;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            background: rgba(0,0,0,0.6);
+            padding: 10px 15px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+    <!-- Подключаем Three.js через CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-  <div id="crosshair"></div>
-
-  <div id="hud">
-    <div class="hud-item">❤️ Здоровье: <span id="health">100</span></div>
-    <div class="hud-item">💥 Счёт: <span id="score">0</span></div>
-    <div class="hud-item">🔫 Оружие: <span id="weaponName">Пистолет</span></div>
-    <div class="hud-item">📦 Патроны: <span id="ammo">12 / 12</span></div>
-  </div>
-
-  <div id="blocker">
-    <div id="instructions">
-      <h1>3D ШУТЕР</h1>
-      <p>Кликни мышкой по экрану, чтобы начать игру</p>
-      <br>
-      <p><b>W, A, S, D</b> — Движение</p>
-      <p><b>Пробел</b> — Прыжок</p>
-      <p><b>1 / 2</b> — Выбор оружия (1: Пистолет, 2: Автомат)</p>
-      <p><b>ЛКМ</b> — Стрелять (Автомат стреляет при зажатии!)</p>
-      <p><b>R</b> — Перезарядка</p>
-    </div>
-  </div>
-
-  <script>
-    let camera, scene, renderer, controls;
-    let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false, canJump = false;
-    let prevTime = performance.now();
-    const velocity = new THREE.Vector3();
-    const direction = new THREE.Vector3();
-
-    // Игровые параметры
-    let health = 100;
-    let score = 0;
-
-    // Конфигурации оружия
-    const weapons = {
-      1: {
-        name: 'Пистолет',
-        maxAmmo: 12,
-        ammo: 12,
-        reloadTime: 1500,
-        fireRate: 250, // мс между выстрелами
-        automatic: false,
-        damage: 10
-      },
-      2: {
-        name: 'Автомат',
-        maxAmmo: 30,
-        ammo: 30,
-        reloadTime: 2500,
-        fireRate: 100, // мс между выстрелами (высокий темп)
-        automatic: true,
-        damage: 10
-      }
-    };
-
-    let currentWeaponId = 1;
-    let isReloading = false;
-    let isMouseDown = false;
-    let lastShootTime = 0;
-
-    // Враги и пули
-    const enemies = [];
-    const raycaster = new THREE.Raycaster();
-    
-    // Модели оружия
-    let pistolGroup, rifleGroup;
-    let pistolFlash, rifleFlash;
-
-    init();
-    animate();
-
-    function init() {
-      // 1. Сцена и камера
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0f172a);
-      scene.fog = new THREE.Fog(0x0f172a, 0, 75);
-
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.y = 1.6;
-
-      // 2. Освещение
-      const light = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
-      light.position.set(0.5, 1, 0.75);
-      scene.add(light);
-
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
-      dirLight.position.set(10, 20, 10);
-      scene.add(dirLight);
-
-      // 3. Управление (Pointer Lock)
-      controls = new THREE.PointerLockControls(camera, document.body);
-
-      const blocker = document.getElementById('blocker');
-      blocker.addEventListener('click', () => controls.lock());
-
-      controls.addEventListener('lock', () => blocker.style.display = 'none');
-      controls.addEventListener('unlock', () => blocker.style.display = 'flex');
-
-      scene.add(controls.getObject());
-
-      // Клавиши
-      const onKeyDown = function (event) {
-        switch (event.code) {
-          case 'KeyW': case 'ArrowUp': moveForward = true; break;
-          case 'KeyA': case 'ArrowLeft': moveLeft = true; break;
-          case 'KeyS': case 'ArrowDown': moveBackward = true; break;
-          case 'KeyD': case 'ArrowRight': moveRight = true; break;
-          case 'Space': if (canJump === true) velocity.y += 12; canJump = false; break;
-          case 'KeyR': reload(); break;
-          case 'Digit1': switchWeapon(1); break;
-          case 'Digit2': switchWeapon(2); break;
-        }
-      };
-
-      const onKeyUp = function (event) {
-        switch (event.code) {
-          case 'KeyW': case 'ArrowUp': moveForward = false; break;
-          case 'KeyA': case 'ArrowLeft': moveLeft = false; break;
-          case 'KeyS': case 'ArrowDown': moveBackward = false; break;
-          case 'KeyD': case 'ArrowRight': moveRight = false; break;
-        }
-      };
-
-      document.addEventListener('keydown', onKeyDown);
-      document.addEventListener('keyup', onKeyUp);
-
-      // Обработка зажатия/отпускания мыши для автомата
-      document.addEventListener('mousedown', (e) => {
-        if (e.button === 0) {
-          isMouseDown = true;
-          tryShoot();
-        }
-      });
-      document.addEventListener('mouseup', (e) => {
-        if (e.button === 0) isMouseDown = false;
-      });
-
-      // 4. Пол
-      const floorGeometry = new THREE.PlaneGeometry(200, 200, 20, 20);
-      const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x1e293b });
-      const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-      floor.rotation.x = -Math.PI / 2;
-      scene.add(floor);
-
-      const grid = new THREE.GridHelper(200, 40, 0x38bdf8, 0x334155);
-      grid.position.y = 0.01;
-      scene.add(grid);
-
-      // 5. Создание 3D моделей оружия
-      createWeapons();
-
-      // 6. Спавн врагов
-      setInterval(spawnEnemy, 2500);
-
-      // 7. Рендерер
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
-
-      window.addEventListener('resize', onWindowResize);
-      updateHUD();
-    }
-
-    // Создание моделей 1) Пистолета и 2) Автомата
-    function createWeapons() {
-      // --- 1. Пистолет ---
-      pistolGroup = new THREE.Group();
-      const gunMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
-
-      const pBarrel = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.4), gunMat);
-      const pHandle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.2, 0.1), gunMat);
-      pHandle.position.set(0, -0.1, 0.1);
-      pistolGroup.add(pBarrel, pHandle);
-
-      const flashGeo = new THREE.SphereGeometry(0.08, 8, 8);
-      const flashMat = new THREE.MeshBasicMaterial({ color: 0xffcb00, visible: false });
-      pistolFlash = new THREE.Mesh(flashGeo, flashMat);
-      pistolFlash.position.set(0, 0, -0.25);
-      pistolGroup.add(pistolFlash);
-
-      pistolGroup.position.set(0.2, -0.15, -0.4);
-      camera.add(pistolGroup);
-
-      // --- 2. Автомат ---
-      rifleGroup = new THREE.Group();
-      const rifleMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
-      const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f });
-
-      // Длинный ствол
-      const rBarrel = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.12, 0.8), rifleMat);
-      // Магазин
-      const rMag = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.3, 0.12), gunMat);
-      rMag.position.set(0, -0.15, -0.1);
-      rMag.rotation.x = 0.3;
-      // Приклад
-      const rStock = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.15, 0.3), woodMat);
-      rStock.position.set(0, -0.05, 0.4);
-
-      rifleGroup.add(rBarrel, rMag, rStock);
-
-      rifleFlash = new THREE.Mesh(flashGeo, flashMat);
-      rifleFlash.position.set(0, 0, -0.45);
-      rifleGroup.add(rifleFlash);
-
-      rifleGroup.position.set(0.22, -0.18, -0.45);
-      rifleGroup.visible = false; // По умолчанию скрыт
-      camera.add(rifleGroup);
-    }
-
-    // Переключение оружия
-    function switchWeapon(id) {
-      if (currentWeaponId === id || isReloading) return;
-
-      currentWeaponId = id;
-      if (id === 1) {
-        pistolGroup.visible = true;
-        rifleGroup.visible = false;
-      } else {
-        pistolGroup.visible = false;
-        rifleGroup.visible = true;
-      }
-      updateHUD();
-    }
-
-    // Попытка произвести выстрел
-    function tryShoot() {
-      if (!controls.isLocked || isReloading) return;
-
-      const w = weapons[currentWeaponId];
-      const now = performance.now();
-
-      if (now - lastShootTime < w.fireRate) return;
-
-      if (w.ammo <= 0) {
-        reload();
-        return;
-      }
-
-      w.ammo--;
-      lastShootTime = now;
-      updateHUD();
-
-      // Вспышка и отдача
-      const flash = currentWeaponId === 1 ? pistolFlash : rifleFlash;
-      flash.material.visible = true;
-      setTimeout(() => flash.material.visible = false, 40);
-
-      camera.rotation.x += 0.015;
-
-      // Проверка попадания
-      raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-      const intersects = raycaster.intersectObjects(enemies);
-
-      if (intersects.length > 0) {
-        const hitEnemy = intersects[0].object;
-        scene.remove(hitEnemy);
-        enemies.splice(enemies.indexOf(hitEnemy), 1);
-        score += 10;
-        updateHUD();
-      }
-    }
-
-    // Перезарядка
-    function reload() {
-      if (isReloading) return;
-
-      const w = weapons[currentWeaponId];
-      if (w.ammo === w.maxAmmo) return;
-
-      isReloading = true;
-      document.getElementById('ammo').textContent = 'Перезарядка...';
-
-      setTimeout(() => {
-        w.ammo = w.maxAmmo;
-        isReloading = false;
-        updateHUD();
-      }, w.reloadTime);
-    }
-
-    // Спавн врагов
-    function spawnEnemy() {
-      if (!controls.isLocked || enemies.length >= 15) return;
-
-      const geometry = new THREE.BoxGeometry(1.2, 2, 1.2);
-      const material = new THREE.MeshStandardMaterial({ color: 0xef4444 });
-      const enemy = new THREE.Mesh(geometry, material);
-
-      const angle = Math.random() * Math.PI * 2;
-      const distance = 25 + Math.random() * 15;
-      
-      enemy.position.x = camera.position.x + Math.cos(angle) * distance;
-      enemy.position.z = camera.position.z + Math.sin(angle) * distance;
-      enemy.position.y = 1;
-
-      scene.add(enemy);
-      enemies.push(enemy);
-    }
-
-    function updateHUD() {
-      const w = weapons[currentWeaponId];
-      document.getElementById('health').textContent = health;
-      document.getElementById('score').textContent = score;
-      document.getElementById('weaponName').textContent = w.name;
-
-      if (!isReloading) {
-        document.getElementById('ammo').textContent = `${w.ammo} / ${w.maxAmmo}`;
-      }
-    }
-
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    // Анимационный цикл
-    function animate() {
-      requestAnimationFrame(animate);
-
-      const time = performance.now();
-
-      if (controls.isLocked) {
-        // Если зажата кнопка и выбрано автоматическое оружие
-        if (isMouseDown && weapons[currentWeaponId].automatic) {
-          tryShoot();
-        }
-
-        const delta = (time - prevTime) / 1000;
-
-        velocity.x -= velocity.x * 10.0 * delta;
-        velocity.z -= velocity.z * 10.0 * delta;
-        velocity.y -= 9.8 * 30.0 * delta;
-
-        direction.z = Number(moveForward) - Number(moveBackward);
-        direction.x = Number(moveRight) - Number(moveLeft);
-        direction.normalize();
-
-        if (moveForward || moveBackward) velocity.z -= direction.z * 100.0 * delta;
-        if (moveLeft || moveRight) velocity.x -= direction.x * 100.0 * delta;
-
-        controls.moveRight(-velocity.x * delta);
-        controls.moveForward(-velocity.z * delta);
-
-        controls.getObject().position.y += (velocity.y * delta);
-
-        if (controls.getObject().position.y < 1.6) {
-          velocity.y = 0;
-          controls.getObject().position.y = 1.6;
-          canJump = true;
-        }
-
-        // Движение врагов к игроку
-        const playerPos = controls.getObject().position;
-        enemies.forEach((enemy) => {
-          enemy.lookAt(playerPos.x, 1, playerPos.z);
-          enemy.translateZ(3.5 * delta);
-
-          if (enemy.position.distanceTo(playerPos) < 1.5) {
-            health -= 1;
-            updateHUD();
-            if (health <= 0) {
-              alert('Игра окончена! Твой счёт: ' + score);
-              location.reload();
-            }
-          }
-        });
-      }
-
-      prevTime = time;
-      renderer.render(scene, camera);
-    }
-  </script>
-</body>
-</html>
-// Размеры блока (тайла) в пикселях
-const tileSize = 40;
-
-// Массив карты: 0 — пусто, 1 — стена, 2 — финиш
-const map = [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,1],
-    [1,0,1,1,1,0,1,0,1,1,1,1,1,1,0,1,1,1,0,1],
-    [1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1],
-    [1,0,1,0,1,1,1,1,1,1,1,1,0,1,0,1,0,1,1,1],
-    [1,0,0,0,1,0,0,0,0,0,0,1,0,1,0,1,0,0,0,1],
-    [1,1,1,0,1,0,1,1,1,1,0,1,0,1,0,1,1,1,0,1],
-    [1,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,1,0,1],
-    [1,0,1,1,1,1,1,0,0,1,1,1,1,1,1,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+<div id="info">Управление: <b>WASD</b> или <b>Стрелочки</b></div>
+
+<script>
+// --- 1. СЦЕНА, КАМЕРА И РЕНДЕРЕР ---
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb); // Небо (голубой цвет)
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true; // Включаем тени
+document.body.appendChild(renderer.domElement);
+
+// --- 2. ОСВЕЩЕНИЕ ---
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+dirLight.position.set(20, 40, 20);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
+scene.add(dirLight);
+
+// --- 3. 3D-КАРТА ---
+const CUBE_SIZE = 2;
+const map3D = [
+    [1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,1,0,0,0,2,1],
+    [1,0,1,1,1,0,1,0,1,1,0,1],
+    [1,0,1,0,0,0,0,0,0,1,0,1],
+    [1,0,1,0,1,1,1,1,0,1,0,1],
+    [1,0,0,0,1,0,0,0,0,1,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
-// Функция отрисовки карты (вызывай в своем игровом цикле)
-function drawMap(ctx) {
-    for (let row = 0; row < map.length; row++) {
-        for (let col = 0; col < map[row].length; col++) {
-            const tile = map[row][col];
-            if (tile === 1) {
-                // Стена
-                ctx.fillStyle = '#7f8c8d';
-                ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
-                ctx.strokeStyle = '#34495e';
-                ctx.strokeRect(col * tileSize, row * tileSize, tileSize, tileSize);
-            } else if (tile === 2) {
-                // Финиш / Выход
-                ctx.fillStyle = '#f1c40f';
-                ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+const walls = []; // Для проверки столкновений
+
+function buildMap() {
+    const wallGeo = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x7f8c8d });
+    const finishMat = new THREE.MeshStandardMaterial({ color: 0xf1c40f });
+
+    // Пол
+    const floorWidth = map3D[0].length * CUBE_SIZE;
+    const floorHeight = map3D.length * CUBE_SIZE;
+    const floorGeo = new THREE.PlaneGeometry(floorWidth, floorHeight);
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x27ae60 });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.set(floorWidth / 2 - CUBE_SIZE / 2, 0, floorHeight / 2 - CUBE_SIZE / 2);
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    // Стены
+    for (let r = 0; r < map3D.length; r++) {
+        for (let c = 0; c < map3D[r].length; c++) {
+            const tile = map3D[r][c];
+            if (tile === 1 || tile === 2) {
+                const mat = (tile === 1) ? wallMat : finishMat;
+                const cube = new THREE.Mesh(wallGeo, mat);
+                cube.position.set(c * CUBE_SIZE, CUBE_SIZE / 2, r * CUBE_SIZE);
+                cube.castShadow = true;
+                cube.receiveShadow = true;
+                scene.add(cube);
+
+                if (tile === 1) {
+                    walls.push(cube); // Сохраняем стену для коллизий
+                }
             }
         }
     }
 }
+buildMap();
 
-      function drawCharacter(ctx, x, y, color = '#3498db') {
-    ctx.save();
-    ctx.translate(x, y);
+// --- 4. СОЗДАНИЕ 3D-ЧЕЛОВЕЧКА ---
+function createCharacter(colorHex) {
+    const group = new THREE.Group();
 
     // Голова
-    ctx.fillStyle = '#ffe0bd';
-    ctx.beginPath();
-    ctx.arc(0, -12, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    const headGeo = new THREE.SphereGeometry(0.35, 16, 16);
+    const headMat = new THREE.MeshStandardMaterial({ color: 0xffe0bd });
+    const head = new THREE.Mesh(headGeo, headMat);
+    head.position.y = 1.6;
+    head.castShadow = true;
+    group.add(head);
 
-    // Глаза
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(-3, -14, 2, 2);
-    ctx.fillRect(1, -14, 2, 2);
+    // Глаза (чтобы видеть направление)
+    const eyeGeo = new THREE.BoxGeometry(0.08, 0.08, 0.08);
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+  const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+    leftEye.position.set(-0.12, 1.65, 0.3);
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    rightEye.position.set(0.12, 1.65, 0.3);
+    group.add(leftEye, rightEye);
 
-    // Торс / Кофта
-    ctx.fillStyle = color;
-    ctx.fillRect(-6, -4, 12, 14);
+    // Тело
+    const bodyGeo = new THREE.BoxGeometry(0.5, 0.7, 0.3);
+    const bodyMat = new THREE.MeshStandardMaterial({ color: colorHex });
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    body.position.y = 1.05;
+    body.castShadow = true;
+    group.add(body);
 
     // Руки
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(-6, -2);
-    ctx.lineTo(-10, 6);
-    ctx.moveTo(6, -2);
-    ctx.lineTo(10, 6);
-    ctx.stroke();
+    const armGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.6);
+    const armMat = new THREE.MeshStandardMaterial({ color: colorHex });
+    const leftArm = new THREE.Mesh(armGeo, armMat);
+    leftArm.position.set(-0.35, 1.05, 0);
+    leftArm.castShadow = true;
+    const rightArm = new THREE.Mesh(armGeo, armMat);
+    rightArm.position.set(0.35, 1.05, 0);
+    rightArm.castShadow = true;
+    group.add(leftArm, rightArm);
 
     // Ноги
-    ctx.strokeStyle = '#2c3e50';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(-3, 10);
-    ctx.lineTo(-4, 18);
-    ctx.moveTo(3, 10);
-    ctx.lineTo(4, 18);
-    ctx.stroke();
+    const legGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.7);
+    const legMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50 });
+    const leftLeg = new THREE.Mesh(legGeo, legMat);
+    leftLeg.position.set(-0.15, 0.35, 0);
+    leftLeg.castShadow = true;
+    const rightLeg = new THREE.Mesh(legGeo, legMat);
+    rightLeg.position.set(0.15, 0.35, 0);
+    rightLeg.castShadow = true;
+    group.add(leftLeg, rightLeg);
 
-    ctx.restore();
+    return group;
 }
+
+// Игрок (синий)
+const player = createCharacter(0x3498db);
+player.position.set(2, 0, 2);
+scene.add(player);
+
+// Враг / NPC (красный)
+const npc = createCharacter(0xe74c3c);
+npc.position.set(14, 0, 2);
+scene.add(npc);
+
+// --- 5. УПРАВЛЕНИЕ И ФИЗИКА ---
+const keys = {};
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+const speed = 0.08;
+
+function updatePlayer() {
+    let dx = 0;
+    let dz = 0;
+
+    if (keys['KeyW'] || keys['ArrowUp']) dz -= speed;
+    if (keys['KeyS'] || keys['ArrowDown']) dz += speed;
+    if (keys['KeyA'] || keys['ArrowLeft']) dx -= speed;
+    if (keys['KeyD'] || keys['ArrowRight']) dx += speed;
+
+    if (dx !== 0 || dz !== 0) {
+        // Поворот человечка в сторону движения
+        const angle = Math.atan2(dx, dz);
+        player.rotation.y = angle;
+
+        // Новая позиция
+        const nextX = player.position.x + dx;
+        const nextZ = player.position.z + dz;
+
+        // Простая коллизия со стенами (радиус игрока = 0.4)
+        let collide = false;
+        for (let wall of walls) {
+            const box = new THREE.Box3().setFromObject(wall);
+            const playerBox = new THREE.Box3(
+                new THREE.Vector3(nextX - 0.3, 0, nextZ - 0.3),
+                new THREE.Vector3(nextX + 0.3, 2, nextZ + 0.3)
+            );
+            if (box.intersectsBox(playerBox)) {
+                collide = true;
+                break;
+            }
+        }
+
+        if (!collide) {
+            player.position.x = nextX;
+            player.position.z = nextZ;
+        }
+    }
+
+    // Камера следит за игроком
+    camera.position.x = player.position.x;
+    camera.position.y = player.position.y + 7;
+    camera.position.z = player.position.z + 8;
+    camera.lookAt(player.position);
+}
+
+// Изменение размера окна
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// --- 6. ИГРОВОЙ ЦИКЛ ---
+function animate() {
+    requestAnimationFrame(animate);
+    updatePlayer();
+    renderer.render(scene, camera);
+}
+
+animate();
+</script>
+
+</body>
+</html>
