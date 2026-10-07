@@ -236,5 +236,152 @@ function animate() {
 animate();
 </script>
 
+// Переменные для прыжка и гравитации
+let vy = 0;              // Текущая вертикальная скорость
+const gravity = -0.015;  // Сила гравитации (притягивает вниз)
+const jumpForce = 0.35;  // Сила импульса при прыжке
+let isGrounded = true;   // Находится ли персонаж на земле
+
+// При нажатии Пробела, если игрок на земле — задаем импульс вверх
+window.addEventListener('keydown', e => {
+    keys[e.code] = true;
+    
+    if (e.code === 'Space' && isGrounded) {
+        vy = jumpForce;
+        isGrounded = false;
+    }
+});
+
+function updatePlayer() {
+    let dx = 0;
+    let dz = 0;
+
+    // Горизонтальное движение (WASD / Стрелочки)
+    if (keys['KeyW'] || keys['ArrowUp']) dz -= speed;
+    if (keys['KeyS'] || keys['ArrowDown']) dz += speed;
+    if (keys['KeyA'] || keys['ArrowLeft']) dx -= speed;
+    if (keys['KeyD'] || keys['ArrowRight']) dx += speed;
+
+    if (dx !== 0 || dz !== 0) {
+        // Поворот человечка в сторону движения
+        const angle = Math.atan2(dx, dz);
+        player.rotation.y = angle;
+
+        // Новые координаты X и Z
+        const nextX = player.position.x + dx;
+        const nextZ = player.position.z + dz;
+
+        // Проверка столкновений со стенами
+        let collide = false;
+        for (let wall of walls) {
+            const box = new THREE.Box3().setFromObject(wall);
+            const playerBox = new THREE.Box3(
+                new THREE.Vector3(nextX - 0.3, player.position.y, nextZ - 0.3),
+                new THREE.Vector3(nextX + 0.3, player.position.y + 2, nextZ + 0.3)
+            );
+            if (box.intersectsBox(playerBox)) {
+                collide = true;
+                break;
+            }
+        }
+
+        if (!collide) {
+            player.position.x = nextX;
+            player.position.z = nextZ;
+        }
+    }
+
+    // --- ФИЗИКА ПРЫЖКА И ГРАВИТАЦИИ ---
+    player.position.y += vy; // Применяем скорость к Y
+    vy += gravity;           // Гравитация тянет скорость вниз
+
+    // Проверка приземления на пол (высота Y = 0)
+    if (player.position.y <= 0) {
+        player.position.y = 0;
+        vy = 0;
+        isGrounded = true; // Игрок снова на земле и может прыгать
+    }
+
+    // Слежение камеры за игроком с учетом высоты
+    camera.position.x = player.position.x;
+    camera.position.y = player.position.y + 7;
+    camera.position.z = player.position.z + 8;
+    camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+}
+
+function updatePlayer() {
+    let dx = 0;
+    let dz = 0;
+
+    // 1. Управление (WASD / Стрелочки)
+    if (keys['KeyW'] || keys['ArrowUp']) dz -= speed;
+    if (keys['KeyS'] || keys['ArrowDown']) dz += speed;
+    if (keys['KeyA'] || keys['ArrowLeft']) dx -= speed;
+    if (keys['KeyD'] || keys['ArrowRight']) dx += speed;
+
+    if (dx !== 0 || dz !== 0) {
+        // Поворот человечка в сторону движения
+        const angle = Math.atan2(dx, dz);
+        player.rotation.y = angle;
+
+        const nextX = player.position.x + dx;
+        const nextZ = player.position.z + dz;
+
+        // 2. Проверка боковых столкновений со стенами
+        let collide = false;
+        for (let wall of walls) {
+            const box = new THREE.Box3().setFromObject(wall);
+            
+            // Если игрок находиться НИЖЕ вершины стены, проверяем врезание в бок
+            if (player.position.y < CUBE_SIZE - 0.2) {
+                const playerBox = new THREE.Box3(
+                    new THREE.Vector3(nextX - 0.3, player.position.y, nextZ - 0.3),
+                    new THREE.Vector3(nextX + 0.3, player.position.y + 2, nextZ + 0.3)
+                );
+                if (box.intersectsBox(playerBox)) {
+                    collide = true;
+                    break;
+                }
+            }
+        }
+
+        if (!collide) {
+            player.position.x = nextX;
+            player.position.z = nextZ;
+        }
+    }
+
+    // 3. Расчет уровня земли под ногами
+    // Определяем текущую ячейку карты под игроком
+    const tileCol = Math.round(player.position.x / CUBE_SIZE);
+    const tileRow = Math.round(player.position.z / CUBE_SIZE);
+
+    let groundY = 0; // По умолчанию пол на Y = 0
+
+    // Проверяем, есть ли под нами блок стены
+    if (map3D[tileRow] && map3D[tileRow][tileCol] === 1) {
+        groundY = CUBE_SIZE; // Верхняя грань блока на Y = 2
+    }
+
+    // 4. Физика падения и приземления
+    player.position.y += vy;
+    vy += gravity;
+
+    // Приземление на рассчитанную высоту (на пол или на блок)
+    if (player.position.y <= groundY) {
+        player.position.y = groundY;
+        vy = 0;
+        isGrounded = true;
+    } else {
+        isGrounded = false; // Если спрыгнули с блока, игрок начинает падать
+    }
+
+    // 5. Слежение камеры за игроком
+    camera.position.x = player.position.x;
+    camera.position.y = player.position.y + 7;
+    camera.position.z = player.position.z + 8;
+    camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+}
+
 </body>
 </html>
