@@ -128,7 +128,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, #1a1a2e 0%, #000000 100%);
+            background: radial-gradient(circle, #1a0505 0%, #000000 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -140,9 +140,9 @@
 
         h1 {
             font-size: 46px;
-            color: #ffcc00;
+            color: #ff2222;
             margin-bottom: 10px;
-            text-shadow: 0 0 15px #ffaa00;
+            text-shadow: 0 0 15px #ff0000;
             letter-spacing: 3px;
         }
 
@@ -155,7 +155,7 @@
         .menu-btn {
             background: #222;
             color: #fff;
-            border: 2px solid #ffcc00;
+            border: 2px solid #ff2222;
             padding: 14px 28px;
             margin: 8px;
             font-size: 18px;
@@ -164,13 +164,13 @@
             cursor: pointer;
             width: 300px;
             transition: all 0.2s;
-            box-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
         }
 
         .menu-btn:active, .menu-btn:hover {
-            background: #ffcc00;
+            background: #ff2222;
             color: #000;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
         }
 
         #mobile-controls {
@@ -205,7 +205,7 @@
             left: 35px;
             width: 50px;
             height: 50px;
-            background: rgba(255, 204, 0, 0.6);
+            background: rgba(255, 34, 34, 0.6);
             border-radius: 50%;
         }
 
@@ -227,7 +227,7 @@
 
         #quiz-box {
             background: rgba(20, 20, 20, 0.95);
-            border: 2px solid #ffcc00;
+            border: 2px solid #ff2222;
             border-radius: 12px;
             padding: 25px;
             max-width: 500px;
@@ -247,7 +247,7 @@
         }
 
         .quiz-opt:hover {
-            background: #ffcc00;
+            background: #ff2222;
             color: #000;
         }
     </style>
@@ -269,7 +269,7 @@
     <!-- Главное Меню -->
     <div id="main-menu">
         <h1>ИГРА КОЧ</h1>
-        <p class="subtitle">Разрушения • Трюки • Осенний вайб</p>
+        <p class="subtitle">Разрушения • Трюки • Выживание</p>
         <button class="menu-btn" onclick="startGame(1)">Уровень 1: Арена Трюков</button>
         <button class="menu-btn" onclick="startGame(2)">Уровень 2: Ночной Город</button>
         <button class="menu-btn" onclick="startGame(3)">Уровень 3: Промзона и Коч</button>
@@ -313,81 +313,24 @@
         const ramps = [];
         const clock = new THREE.Clock();
 
-        // Аудио переменные
-        let audioCtx = null;
-        let engineOsc = null;
-        let engineGain = null;
-
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             isMobile = true;
         }
 
-        function initAudio() {
-            if (audioCtx) return;
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-            // 1. Мелодичная осенняя музыка (меланхоличные аккорды пианино/синта)
-            const notes = [220.00, 246.94, 261.63, 293.66, 329.63, 293.66, 261.63, 246.94]; // Ноты в минорном ключе
-            let noteIndex = 0;
-
-            setInterval(() => {
-                if (!audioCtx) return;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                
-                osc.type = 'sine'; // Мягкий звук
-                osc.frequency.setValueAtTime(notes[noteIndex], audioCtx.currentTime);
-                noteIndex = (noteIndex + 1) % notes.length;
-
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 1.5);
-            }, 1200);
-
-            // 2. Звук мотора машины
-            engineOsc = audioCtx.createOscillator();
-            engineGain = audioCtx.createGain();
-            
-            engineOsc.type = 'triangle';
-            engineOsc.frequency.setValueAtTime(40, audioCtx.currentTime);
-            engineGain.gain.setValueAtTime(0, audioCtx.currentTime);
-            
-            engineOsc.connect(engineGain);
-            engineGain.connect(audioCtx.destination);
-            engineOsc.start();
-        }
-
-        window.addEventListener('click', () => { initAudio(); });
-        window.addEventListener('touchstart', () => { initAudio(); });
-
-        function updateEngineSound(speed) {
-            if (!audioCtx || !engineOsc || !engineGain) return;
-            if (inVehicle && currentVehicle) {
-                const pitch = Math.max(40, Math.min(180, 40 + Math.abs(speed) * 5));
-                engineOsc.frequency.setTargetAtTime(pitch, audioCtx.currentTime, 0.1);
-                engineGain.gain.setTargetAtTime(0.12, audioCtx.currentTime, 0.1);
-            } else {
-                engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
-            }
-        }
-
         function initScene() {
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x101018, 0.08); // Мягкий осенний вечерний туман
+            scene.fog = new THREE.FogExp2(0x050508, 0.08);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('game-canvas'), antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
 
-            const ambientLight = new THREE.AmbientLight(0x444455);
+            const ambientLight = new THREE.AmbientLight(0x333344);
             scene.add(ambientLight);
 
-            const flashlight = new THREE.SpotLight(0xfffaed, 2, 30, Math.PI / 5, 0.5); // Теплый свет фары
+            const flashlight = new THREE.SpotLight(0xffffff, 2, 30, Math.PI / 5, 0.5);
             camera.add(flashlight);
             flashlight.position.set(0, 0, 0.5);
             flashlight.target = camera;
@@ -419,7 +362,7 @@
             rampGeo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
             rampGeo.computeVertexNormals();
 
-            const rampMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, side: THREE.DoubleSide });
+            const rampMat = new THREE.MeshStandardMaterial({ color: 0xff5500, side: THREE.DoubleSide });
             const ramp = new THREE.Mesh(rampGeo, rampMat);
             ramp.position.set(x, 0, z);
             ramp.rotation.y = rotation;
@@ -432,13 +375,13 @@
             cars.length = 0;
             ramps.length = 0;
 
-            const ambientLight = new THREE.AmbientLight(0x444455);
+            const ambientLight = new THREE.AmbientLight(0x333344);
             scene.add(ambientLight);
             scene.add(camera);
 
-            // Асфальт
+            // Пол
             const floorGeo = new THREE.PlaneGeometry(160, 160);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x1a1a22, roughness: 0.9 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x111115, roughness: 0.9 });
             const floor = new THREE.Mesh(floorGeo, floorMat);
             floor.rotation.x = -Math.PI / 2;
             scene.add(floor);
@@ -447,10 +390,10 @@
                 createRamp(0, -15, 0);
                 createRamp(25, -25, Math.PI / 4);
                 createRamp(-25, -25, -Math.PI / 4);
-                createCar(0, 5, 0xff3333);
-                createCar(10, 5, 0x00aaff);
+                createCar(0, 5, 0xff2222);
+                createCar(10, 5, 0x00ccff);
             } else if (level === 2) { // Город
-                const bldgMat = new THREE.MeshStandardMaterial({ color: 0x222233 });
+                const bldgMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2a });
                 for(let i = -50; i <= 50; i += 30) {
                     const bldg = new THREE.Mesh(new THREE.BoxGeometry(20, 25, 20), bldgMat);
                     bldg.position.set(i, 12.5, -45);
@@ -459,7 +402,7 @@
                 createRamp(0, -20, 0);
                 createCar(-5, 0, 0xffaa00);
             } else if (level === 3) { // Промзона и Коч
-                createCar(0, 0, 0xff2222);
+                createCar(0, 0, 0xff0000);
                 
                 const monsterGeo = new THREE.BoxGeometry(2, 4, 2);
                 const monsterMat = new THREE.MeshStandardMaterial({ color: 0xff0000, wireframe: true });
@@ -473,19 +416,21 @@
 
         function createCar(x, z, color) {
             const carGroup = new THREE.Group();
+            
             const bodyGeo = new THREE.BoxGeometry(2.2, 1.1, 4.2);
             const bodyMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.3 });
             const body = new THREE.Mesh(bodyGeo, bodyMat);
             body.position.y = 0.8;
             carGroup.add(body);
 
-            const lightL = new THREE.SpotLight(0xfffaed, 3, 30, Math.PI/6);
+            // Фонари машины
+            const lightL = new THREE.SpotLight(0xffffff, 3, 30, Math.PI/6);
             lightL.position.set(-0.8, 0.9, -2);
             lightL.target.position.set(-0.8, 0.5, -10);
             carGroup.add(lightL);
             carGroup.add(lightL.target);
 
-            const lightR = new THREE.SpotLight(0xfffaed, 3, 30, Math.PI/6);
+            const lightR = new THREE.SpotLight(0xffffff, 3, 30, Math.PI/6);
             lightR.position.set(0.8, 0.9, -2);
             lightR.target.position.set(0.8, 0.5, -10);
             carGroup.add(lightR);
@@ -507,6 +452,8 @@
         function triggerDamage(car, amount) {
             car.damage = Math.min(100, car.damage + amount);
             document.getElementById('damage-bar').style.width = car.damage + '%';
+            
+            // Деформация / Изменение цвета при повреждении
             car.bodyMesh.scale.x = 1 - (car.damage * 0.003);
             car.bodyMesh.scale.z = 1 - (car.damage * 0.002);
             car.bodyMesh.material.color.setHSL(0, 1 - (car.damage*0.008), 0.5 - (car.damage*0.003));
@@ -531,7 +478,7 @@
         }
 
         function setupKeyboard() {
-            document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', (e) => {
                 if (e.code === 'KeyW') moveForward = true;
                 if (e.code === 'KeyS') moveBackward = true;
                 if (e.code === 'KeyA') moveLeft = true;
@@ -569,6 +516,7 @@
             const stick = document.getElementById('joystick-stick');
             const container = document.getElementById('joystick-container');
             const actionBtn = document.getElementById('action-btn-mobile');
+
             container.addEventListener('touchstart', (e) => {
                 joystickActive = true;
                 const touch = e.touches[0];
@@ -617,7 +565,6 @@
                     }
                 }
             });
-
             const resetLook = (e) => {
                 for (let touch of e.changedTouches) {
                     if (touch.identifier === touchLookId) touchLookId = null;
@@ -662,7 +609,8 @@
             const q = quizData[currentQuizIdx];
             document.getElementById('quiz-question').innerText = q.q;
             const optsContainer = document.getElementById('quiz-options');
-            optsContainer.innerHTML = "";\
+            optsContainer.innerHTML = "";
+
             q.opts.forEach((opt, idx) => {
                 const btn = document.createElement('div');
                 btn.className = 'quiz-opt';
@@ -692,6 +640,7 @@
             if (inVehicle && currentVehicle) {
                 const car = currentVehicle;
                 
+                // Физика Управления и Трюков
                 if (moveForward || joystickDir.y < -0.3) car.speed = Math.min(25, car.speed + 15 * delta);
                 else if (moveBackward || joystickDir.y > 0.3) car.speed = Math.max(-10, car.speed - 10 * delta);
                 else car.speed *= 0.98;
@@ -700,8 +649,8 @@
                 if (moveRight || joystickDir.x > 0.3) car.mesh.rotation.y -= 1.8 * delta;
 
                 car.mesh.translateZ(-car.speed * delta);
-                updateEngineSound(car.speed);
 
+                // Проверка наезд на рампу (Трамплин)
                 let onRamp = false;
                 ramps.forEach(r => {
                     if (car.mesh.position.distanceTo(r.position) < 4) {
@@ -716,7 +665,7 @@
                     car.mesh.position.y -= 12 * delta;
                     car.airTime += delta;
                     if (car.mesh.position.y <= 0) {
-                        car.mesh.position.y = 0;
+                    car.mesh.position.y = 0;
                         if (car.inAir && car.airTime > 0.5) {
                             addStuntPoints(Math.floor(car.airTime * 300), "МЕГА ПРЫЖОК!");
                             triggerDamage(car, Math.floor(car.airTime * 15));
@@ -729,7 +678,6 @@
                 camera.position.copy(car.mesh.position);
                 camera.position.y += 2.2;
             } else {
-                updateEngineSound(0);
                 const speed = 5 * delta;
                 if ((!isMobile && controls && controls.isLocked) || isMobile) {
                     if (moveForward || joystickDir.y < -0.3) camera.translateZ(-speed);
