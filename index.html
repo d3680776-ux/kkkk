@@ -1,501 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D Horror Maze: First Person</title>
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Three.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Игра: Собери кристаллы</title>
     <style>
-        /* Prevent scroll and touch highlights */
-        body, html {
+        body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
             overflow: hidden;
-            background-color: #000;
+            background-color: #111;
+            font-family: Arial, sans-serif;
             user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
-
-        /* D-Pad / Touch control styles */
-        .touch-btn {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(4px);
-            active:bg-red-600;
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
         }
-
-        .touch-btn:active {
-            background: rgba(220, 38, 38, 0.6);
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #aaa;
+            font-size: 16px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 8px;
         }
     </style>
 </head>
-<body class="relative w-full h-full text-white select-none">
+<body>
 
-    <!-- WebGL Canvas -->
-    <div id="canvas-container" class="w-full h-full absolute inset-0 z-0"></div>
+    <div id="ui">Счет: <span id="score">0</span></div>
+    <div id="instructions">Управление: Клавиши **W, A, S, D** — движение | **Пробел** — прыжок</div>
 
-    <!-- UI Overlay HUD -->
-    <div id="hud" class="absolute top-4 left-4 z-10 flex flex-col gap-2 p-4 bg-black/70 backdrop-blur-md rounded-xl border border-gray-800 shadow-2xl min-w-[200px]">
-        <div class="flex flex-col gap-1">
-            <span class="text-xs font-bold tracking-wider text-red-500 uppercase">Health</span>
-            <div class="w-full bg-gray-900 h-3 rounded-full overflow-hidden border border-gray-700">
-                <div id="hp-bar" class="bg-gradient-to-r from-red-700 to-red-500 h-full w-full transition-all duration-150"></div>
-            </div>
-        </div>
-
-        <div class="flex justify-between items-center mt-1">
-            <span class="text-xs font-bold tracking-wider text-amber-400 uppercase">Key Status:</span>
-            <span id="key-status" class="text-xs font-black tracking-widest text-red-500">MISSING</span>
-        </div>
-    </div>
-
-    <!-- Crosshair -->
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white/40 rounded-full z-10 pointer-events-none"></div>
-
-    <!-- Controls Overlay / Start Screen -->
-    <div id="start-overlay" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/90 backdrop-blur-lg p-6 text-center">
-        <div class="max-w-md w-full flex flex-col items-center gap-6">
-            <div class="flex flex-col items-center gap-2">
-                <h1 class="text-4xl md:text-5xl font-black tracking-widest text-red-600 uppercase drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]">
-                    The Labyrinth
-                </h1>
-                <p class="text-gray-400 text-sm">Find the golden key and escape before the entity catches you.</p>
-            </div>
-
-            <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-left text-xs text-gray-300 w-full flex flex-col gap-2">
-                <p class="font-bold text-gray-200 border-b border-gray-800 pb-1">Controls:</p>
-                <div class="grid grid-cols-2 gap-2">
-                    <div><span class="text-red-400 font-mono">WASD / Arrow Keys:</span> Move</div>
-                    <div><span class="text-red-400 font-mono">Drag Mouse/Touch:</span> Look Around</div>
-                </div>
-            </div>
-
-            <button id="start-btn" class="w-full py-4 bg-gradient-to-r from-red-800 to-red-600 hover:from-red-700 hover:to-red-500 text-white font-bold rounded-xl shadow-lg shadow-red-900/50 transition-all duration-200 text-lg uppercase tracking-wider">
-                Begin Nightmare
-            </button>
-        </div>
-    </div>
-    <!-- Game Over / Victory Modal -->
-    <div id="end-overlay" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/95 backdrop-blur-xl p-6 text-center">
-        <div class="max-w-md w-full flex flex-col items-center gap-6">
-            <h2 id="end-title" class="text-4xl font-black tracking-widest uppercase"></h2>
-            <p id="end-msg" class="text-gray-300 text-sm"></p>
-            <button id="restart-btn" class="w-full py-4 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white font-bold rounded-xl transition-all duration-200 text-lg uppercase tracking-wider">
-                Try Again
-            </button>
-        </div>
-    </div>
-
-    <!-- Mobile Touch Controls -->
-    <div id="mobile-controls" class="absolute bottom-6 left-6 z-20 md:hidden flex flex-col gap-2 pointer-events-auto">
-        <div class="flex justify-center">
-            <button id="btn-up" class="touch-btn w-12 h-12 rounded-lg flex items-center justify-center text-xl">▲</button>
-        </div>
-        <div class="flex gap-2">
-            <button id="btn-left" class="touch-btn w-12 h-12 rounded-lg flex items-center justify-center text-xl">◄</button>
-            <button id="btn-down" class="touch-btn w-12 h-12 rounded-lg flex items-center justify-center text-xl">▼</button>
-            <button id="btn-right" class="touch-btn w-12 h-12 rounded-lg flex items-center justify-center text-xl">►</button>
-        </div>
-    </div>
+    <!-- Подключаем Three.js через CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        // --- Game Config & Constants ---
-        const CUBE_SIZE = 4;
-        const PLAYER_SPEED = 0.08;
-        const MONSTER_SPEED = 0.045;
-        const MOUSE_SENSITIVITY = 0.003;
+        // 1. Инициализация сцены, камеры и рендерера
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a2e);
+        scene.fog = new THREE.FogExp2(0x1a1a2e, 0.015);
 
-        // Maze Grid (1: Wall, 0: Path, 2: Exit, 3: Golden Key)
-        const mazeMap = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,1,0,0,0,0,0,0,1,0,0,3,1],
-            [1,0,1,0,1,0,1,1,1,1,0,1,0,1,0,1],
-            [1,0,1,0,0,0,0,0,0,1,0,0,0,1,0,1],
-            [1,0,1,1,1,1,0,1,0,1,1,1,0,1,0,1],
-            [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1],
-            [1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
-            [1,0,0,0,0,1,0,0,0,1,0,0,0,0,2,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
 
-        // --- Core Variables ---
-        let scene, camera, renderer, flashlight;
-        let walls = [];
-        let keyMesh = null;
-        let exitMesh = null;
-        let monsterGroup = null;
+        // 2. Освещение
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
 
-        let gameRunning = false;
-        let playerHp = 100;
-        let hasKey = false;
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(20, 40, 20);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
 
-        // Player Rotation Angle State (Yaw & Pitch)
-        let yaw = 0;
-        let pitch = 0;
+        // 3. Создание мира (Платформа)
+        const planeGeo = new THREE.PlaneGeometry(100, 100);
+        const planeMat = new THREE.MeshStandardMaterial({ color: 0x16213e, roughness: 0.8 });
+        const plane = new THREE.Mesh(planeGeo, planeMat);
+        plane.rotation.x = -Math.PI / 2;
+        plane.receiveShadow = true;
+        scene.add(plane);
 
-        // Touch / Mouse Dragging State
-        let isDragging = false;
-        let previousMouseX = 0;
-        let previousMouseY = 0;
+        // Декоративная сетка на полу
+        const grid = new THREE.GridHelper(100, 50, 0x0f3460, 0x0f3460);
+        grid.position.y = 0.01;
+        scene.add(grid);
 
-        // Keyboard Movement State
-        const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false };
+        // 4. Игрок
+        const playerGeo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+        const playerMat = new THREE.MeshStandardMaterial({ color: 0xe94560, roughness: 0.3 });
+        const player = new THREE.Mesh(playerGeo, playerMat);
+        player.position.set(0, 0.75, 0);
+        player.castShadow = true;
+        scene.add(player);
 
-        // DOM Elements
-        const canvasContainer = document.getElementById('canvas-container');
-        const startOverlay = document.getElementById('start-overlay');
-        const startBtn = document.getElementById('start-btn');
-        const endOverlay = document.getElementById('end-overlay');
-        const endTitle = document.getElementById('end-title');
-        const endMsg = document.getElementById('end-msg');
-        const restartBtn = document.getElementById('restart-btn');
-        const hpBar = document.getElementById('hp-bar');
-        const keyStatus = document.getElementById('key-status');
+        // 5. Создание кристаллов для сбора
+        const crystals = [];
+        const crystalGeo = new THREE.OctahedronGeometry(0.7);
+        const crystalMat = new THREE.MeshStandardMaterial({ color: 0x00fff5, roughness: 0.2, emissive: 0x005555 });
 
-        function initScene() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x020202);
-            scene.fog = new THREE.FogExp2(0x020202, 0.15); // Fog for horror atmosphere
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            canvasContainer.appendChild(renderer.domElement);
-
-            // Flashlight on Player
-            flashlight = new THREE.SpotLight(0xffeedd, 2.5, 22, Math.PI / 5, 0.5, 1);
-            camera.add(flashlight);
-            flashlight.position.set(0, 0, 0);
-            flashlight.target.position.set(0, 0, -1);
-            camera.add(flashlight.target);
-            scene.add(camera);
-
-            // Dim Ambient light
-            const ambient = new THREE.AmbientLight(0x111118, 0.2);
-            scene.add(ambient);
-
-            buildMaze();
-            createMonster();
-            resetPlayerPosition();
+        function spawnCrystal() {
+            const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+            const x = (Math.random() - 0.5) * 80;
+            const z = (Math.random() - 0.5) * 80;
+            crystal.position.set(x, 0.8, z);
+            crystal.castShadow = true;
+            scene.add(crystal);
+            crystals.push(crystal);
         }
 
-        function buildMaze() {
-            const wallGeo = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0x1f1f22, roughness: 0.9 });
+        // Спавним 15 кристаллов на карте
+        for (let i = 0; i < 15; i++) {
+            spawnCrystal();
+        }
 
-            const width = mazeMap[0].length * CUBE_SIZE;
-            const height = mazeMap.length * CUBE_SIZE;
-
-            // Floor & Ceiling
-            const floorGeo = new THREE.PlaneGeometry(width, height);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x0f0f12, roughness: 0.8 });
-
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            floor.position.set(width / 2 - CUBE_SIZE / 2, 0, height / 2 - CUBE_SIZE / 2);
-            scene.add(floor);
-
-            const ceiling = new THREE.Mesh(floorGeo, floorMat);
-            ceiling.rotation.x = Math.PI / 2;
-            ceiling.position.set(width / 2 - CUBE_SIZE / 2, CUBE_SIZE, height / 2 - CUBE_SIZE / 2);
-            scene.add(ceiling);
-
-            // Walls & Items
-            for (let r = 0; r < mazeMap.length; r++) {
-                for (let c = 0; c < mazeMap[r].length; c++) {
-                    const tile = mazeMap[r][c];
-                    const x = c * CUBE_SIZE;
-                    const z = r * CUBE_SIZE;
-
-                    if (tile === 1) {
-                        const wall = new THREE.Mesh(wallGeo, wallMat);
-                        wall.position.set(x, CUBE_SIZE / 2, z);
-                        scene.add(wall);
-                        walls.push(wall);
-                    } else if (tile === 3) {
-                        // Key
-                        const keyGeo = new THREE.OctahedronGeometry(0.4);
-                        const keyMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-                        keyMesh = new THREE.Mesh(keyGeo, keyMat);
-                        keyMesh.position.set(x, 1.5, z);
-                        scene.add(keyMesh);
-                    } else if (tile === 2) {
-                        // Exit Door
-                        const exitGeo = new THREE.BoxGeometry(CUBE_SIZE * 0.8, CUBE_SIZE * 0.8, 0.2);
-                        const exitMat = new THREE.MeshBasicMaterial({ color: 0x880000 });
-                        exitMesh = new THREE.Mesh(exitGeo, exitMat);
-                        exitMesh.position.set(x, CUBE_SIZE / 2, z);
-                        scene.add(exitMesh);
-                    }
+        // 6. Управление с клавиатуры
+        const keys = { w: false, a: false, s: false, d: false, space: false };
+        
+        window.addEventListener('keydown', (e) => {
+        if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = true;
+            if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = true;
+            if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = true;
+            if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = true;
+            if (e.code === 'Space') {
+                if (isGrounded) {
+                    velocityY = 0.3;
+                    isGrounded = false;
                 }
             }
-        }
+        });
 
-        function createMonster() {
-            monsterGroup = new THREE.Group();
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = false;
+            if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = false;
+            if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = false;
+            if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = false;
+        });
 
-            // Body
-            const bodyGeo = new THREE.CylinderGeometry(0.4, 0.2, 2.2, 8);
-            const bodyMat = new THREE.MeshBasicMaterial({ color: 0x770000 });
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            body.position.y = 1.1;
-            monsterGroup.add(body);
+        // Физика игрока
+        const speed = 0.2;
+        let velocityY = 0;
+        const gravity = 0.015;
+        let isGrounded = true;
+        let score = 0;
 
-            // Eyes
-            const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        // 7. Игровой цикл
+        function animate() {
+            requestAnimationFrame(animate);
 
-            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-            leftEye.position.set(-0.15, 1.8, -0.35);
+            // Движение игрока
+            if (keys.w) player.position.z -= speed;
+            if (keys.s) player.position.z += speed;
+            if (keys.a) player.position.x -= speed;
+            if (keys.d) player.position.x += speed;
 
-            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-            rightEye.position.set(0.15, 1.8, -0.35);
-            monsterGroup.add(leftEye, rightEye);
-            monsterGroup.position.set(14 * CUBE_SIZE, 0, 7 * CUBE_SIZE);
-            scene.add(monsterGroup);
-        }
+            // Ограничение движения в пределах поля (-48 до 48)
+            player.position.x = Math.max(-48, Math.min(48, player.position.x));
+            player.position.z = Math.max(-48, Math.min(48, player.position.z));
 
-        function resetPlayerPosition() {
-            camera.position.set(CUBE_SIZE, 1.6, CUBE_SIZE);
-            yaw = 0;
-            pitch = 0;
-            updateCameraRotation();
-        }
+            // Гравитация и прыжки
+            velocityY -= gravity;
+            player.position.y += velocityY;
 
-        function updateCameraRotation() {
-            pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, pitch));
-            camera.rotation.order = "YXZ";
-            camera.rotation.y = yaw;
-            camera.rotation.x = pitch;
-        }
+            if (player.position.y <= 0.75) {
+                player.position.y = 0.75;
+                velocityY = 0;
+                isGrounded = true;
+            }
 
-        function setupControls() {
-            // Keyboard Inputs
-            window.addEventListener('keydown', (e) => {
-                if (e.key in keys) keys[e.key] = true;
-                if (e.code === 'KeyW') keys.w = true;
-                if (e.code === 'KeyA') keys.a = true;
-                if (e.code === 'KeyS') keys.s = true;
-                if (e.code === 'KeyD') keys.d = true;
+            // Вращение и проверка сбора кристаллов
+            crystals.forEach((crystal, index) => {
+                crystal.rotation.y += 0.03;
+                crystal.rotation.x += 0.02;
+
+                // Проверка столкновения игрока с кристаллом (простая дистанция)
+                const distance = player.position.distanceTo(crystal.position);
+                if (distance < 1.5) {
+                    scene.remove(crystal);
+                    crystals.splice(index, 1);
+                    score += 10;
+                    document.getElementById('score').innerText = score;
+
+                    // Спавним новый кристалл взамен собранного
+                    spawnCrystal();
+                }
             });
 
-            window.addEventListener('keyup', (e) => {
-                if (e.key in keys) keys[e.key] = false;
-                if (e.code === 'KeyW') keys.w = false;
-                if (e.code === 'KeyA') keys.a = false;
-                if (e.code === 'KeyS') keys.s = false;
-                if (e.code === 'KeyD') keys.d = false;
-            });
+            // Плавное следование камеры за игроком
+            camera.position.x = player.position.x;
+            camera.position.y = player.position.y + 12;
+            camera.position.z = player.position.z + 15;
+            camera.lookAt(player.position);
 
-            // Drag Controls (Mouse / Touch) for looking around without requiring PointerLock
-            const onDragStart = (x, y) => {
-                if (!gameRunning) return;
-                isDragging = true;
-                previousMouseX = x;
-                previousMouseY = y;
-            };
-
-            const onDragMove = (x, y) => {
-                if (!isDragging || !gameRunning) return;
-                const deltaX = x - previousMouseX;
-                const deltaY = y - previousMouseY;
-
-                yaw -= deltaX * MOUSE_SENSITIVITY;
-                pitch -= deltaY * MOUSE_SENSITIVITY;
-
-                updateCameraRotation();
-
-                previousMouseX = x;
-                previousMouseY = y;
-            };
-
-            const onDragEnd = () => {
-                isDragging = false;
-            };
-
-            // Mouse events
-            window.addEventListener('mousedown', (e) => onDragStart(e.clientX, e.clientY));
-            window.addEventListener('mousemove', (e) => onDragMove(e.clientX, e.clientY));
-            window.addEventListener('mouseup', onDragEnd);
-
-            // Touch events
-            window.addEventListener('touchstart', (e) => {
-                if (e.touches.length > 0) onDragStart(e.touches[0].clientX, e.touches[0].clientY);
-            });
-            window.addEventListener('touchmove', (e) => {
-                if (e.touches.length > 0) onDragMove(e.touches[0].clientX, e.touches[0].clientY);
-            });
-            window.addEventListener('touchend', onDragEnd);
-
-            // Onscreen D-Pad Controls for Mobile
-            const bindTouchBtn = (id, keyName) => {
-                const btn = document.getElementById(id);
-                if (!btn) return;
-                btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; });
-                btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
-                btn.addEventListener('mousedown', () => keys[keyName] = true);
-                btn.addEventListener('mouseup', () => keys[keyName] = false);
-            };
-
-            bindTouchBtn('btn-up', 'w');
-            bindTouchBtn('btn-left', 'a');
-            bindTouchBtn('btn-down', 's');
-            bindTouchBtn('btn-right', 'd');
-
-            // Resize Handler
-            window.addEventListener('resize', onWindowResize);
+            renderer.render(scene, camera);
         }
 
-        function onWindowResize() {
+        animate();
+
+        // Адаптация при изменении размера окна
+        window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        function updateGame() {
-            if (!gameRunning) return;
-
-            // Player Movement
-            const moveVector = new THREE.Vector3();
-            if (keys.w || keys.ArrowUp) moveVector.z -= 1;
-            if (keys.s || keys.ArrowDown) moveVector.z += 1;
-            if (keys.a || keys.ArrowLeft) moveVector.x -= 1;
-            if (keys.d || keys.ArrowRight) moveVector.x += 1;
-
-            if (moveVector.lengthSq() > 0) {
-                moveVector.normalize();
-                moveVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-
-                const nextX = camera.position.x + moveVector.x * PLAYER_SPEED;
-                const nextZ = camera.position.z + moveVector.z * PLAYER_SPEED;
-
-                // Wall Collisions
-                let collideX = false;
-                let collideZ = false;
-
-                for (let wall of walls) {
-                    const box = new THREE.Box3().setFromObject(wall);
-                    const playerSphereX = new THREE.Sphere(new THREE.Vector3(nextX, 1.6, camera.position.z), 0.5);
-                    const playerSphereZ = new THREE.Sphere(new THREE.Vector3(camera.position.x, 1.6, nextZ), 0.5);
-
-                    if (box.intersectsSphere(playerSphereX)) collideX = true;
-                    if (box.intersectsSphere(playerSphereZ)) collideZ = true;
-                }
-
-                if (!collideX) camera.position.x = nextX;
-                if (!collideZ) camera.position.z = nextZ;
-            }
-
-            // Key Collection
-            if (keyMesh) {
-                keyMesh.rotation.y += 0.02;
-                if (camera.position.distanceTo(keyMesh.position) < 1.5) {
-                    scene.remove(keyMesh);
-                    keyMesh = null;
-                    hasKey = true;
-                    keyStatus.innerText = "FOUND!";
-                    keyStatus.className = "text-xs font-black tracking-widest text-green-400";
-                    exitMesh.material.color.setHex(0x00ff00);
-                }
-            }
-
-            // Exit Check
-            if (exitMesh && camera.position.distanceTo(exitMesh.position) < 2.0) {
-                if (hasKey) {
-                    endGame(true, "YOU ESCAPED!", "You unlocked the exit and survived the darkness.");
-                    return;
-                }
-            }
-
-            // Monster Pursuit
-            if (monsterGroup) {
-                const distToMonster = camera.position.distanceTo(monsterGroup.position);
-                monsterGroup.lookAt(camera.position.x, 0, camera.position.z);
-
-                if (distToMonster < 25) {
-                    monsterGroup.translateZ(MONSTER_SPEED);
-
-                    // Attack Player
-                    if (distToMonster < 1.8) {
-                        playerHp -= 1.2;
-                        hpBar.style.width = Math.max(0, playerHp) + '%';
-
-                        if (playerHp <= 0) {
-                            endGame(false, "YOU DIED...", "The monster caught you in the darkness.");
-                            return;
-                        }
-                    }
-                }
-            }
-
-            // Atmospheric Flashlight Flicker
-            flashlight.intensity = 2.5 + (Math.random() < 0.05 ? (Math.random() - 0.5) * 1.5 : 0);
-        }
-
-        function endGame(won, title, message) {
-            gameRunning = false;
-            endTitle.innerText = title;
-            endTitle.className = won ? "text-4xl font-black tracking-widest uppercase text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,0.8)]" : "text-4xl font-black tracking-widest uppercase text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]";
-            endMsg.innerText = message;
-            endOverlay.classList.remove('hidden');
-        }
-
-        function restartGame() {
-            playerHp = 100;
-            hasKey = false;
-            hpBar.style.width = '100%';
-            keyStatus.innerText = "MISSING";
-            keyStatus.className = "text-xs font-black tracking-widest text-red-500";
-            if (!keyMesh) {
-                const keyGeo = new THREE.OctahedronGeometry(0.4);
-                const keyMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-                keyMesh = new THREE.Mesh(keyGeo, keyMat);
-                keyMesh.position.set(14 * CUBE_SIZE, 1.5, 1 * CUBE_SIZE);
-                scene.add(keyMesh);
-            }
-
-            if (exitMesh) exitMesh.material.color.setHex(0x880000);
-            if (monsterGroup) monsterGroup.position.set(14 * CUBE_SIZE, 0, 7 * CUBE_SIZE);
-
-            resetPlayerPosition();
-            endOverlay.classList.add('hidden');
-            gameRunning = true;
-        }
-
-        // Render Loop
-        function animate() {
-            requestAnimationFrame(animate);
-            updateGame();
-            if (renderer && scene && camera) {
-                renderer.render(scene, camera);
-            }
-        }
-
-        // Initialize Game
-        startBtn.addEventListener('click', () => {
-            startOverlay.classList.add('hidden');
-            gameRunning = true;
         });
-
-        restartBtn.addEventListener('click', restartGame);
-
-        window.onload = () => {
-            initScene();
-            setupControls();
-            animate();
-        };
     </script>
 </body>
 </html>
