@@ -2,200 +2,584 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Игра: Собери кристаллы</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Игра Коч — BETA TEST v0.2</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #111;
-            font-family: Arial, sans-serif;
+        * {
+            box-sizing: border-box;
             user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
-        #ui {
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+        }
+
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Водяной знак BETA TEST v0.2 */
+        #watermark {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            font-size: 24px;
+            top: 15px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 20px;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            letter-spacing: 2px;
             pointer-events: none;
+            z-index: 100;
+            text-shadow: 0 0 8px rgba(0,0,0,0.8);
         }
-        #instructions {
+
+        /* Прицел */
+        #crosshair {
             position: absolute;
-            bottom: 20px;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 90;
+        }
+
+        /* Подсказка по взаимодействию */
+        #action-prompt {
+            position: absolute;
+            bottom: 25%;
             left: 50%;
             transform: translateX(-50%);
-            color: #aaa;
-            font-size: 16px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffcc00;
             padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            display: none;
+            pointer-events: none;
+            z-index: 90;
+            border: 1px solid #ffcc00;
+            text-align: center;
+        }
+
+        /* Меню игры */
+        #main-menu, #quiz-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #1a0505 0%, #000000 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            color: #ff2222;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px #ff0000;
+            letter-spacing: 3px;
+        }
+
+        p.subtitle {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .menu-btn {
+            background: #222;
+            color: #fff;
+            border: 2px solid #ff2222;
+            padding: 14px 28px;
+            margin: 10px;
+            font-size: 18px;
+            font-weight: bold;
             border-radius: 8px;
+            cursor: pointer;
+            width: 280px;
+            transition: all 0.2s;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+        }
+
+        .menu-btn:active, .menu-btn:hover {
+            background: #ff2222;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        }
+
+        /* Мобильное управление */
+        #mobile-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 80;
+            display: none;
+        }
+
+        .touch-zone {
+            position: absolute;
+            pointer-events: auto;
+        }
+
+        #joystick-container {
+            bottom: 40px;
+            left: 40px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        #joystick-stick {
+            position: absolute;
+            top: 35px;
+            left: 35px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 34, 34, 0.6);
+            border-radius: 50%;
+        }
+
+        #action-btn-mobile {
+            bottom: 50px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 204, 0, 0.4);
+            border: 2px solid #ffcc00;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #quiz-box {
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #ff2222;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .quiz-opt {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .quiz-opt:hover {
+            background: #ff2222;
+            color: #000;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
 </head>
 <body>
 
-    <div id="ui">Счет: <span id="score">0</span></div>
-    <div id="instructions">Управление: Клавиши **W, A, S, D** — движение | **Пробел** — прыжок</div>
+    <div id="watermark">BETA TEST v0.2</div>
+    <div id="crosshair"></div>
+    <div id="action-prompt">Нажмите [E] или Кнопку, чтобы сесть в машину</div>
 
-    <!-- Подключаем Three.js через CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Главное Меню -->
+    <div id="main-menu">
+        <h1>ИГРА КОЧ</h1>
+        <p class="subtitle">Хоррор Выживание • Выберите Уровень</p>
+        <button class="menu-btn" onclick="startGame(1)">Уровень 1: Лабиринт</button>
+        <button class="menu-btn" onclick="startGame(2)">Уровень 2: Город</button>
+        <button class="menu-btn" onclick="startGame(3)">Уровень 3: Промзона и Авто</button>
+        <button class="menu-btn" style="border-color: #ffcc00;" onclick="openQuiz()">Тест для Михаила и Вовы</button>
+    </div>
+
+    <!-- Окно Теста -->
+    <div id="quiz-screen" style="display: none;">
+        <div id="quiz-box">
+            <h2 id="quiz-title" style="color: #ffcc00;">Тест для Друзей</h2>
+            <p id="quiz-question" style="font-size: 18px; margin: 20px 0;"></p>
+            <div id="quiz-options"></div>
+            <button class="menu-btn" style="margin-top: 20px; width: 100%;" onclick="closeQuiz()">Назад в меню</button>
+        </div>
+    </div>
+
+    <!-- Мобильное Управление -->
+    <div id="mobile-controls">
+        <div id="joystick-container" class="touch-zone">
+            <div id="joystick-stick"></div>
+        </div>
+        <div id="action-btn-mobile" class="touch-zone">ДЕЙСТВИЕ</div>
+    </div>
+
+    <canvas id="game-canvas"></canvas>
 
     <script>
-        // 1. Инициализация сцены, камеры и рендерера
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1a1a2e);
-        scene.fog = new THREE.FogExp2(0x1a1a2e, 0.015);
+        let scene, camera, renderer, controls;
+        let isMobile = false;
+        let currentLevel = 1;
+        let inVehicle = false;
+        let currentVehicle = null;
+        let monster = null;
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let joystickActive = false, joystickOrigin = { x: 0, y: 0 }, joystickDir = { x: 0, y: 0 };
+        let touchLookId = null, lastTouchLook = { x: 0, y: 0 };
 
-        // 2. Освещение
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
+        const cars = [];
+        const clock = new THREE.Clock();
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(20, 40, 20);
-        dirLight.castShadow = true;
-        scene.add(dirLight);
-
-        // 3. Создание мира (Платформа)
-        const planeGeo = new THREE.PlaneGeometry(100, 100);
-        const planeMat = new THREE.MeshStandardMaterial({ color: 0x16213e, roughness: 0.8 });
-        const plane = new THREE.Mesh(planeGeo, planeMat);
-        plane.rotation.x = -Math.PI / 2;
-        plane.receiveShadow = true;
-        scene.add(plane);
-
-        // Декоративная сетка на полу
-        const grid = new THREE.GridHelper(100, 50, 0x0f3460, 0x0f3460);
-        grid.position.y = 0.01;
-        scene.add(grid);
-
-        // 4. Игрок
-        const playerGeo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-        const playerMat = new THREE.MeshStandardMaterial({ color: 0xe94560, roughness: 0.3 });
-        const player = new THREE.Mesh(playerGeo, playerMat);
-        player.position.set(0, 0.75, 0);
-        player.castShadow = true;
-        scene.add(player);
-
-        // 5. Создание кристаллов для сбора
-        const crystals = [];
-        const crystalGeo = new THREE.OctahedronGeometry(0.7);
-        const crystalMat = new THREE.MeshStandardMaterial({ color: 0x00fff5, roughness: 0.2, emissive: 0x005555 });
-
-        function spawnCrystal() {
-            const crystal = new THREE.Mesh(crystalGeo, crystalMat);
-            const x = (Math.random() - 0.5) * 80;
-            const z = (Math.random() - 0.5) * 80;
-            crystal.position.set(x, 0.8, z);
-            crystal.castShadow = true;
-            scene.add(crystal);
-            crystals.push(crystal);
+        // Проверка на мобильное устройство
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            isMobile = true;
         }
 
-        // Спавним 15 кристаллов на карте
-        for (let i = 0; i < 15; i++) {
-            spawnCrystal();
+        function initScene() {
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050508, 0.12);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('game-canvas'), antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+
+            const ambientLight = new THREE.AmbientLight(0x1a1a24);
+            scene.add(ambientLight);
+
+            // Фонарик игрока
+            const flashlight = new THREE.SpotLight(0xffffff, 2, 25, Math.PI / 5, 0.5);
+            camera.add(flashlight);
+            flashlight.position.set(0, 0, 0.5);
+            flashlight.target = camera;
+            scene.add(camera);
+
+            if (!isMobile) {
+                controls = new THREE.PointerLockControls(camera, document.body);
+                document.body.addEventListener('click', () => {
+                    if (document.getElementById('main-menu').style.display === 'none' && 
+                        document.getElementById('quiz-screen').style.display === 'none') {
+                        controls.lock();
+                    }
+                });
+            } else {
+                document.getElementById('mobile-controls').style.display = 'block';
+                setupMobileControls();
+            }
+
+            window.addEventListener('resize', onWindowResize);
+            setupKeyboard();
         }
 
-        // 6. Управление с клавиатуры
-        const keys = { w: false, a: false, s: false, d: false, space: false };
-        
-        window.addEventListener('keydown', (e) => {
-        if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = true;
-            if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = true;
-            if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = true;
-            if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = true;
-            if (e.code === 'Space') {
-                if (isGrounded) {
-                    velocityY = 0.3;
-                    isGrounded = false;
+        function buildLevel(level) {
+            // Очистка сцены
+            while(scene.children.length > 0){ 
+                scene.remove(scene.children[0]); 
+            }
+            cars.length = 0;
+
+            const ambientLight = new THREE.AmbientLight(0x222233);
+            scene.add(ambientLight);
+            scene.add(camera);
+
+            // Пол
+            const floorGeo = new THREE.PlaneGeometry(100, 100);
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.8 });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            if (level === 1) { // Лабиринт
+                const wallMat = new THREE.MeshStandardMaterial({ color: 0x331111 });
+                for(let i = -40; i <= 40; i += 20) {
+                    for(let j = -40; j <= 40; j += 20) {
+                        if (Math.abs(i) + Math.abs(j) > 20) {
+                            const wall = new THREE.Mesh(new THREE.BoxGeometry(8, 5, 8), wallMat);
+                            wall.position.set(i, 2.5, j);
+                            scene.add(wall);
+                        }
+                    }
                 }
-            }
-        });
-
-        window.addEventListener('keyup', (e) => {
-            if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = false;
-            if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = false;
-            if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = false;
-            if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = false;
-        });
-
-        // Физика игрока
-        const speed = 0.2;
-        let velocityY = 0;
-        const gravity = 0.015;
-        let isGrounded = true;
-        let score = 0;
-
-        // 7. Игровой цикл
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Движение игрока
-            if (keys.w) player.position.z -= speed;
-            if (keys.s) player.position.z += speed;
-            if (keys.a) player.position.x -= speed;
-            if (keys.d) player.position.x += speed;
-
-            // Ограничение движения в пределах поля (-48 до 48)
-            player.position.x = Math.max(-48, Math.min(48, player.position.x));
-            player.position.z = Math.max(-48, Math.min(48, player.position.z));
-
-            // Гравитация и прыжки
-            velocityY -= gravity;
-            player.position.y += velocityY;
-
-            if (player.position.y <= 0.75) {
-                player.position.y = 0.75;
-                velocityY = 0;
-                isGrounded = true;
+            } else if (level === 2) { // Город
+                const bldgMat = new THREE.MeshStandardMaterial({ color: 0x111122 });
+                for(let i = -35; i <= 35; i += 25) {
+                    const bldg = new THREE.Mesh(new THREE.BoxGeometry(15, 20, 15), bldgMat);
+                    bldg.position.set(i, 10, -25);
+                    scene.add(bldg);
+                }
+            } else if (level === 3) { // Промзона с авто и монстром
+                createCar(-10, 0, 0xff0000); // Седан
+                createCar(10, 0, 0x00ff00);  // Спорткар
+                
+                // Создание Монстра
+                const monsterGeo = new THREE.BoxGeometry(1.5, 3, 1.5);
+                const monsterMat = new THREE.MeshStandardMaterial({ color: 0xff0000, wireframe: true });
+                monster = new THREE.Mesh(monsterGeo, monsterMat);
+                monster.position.set(0, 1.5, -30);
+                scene.add(monster);
             }
 
-            // Вращение и проверка сбора кристаллов
-            crystals.forEach((crystal, index) => {
-                crystal.rotation.y += 0.03;
-                crystal.rotation.x += 0.02;
+            camera.position.set(0, 1.6, 10);
+        }
 
-                // Проверка столкновения игрока с кристаллом (простая дистанция)
-                const distance = player.position.distanceTo(crystal.position);
-                if (distance < 1.5) {
-                    scene.remove(crystal);
-                    crystals.splice(index, 1);
-                    score += 10;
-                    document.getElementById('score').innerText = score;
+        function createCar(x, z, color) {
+            const carGroup = new THREE.Group();
+            
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 1, 4),
+                new THREE.MeshStandardMaterial({ color: color })
+            );
+            body.position.y = 0.7;
+            carGroup.add(body);
 
-                    // Спавним новый кристалл взамен собранного
-                    spawnCrystal();
+            carGroup.position.set(x, 0, z);
+            scene.add(carGroup);
+            cars.push({ mesh: carGroup, speed: 0 });
+        }
+
+        function startGame(level) {
+            currentLevel = level;
+            document.getElementById('main-menu').style.display = 'none';
+            buildLevel(level);
+            if (!isMobile && controls) controls.lock();
+        }
+
+        function setupKeyboard() {
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'KeyW') moveForward = true;
+                if (e.code === 'KeyS') moveBackward = true;
+                if (e.code === 'KeyA') moveLeft = true;
+                if (e.code === 'KeyD') moveRight = true;
+                if (e.code === 'KeyE') handleAction();
+            });
+
+            document.addEventListener('keyup', (e) => {
+                if (e.code === 'KeyW') moveForward = false;
+                if (e.code === 'KeyS') moveBackward = false;
+                if (e.code === 'KeyA') moveLeft = false;
+                if (e.code === 'KeyD') moveRight = false;
+            });
+        }
+
+        function handleAction() {
+            if (inVehicle) {
+                // Выйти из авто
+                inVehicle = false;
+                currentVehicle = null;
+                camera.position.y = 1.6;
+                document.getElementById('action-prompt').style.display = 'none';
+            } else {
+                // Попробовать сесть в ближайшее авто
+                cars.forEach(car => {
+                    if (camera.position.distanceTo(car.mesh.position) < 4) {
+                        inVehicle = true;
+                        currentVehicle = car;
+                        document.getElementById('action-prompt').innerText = "Нажмите [E] для выхода из машины";
+                    }
+                });
+            }
+        }
+
+        function setupMobileControls() {
+            const stick = document.getElementById('joystick-stick');
+            const container = document.getElementById('joystick-container');
+            const actionBtn = document.getElementById('action-btn-mobile');
+
+            container.addEventListener('touchstart', (e) => {
+                joystickActive = true;
+                const touch = e.touches[0];
+                joystickOrigin = { x: touch.clientX, y: touch.clientY };
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!joystickActive) return;
+                const touch = e.touches[0];
+                const dx = touch.clientX - joystickOrigin.x;
+                const dy = touch.clientY - joystickOrigin.y;
+                const dist = Math.min(Math.hypot(dx, dy), 40);
+                const angle = Math.atan2(dy, dx);
+
+                stick.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
+                joystickDir = { x: Math.cos(angle)*(dist/40), y: Math.sin(angle)*(dist/40) };
+            });
+
+            const resetJoystick = () => {
+                joystickActive = false;
+                stick.style.transform = 'translate(0px, 0px)';
+                joystickDir = { x: 0, y: 0 };
+            };
+
+            container.addEventListener('touchend', resetJoystick);
+            actionBtn.addEventListener('touchstart', (e) => { e.preventDefault(); handleAction(); });
+
+            // Свайп для обзора
+            window.addEventListener('touchstart', (e) => {
+                for (let touch of e.changedTouches) {
+                    if (touch.clientX > window.innerWidth / 2 && touchLookId === null) {
+                        touchLookId = touch.identifier;
+                        lastTouchLook = { x: touch.clientX, y: touch.clientY };
+                    }
                 }
             });
 
-            // Плавное следование камеры за игроком
-            camera.position.x = player.position.x;
-            camera.position.y = player.position.y + 12;
-            camera.position.z = player.position.z + 15;
-            camera.lookAt(player.position);
+            window.addEventListener('touchmove', (e) => {
+                for (let touch of e.changedTouches) {
+                    if (touch.identifier === touchLookId) {
+            const dx = touch.clientX - lastTouchLook.x;
+                        const dy = touch.clientY - lastTouchLook.y;
+                        camera.rotation.y -= dx * 0.005;
+                        camera.rotation.x -= dy * 0.005;
+                        camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x));
+                        lastTouchLook = { x: touch.clientX, y: touch.clientY };
+                    }
+                }
+            });
+
+            const resetLook = (e) => {
+                for (let touch of e.changedTouches) {
+                    if (touch.identifier === touchLookId) touchLookId = null;
+                }
+            };
+            window.addEventListener('touchend', resetLook);
+        }
+
+        // Система Викторины для Михаила и Вовы
+        const quizData = [
+            {
+                q: "Вопрос для Вовы: Что нужно делать при встрече с Кочем?",
+                opts: ["Бежать в машину", "Попытаться подружиться", "Закрыть глаза"],
+                ans: 0
+            },
+            {
+                q: "Вопрос для Михаила: Какая версия игры сейчас тестируется?",
+                opts: ["ALPHA v0.1", "BETA TEST v0.2", "RELEASE 1.0"],
+                ans: 1
+            }
+        ];
+        let currentQuizIdx = 0;
+
+        function openQuiz() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'flex';
+            currentQuizIdx = 0;
+            renderQuiz();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        }
+
+        function renderQuiz() {
+            if (currentQuizIdx >= quizData.length) {
+                document.getElementById('quiz-question').innerText = "Поздравляем! Михаил и Вова готовы к тестированию игры!";
+                document.getElementById('quiz-options').innerHTML = "";
+                return;
+            }
+
+            const q = quizData[currentQuizIdx];
+            document.getElementById('quiz-question').innerText = q.q;
+            const optsContainer = document.getElementById('quiz-options');
+            optsContainer.innerHTML = "";
+
+            q.opts.forEach((opt, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-opt';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (idx === q.ans) alert("Правильно!");
+                    else alert("Неверно, попробуй ещё раз!");
+                    currentQuizIdx++;
+                    renderQuiz();
+                };
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            // Проверка ближних машин для подсказки
+            if (!inVehicle) {
+                let nearCar = false;
+                cars.forEach(car => {
+                    if (camera.position.distanceTo(car.mesh.position) < 4) {
+                        nearCar = true;
+                    }
+                });
+                document.getElementById('action-prompt').style.display = nearCar ? 'block' : 'none';
+            }
+
+            // Движение игрока / Транспорта
+            if (inVehicle && currentVehicle) {
+                const speed = 12 * delta;
+                if (moveForward || joystickDir.y < -0.3) currentVehicle.mesh.translateZ(-speed);
+                if (moveBackward || joystickDir.y > 0.3) currentVehicle.mesh.translateZ(speed);
+                if (moveLeft || joystickDir.x < -0.3) currentVehicle.mesh.rotation.y += 2 * delta;
+                if (moveRight || joystickDir.x > 0.3) currentVehicle.mesh.rotation.y -= 2 * delta;
+
+                camera.position.copy(currentVehicle.mesh.position);
+                camera.position.y += 1.8;
+            } else {
+            const speed = 5 * delta;
+                if ((!isMobile && controls && controls.isLocked) || isMobile) {
+                    if (moveForward || joystickDir.y < -0.3) camera.translateZ(-speed);
+                    if (moveBackward || joystickDir.y > 0.3) camera.translateZ(speed);
+                    if (moveLeft || joystickDir.x < -0.3) camera.translateX(-speed);
+                    if (moveRight || joystickDir.x > 0.3) camera.translateX(speed);
+                }
+            }
+
+            // Поведение монстра на 3 уровне
+            if (monster && currentLevel === 3) {
+                monster.lookAt(camera.position);
+                monster.position.lerp(camera.position, 0.005);
+            }
 
             renderer.render(scene, camera);
         }
 
-        animate();
-
-        // Адаптация при изменении размера окна
-        window.addEventListener('resize', () => {
+        function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        }
+
+        initScene();
+        animate();
     </script>
 </body>
 </html>
