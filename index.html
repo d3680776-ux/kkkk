@@ -3,18 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Общий Онлайн Чат</title>
-  
-  <!-- Подключаем Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
+  <title>Онлайн Чат</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
     }
 
     body {
@@ -22,9 +17,8 @@
       color: #f8fafc;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      justify-content: center; /* Центрирование по горизонтали */
+      align-items: center;     /* Центрирование по вертикали */
       padding: 16px;
     }
 
@@ -33,8 +27,8 @@
       border: 1px solid #334155;
       border-radius: 20px;
       width: 100%;
-      max-width: 600px;
-      height: 80vh;
+      max-width: 500px;
+      height: 75vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -55,13 +49,9 @@
       color: #38bdf8;
     }
 
-    .status-badge {
-      font-size: 11px;
-      background: rgba(56, 189, 248, 0.1);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 4px 10px;
-      border-radius: 12px;
+    .status {
+      font-size: 12px;
+      color: #4ade80;
     }
 
     .messages-box {
@@ -79,7 +69,6 @@
       padding: 10px 14px;
       max-width: 85%;
       word-wrap: break-word;
-      line-height: 1.4;
     }
 
     .msg-header {
@@ -127,7 +116,7 @@
     }
 
     #usernameInput {
-      width: 130px;
+      width: 110px;
     }
 
     #messageInput {
@@ -142,7 +131,6 @@
       padding: 10px 18px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
     button:hover {
@@ -154,91 +142,104 @@
 
   <div class="chat-card">
     <div class="chat-header">
-      <h1>💬 Общий Онлайн Чат</h1>
-      <span class="status-badge">Онлайн синк</span>
+      <h1>💬 Чат онлайн</h1>
+      <span class="status">● В сети</span>
     </div>
 
-    <div class="messages-box" id="msgContainer">
-      <div class="msg-item" style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); align-self: center; text-align: center;">
-        <div class="msg-text" style="color: #38bdf8; font-size: 12px;">Загрузка сообщений из облака...</div>
-      </div>
-    </div>
+    <div class="messages-box" id="msgContainer">Загрузка сообщений...</div>
 
     <div class="chat-footer">
       <input type="text" id="usernameInput" placeholder="Имя" maxlength="15">
-      <input type="text" id="messageInput" placeholder="Напишите сообщение..." onkeydown="if(event.key==='Enter') sendMsg()">
+      <input type="text" id="messageInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendMsg()">
       <button onclick="sendMsg()">Отправить</button>
     </div>
   </div>
 
   <script>
-    // Подключение к облачной базе данных
-    const firebaseConfig = {
-      databaseURL: "https://public-chat-demo-default-rtdb.firebaseio.com"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    const chatRef = database.ref("global_messages");
+    // Твой уникальный ID из npoint.io уже подставлен!
+    const BIN_ID = "fb49ce2087440a661a3d"; 
+    const API_URL = `https://api.npoint.io/${BIN_ID}`;
 
-    // Случайное имя при входе
-    document.getElementById("usernameInput").value = "User_" + Math.floor(100 + Math.random() * 900);
+    let allMessages = [];
 
-    // Слушаем новые сообщения в реальном времени
-    chatRef.limitToLast(50).on("child_added", (snapshot) => {
-      const data = snapshot.val();
-      appendMessageUI(data.author, data.text, data.time);
-    });
+    // Генерируем имя по умолчанию
+    document.getElementById("usernameInput").value = "Игрок_" + Math.floor(100 + Math.random() * 900);
 
-    chatRef.once("value", () => {
-      const container = document.getElementById("msgContainer");
-      if (container.innerHTML.includes("Загрузка сообщений")) {
-        container.innerHTML = "";
+    // Загрузка сообщений из базы
+    async function loadMessages() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        allMessages = data.messages || [];
+        renderUI();
+      } catch (err) {
+        console.error("Ошибка загрузки:", err);
       }
-    });
+    }
 
-    function sendMsg() {
+    // Отображение сообщений на экране
+    function renderUI() {
+      const container = document.getElementById("msgContainer");
+      if (allMessages.length === 0) {
+      container.innerHTML = '<div style="color: #64748b; text-align: center;">Сообщений пока нет. Напиши первым!</div>';
+        return;
+      }
+
+      container.innerHTML = "";
+      allMessages.forEach(msg => {
+        const msgEl = document.createElement("div");
+        msgEl.className = "msg-item";
+        msgEl.innerHTML = `
+          <div class="msg-header">
+            <span class="msg-author">${escapeHTML(msg.author)}</span>
+            <span class="msg-time">${msg.time}</span>
+          </div>
+          <div class="msg-text">${escapeHTML(msg.text)}</div>
+        `;
+        container.appendChild(msgEl);
+      });
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Отправка нового сообщения
+    async function sendMsg() {
       const msgInput = document.getElementById("messageInput");
       const usernameInput = document.getElementById("usernameInput");
-      
+
       const text = msgInput.value.trim();
       const author = usernameInput.value.trim() || "Аноним";
 
       if (!text) return;
 
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      // Отправка в облако
-      chatRef.push({
+      const newMsg = {
         author: author,
         text: text,
-        time: timeStr
-      });
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
 
+      allMessages.push(newMsg);
       msgInput.value = "";
-    }
+      renderUI();
 
-    function appendMessageUI(author, text, time) {
-      const container = document.getElementById("msgContainer");
-      const msgEl = document.createElement("div");
-      msgEl.className = "msg-item";
-
-      msgEl.innerHTML = `
-        <div class="msg-header">
-          <span class="msg-author">${escapeHTML(author)}</span>
-          <span class="msg-time">${time || ''}</span>
-        </div>
-        <div class="msg-text">${escapeHTML(text)}</div>
-      `;
-
-      container.appendChild(msgEl);
-      container.scrollTop = container.scrollHeight;
+      try {
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: allMessages })
+        });
+      } catch (err) {
+        console.error("Ошибка сохранения:", err);
+      }
     }
 
     function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
+
+    // Загружаем при старте и обновляем каждые 3 секунды
+    loadMessages();
+    setInterval(loadMessages, 3000);
   </script>
 </body>
 </html>
