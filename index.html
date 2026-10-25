@@ -1,26 +1,26 @@
-
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мем-Дека 3000 — Звуковая панель</title>
+    <title>3D Мем-Дека 4.0 Pro</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Rubik', 'Segoe UI', Tahoma, sans-serif;
         }
 
         body {
-            background-color: #f7f2ea;
-            color: #111;
+            background: linear-gradient(135deg, #1e0538 0%, #0c0826 100%);
+            color: #fff;
             padding: 20px;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -30,176 +30,224 @@
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             text-transform: uppercase;
-            text-shadow: 3px 3px 0px #ff595e;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #ff007f, #7928ca, #00dfd8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 5px 20px rgba(121, 40, 202, 0.5);
             margin-bottom: 8px;
         }
 
         p {
-            color: #555;
+            color: #b3a0d6;
+            font-size: 1.1rem;
             font-weight: 600;
         }
 
         /* Панель управления */
         .controls {
-            background: #fff;
-            border: 3px solid #000;
-            box-shadow: 5px 5px 0px #000;
-            padding: 15px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 20px;
             margin-bottom: 25px;
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .search-box {
             flex: 1;
-            min-width: 200px;
+            min-width: 220px;
         }
 
         .search-box input {
             width: 100%;
-            padding: 10px 14px;
-            border: 3px solid #000;
-            border-radius: 8px;
+            padding: 12px 18px;
+            border: 2px solid #7928ca;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
             font-size: 1rem;
-            font-weight: bold;
+            color: #fff;
             outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #ff007f;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
         }
 
         .action-btns {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .btn {
-            background: #ffca3a;
-            border: 3px solid #000;
-            box-shadow: 3px 3px 0px #000;
-            padding: 10px 15px;
+        /* Системные кнопки управления */
+        .ctrl-btn {
+            background: #2a2a40;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: 0 5px 0 #151525;
             transition: all 0.1s ease;
         }
 
-        .btn:active {
-            transform: translate(2px, 2px);
-            box-shadow: 1px 1px 0px #000;
+        .ctrl-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #151525;
         }
 
-        .btn-stop {
-            background: #ff595e;
-            color: #fff;
+        .ctrl-btn-stop {
+            background: #ff2a5f;
+            box-shadow: 0 5px 0 #b3002d;
+        }
+        .ctrl-btn-stop:active {
+            box-shadow: 0 1px 0 #b3002d;
         }
 
         .volume-control {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-weight: bold;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 15px;
+            border-radius: 12px;
         }
 
         /* Категории */
         .categories {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             overflow-x: auto;
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .cat-btn {
-            background: #fff;
-            border: 2px solid #000;
-            padding: 6px 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+            padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
             white-space: nowrap;
+            transition: all 0.2s;
         }
 
-        .cat-btn.active {
-            background: #8ac926;
-            color: #000;
+        .cat-btn.active, .cat-btn:hover {
+            background: #ff007f;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
         }
 
         /* Сетка мемов */
         .meme-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            padding-bottom: 80px;
         }
 
+        /* Настоящие 3D Кнопки Мемов */
         .meme-card {
-            background: #fff;
-            border: 3px solid #000;
-            box-shadow: 4px 4px 0px #000;
-            border-radius: 12px;
-            padding: 15px 10px;
+            background: linear-gradient(180deg, #3a3a5a 0%, #25253e 100%);
+            border-radius: 16px;
+            padding: 18px 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             cursor: pointer;
             position: relative;
-            transition: transform 0.1s, box-shadow 0.1s;
             user-select: none;
+            
+            /* 3D Эффекты */
+            box-shadow: 0 8px 0 #181828, 0 15px 20px rgba(0, 0, 0, 0.4);
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.2s;
         }
 
         .meme-card:hover {
+            background: linear-gradient(180deg, #45456c 0%, #2d2d4a 100%);
             transform: translateY(-2px);
-            box-shadow: 6px 6px 0px #000;
+            box-shadow: 0 10px 0 #181828, 0 20px 25px rgba(0, 0, 0, 0.5);
         }
 
-        .meme-card:active, .meme-card.playing {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px #000;
-            background-color: #1982c4;
-            color: #fff;
-    
+        .meme-card:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #181828, 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Анимация проигрывания */
+        .meme-card.playing {
+            background: linear-gradient(180deg, #ff007f 0%, #7928ca 100%) !important;
+            box-shadow: 0 0 25px #ff007f, 0 4px 0 #4a0028 !important;
+            transform: translateY(4px);
+            animation: pulse 0.6s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { box-shadow: 0 0 15px #ff007f, 0 4px 0 #4a0028; }
+            to { box-shadow: 0 0 30px #00dfd8, 0 4px 0 #4a0028; }
+        }
 
         .meme-emoji {
-        font-size: 2.2rem;
-            margin-bottom: 8px;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
         }
 
         .meme-title {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: bold;
             text-align: center;
             line-height: 1.2;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .fav-star {
             position: absolute;
-            top: 5px;
-            right: 8px;
-            font-size: 1.1rem;
-            color: #ccc;
+            top: 8px;
+            right: 10px;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.2);
             cursor: pointer;
+            transition: color 0.2s;
         }
 
         .fav-star.active {
             color: #ffca3a;
+            text-shadow: 0 0 10px #ffca3a;
         }
 
-        /* Плеер снизу */
+        /* Нижний статус-бар */
         .status-bar {
             position: fixed;
-            bottom: 15px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: #000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ff007f;
             color: #fff;
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 30px;
             font-weight: bold;
             display: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
             z-index: 100;
         }
     </style>
@@ -208,36 +256,36 @@
 
     <div class="container">
         <header>
-            <h1>🗿 Мем-Дека 3000</h1>
-            <p>Жми на кнопки и запускай топовые мемы!</p>
+            <h1>🔊 3D МЕМ-ДЕКА 4.0</h1>
+            <p>Жми на объемные кнопки и врывайся в мемы!</p>
         </header>
 
-        <!-- Управление -->
+        <!-- Панель управления -->
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Поиск мема..." oninput="filterMemes()">
+                <input type="text" id="searchInput" placeholder="🔍 Найти мем (например: Голда, Коч...)" oninput="filterMemes()">
             </div>
             
             <div class="volume-control">
-                🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8" onchange="updateVolume()">
+                🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8" onchange="updateVolume()">
             </div>
 
             <div class="action-btns">
-                <button class="btn" onclick="playRandom()">🎲 Рандом</button>
-                <button class="btn btn-stop" onclick="stopAll()">🛑 СТОП</button>
+                <button class="ctrl-btn" onclick="playRandom()">🎲 Рандом</button>
+                <button class="ctrl-btn ctrl-btn-stop" onclick="stopAll()">🛑 СТОП</button>
             </div>
         </div>
-
         <!-- Категории -->
         <div class="categories" id="categoriesContainer">
-            <button class="cat-btn active" onclick="selectCategory('all', this)">Все</button>
+            <button class="cat-btn active" onclick="selectCategory('all', this)">Все мемы</button>
             <button class="cat-btn" onclick="selectCategory('fav', this)">⭐ Избранное</button>
-            <button class="cat-btn" onclick="selectCategory('reaction', this)">Реакции</button>
-            <button class="cat-btn" onclick="selectCategory('games', this)">Игры</button>
-            <button class="cat-btn" onclick="selectCategory('music', this)">Музыка</button>
+            <button class="cat-btn" onclick="selectCategory('ru', this)">🇷🇺 Русские мемы</button>
+            <button class="cat-btn" onclick="selectCategory('reaction', this)">💥 Реакции</button>
+            <button class="cat-btn" onclick="selectCategory('games', this)">🎮 Игры</button>
+            <button class="cat-btn" onclick="selectCategory('music', this)">🎵 Музыка</button>
         </div>
 
-        <!-- Сетка кнопок -->
+        <!-- Сетка 3D кнопок -->
         <div class="meme-grid" id="memeGrid"></div>
     </div>
 
@@ -245,40 +293,58 @@
     <div class="status-bar" id="statusBar">▶ Играет: <span id="currentMemeName"></span></div>
 
     <script>
-        // База данных мемов
+        // Расширенная коллекция мемов
         const memes = [
+            // Спец затребованные мемы & RU тренды
+            { id: 'golda', name: 'ГОЛДА!', emoji: '🪙', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/golda.mp3' },
+            { id: 'koch', name: 'Коч, братан!', emoji: '🤝', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/koch-bratan.mp3' },
+            { id: 'chinazes', name: 'Чиназес!', emoji: '🤙', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/chinazes.mp3' },
+            { id: 'a4', name: 'Влад А4!', emoji: '📄', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/a4-vlad.mp3' },
+            { id: 'boss', name: 'Эй, Босс!', emoji: '🕶️', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/hey-boss.mp3' },
+            { id: 'sigma', name: 'Sigma Song', emoji: '🗿', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sigma-grindset.mp3' },
+            { id: 'mewing', name: 'Bye Bye (Mewing)', emoji: '🤫', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bye-bye-mewing.mp3' },
+
+            // Классические реакции
             { id: 'bruh', name: 'BRUH', emoji: '🗿', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bruh-sound-effect-sound-button.mp3' },
             { id: 'emotional', name: 'Emotional Damage', emoji: '💥', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/emotional-damage-meme.mp3' },
-            { id: 'pipe', name: 'Металлическая Труба', emoji: '🏗️', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/metal-pipe-clang.mp3' },
+            { id: 'pipe', name: 'Металл. Труба', emoji: '🏗️', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/metal-pipe-clang.mp3' },
             { id: 'fbi', name: 'FBI Open Up!', emoji: '🚨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fbi-open-up_s1.mp3' },
-            { id: 'airhorn', name: 'MLG Airhorn', emoji: '📢', cat: 'music', url: 'https://www.myinstants.com/media/sounds/mlg-airhorn.mp3' },
-            { id: 'badumtss', name: 'Ba-Dum-Tss', emoji: '🥁', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/ba-dum-tss.mp3' },
-            { id: 'oof', name: 'Roblox Oof', emoji: '🩹', cat: 'games', url: 'https://www.myinstants.com/media/sounds/roblox-off.mp3' },
-            { id: 'win_error', name: 'Windows Error', emoji: '💻', cat: 'games', url: 'https://www.myinstants.com/media/sounds/windows-error.mp3' },
-            { id: 'huh', name: 'Huh? Кот', emoji: '🐱', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/huh-cat.mp3' },
-            { id: 'sad_violin', name: 'Sad Violin', emoji: '🎻', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sad-violin.mp3' },
-            { id: 'coffin', name: 'Coffin Dance', emoji: '0⚰️', cat: 'music', url: 'https://www.myinstants.com/media/sounds/coffin-dance-official-music-video-hd.mp3' },
-            { id: 'amongus', name: 'Among Us Report', emoji: 'ඞ', cat: 'games', url: 'https://www.myinstants.com/media/sounds/emergency-meeting-among-us.mp3' },
             { id: 'vine_boom', name: 'Vine Boom', emoji: '💣', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/vine-boom.mp3' },
+            { id: 'badumtss', name: 'Ba-Dum-Tss', emoji: '🥁', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/ba-dum-tss.mp3' },
+            { id: 'huh', name: 'Huh? Кот', emoji: '🐱', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/huh-cat.mp3' },
             { id: 'quack', name: 'Кряк', emoji: '🦆', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/quack.mp3' },
             { id: 'fart', name: 'Wet Fart', emoji: '💨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/dry-fart.mp3' },
-            { id: 'screaming_goat', name: 'Орущая Коза', emoji: '🐐', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/screaming-goat.mp3' },
+            { id: 'goat', name: 'Орущая Коза', emoji: '🐐', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/screaming-goat.mp3' },
+            { id: 'side_eye', name: 'Bombastic Side Eye', emoji: '👀', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bombastic-side-eye.mp3' },
+            { id: 'run', name: 'RUN Meme', emoji: '🏃', cat: 'music', url: 'https://www.myinstants.com/media/sounds/run-meme.mp3' },
+
+            // Игры
+            { id: 'oof', name: 'Roblox Oof', emoji: '🩹', cat: 'games', url: 'https://www.myinstants.com/media/sounds/roblox-off.mp3' },
+            { id: 'win_error', name: 'Windows Error', emoji: '💻', cat: 'games', url: 'https://www.myinstants.com/media/sounds/windows-error.mp3' },
+            { id: 'amongus', name: 'Among Us Report', emoji: 'ඞ', cat: 'games', url: 'https://www.myinstants.com/media/sounds/emergency-meeting-among-us.mp3' },
             { id: 'gta_wasted', name: 'GTA Wasted', emoji: '💀', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-v-wasted-sound-effect.mp3' },
             { id: 'mario_jump', name: 'Mario Jump', emoji: '🍄', cat: 'games', url: 'https://www.myinstants.com/media/sounds/maro-jump.mp3' },
+            { id: 'minecraft_hit', name: 'Minecraft Ouch', emoji: '⛏️', cat: 'games', url: 'https://www.myinstants.com/media/sounds/classic_hurt.mp3' },
+            { id: 'victory', name: 'Victory Fanfare', emoji: '🏆', cat: 'games', url: 'https://www.myinstants.com/media/sounds/ff7-victory-fanfare.mp3' },
+
+            // Музыка и Тренды
+            { id: 'airhorn', name: 'MLG Airhorn', emoji: '📢', cat: 'music', url: 'https://www.myinstants.com/media/sounds/mlg-airhorn.mp3' },
+            { id: 'sad_violin', name: 'Sad Violin', emoji: '🎻', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sad-violin.mp3' },
+            { id: 'coffin', name: 'Coffin Dance', emoji: '⚰️', cat: 'music', url: 'https://www.myinstants.com/media/sounds/coffin-dance-official-music-video-hd.mp3' },
             { id: 'spongebob', name: 'Spongebob Fail', emoji: '🧽', cat: 'music', url: 'https://www.myinstants.com/media/sounds/spongebob-fail.mp3' },
-            { id: 'victory', name: 'Victory Fanfare', emoji: '🏆', cat: 'games', url: 'https://www.myinstants.com/media/sounds/ff7-victory-fanfare.mp3' }
+            { id: 'sax', name: 'Epic Sax Guy', emoji: '🎷', cat: 'music', url: 'https://www.myinstants.com/media/sounds/epic-sax-guy.mp3' },
+            { id: 'troll', name: 'Trollface Song', emoji: '🤡', cat: 'music', url: 'https://www.myinstants.com/media/sounds/troll-face-song.mp3' }
         ];
 
         let activeAudios = [];
         let currentCategory = 'all';
-        let favorites = JSON.parse(localStorage.getItem('meme_favs')) || [];
+        let favorites = JSON.parse(localStorage.getItem('meme_favs_v2')) || [];
 
-        // Инициализация
         function init() {
             renderMemes();
         }
 
-        // Отображение карточек
+        // Отрисовка сетки 3D-кнопок
         function renderMemes() {
             const grid = document.getElementById('memeGrid');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
@@ -293,7 +359,7 @@
             });
 
             if (filtered.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 20px;">Мемы не найдены 😿</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 1.2rem; color: #888;">Мемы не найдены 😿</p>';
                 return;
             }
 
@@ -324,8 +390,9 @@
                 if (card) card.classList.add('playing');
                 showStatus(meme.name);
             }).catch(e => {
-                console.warn('Ошибка аудио:', e);
+                console.warn('Ошибка проигрывания аудиофайла:', e);
             });
+
             activeAudios.push(audio);
 
             audio.onended = () => {
@@ -347,7 +414,7 @@
             hideStatus();
         }
 
-        // Воспроизведение рандомного звука
+        // Воспроизведение случайного звука
         function playRandom() {
             const randomMeme = memes[Math.floor(Math.random() * memes.length)];
             playSound(randomMeme);
@@ -355,17 +422,17 @@
 
         // Избранное
         function toggleFav(e, id) {
-            e.stopPropagation(); // Чтобы не срабатывал клик по карте
+            e.stopPropagation();
             if (favorites.includes(id)) {
                 favorites = favorites.filter(favId => favId !== id);
             } else {
                 favorites.push(id);
             }
-            localStorage.setItem('meme_favs', JSON.stringify(favorites));
+            localStorage.setItem('meme_favs_v2', JSON.stringify(favorites));
             renderMemes();
         }
 
-        // Категории
+        // Выбор категории
         function selectCategory(cat, btn) {
             currentCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -373,18 +440,18 @@
             renderMemes();
         }
 
-        // Фильтрация при поиске
+        // Поиск
         function filterMemes() {
             renderMemes();
         }
 
-        // Обновление громкости у всех играющих звуков
+        // Управление громкостью
         function updateVolume() {
             const vol = parseFloat(document.getElementById('volumeSlider').value);
             activeAudios.forEach(a => a.volume = vol);
         }
 
-        // Статус бар
+        // Индикатор воспроизведения
         function showStatus(name) {
             const bar = document.getElementById('statusBar');
             document.getElementById('currentMemeName').innerText = name;
