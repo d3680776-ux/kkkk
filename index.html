@@ -1,1020 +1,644 @@
- html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ВЕРИТЕ — 3D Головоломки и Оптические Иллюзии</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js for 3D Graphics -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        * {
-            font-family: 'Rajdhani', sans-serif;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ВЕРИТЕ [BETA] — 3D Платформа Головоломок</title>
+  <style>
+    :root {
+      --bg: #070913;
+      --panel: rgba(18, 26, 47, 0.75);
+      --cyan: #00f2fe;
+      --blue: #4facfe;
+      --purple: #7f00ff;
+      --pink: #ff007f;
+      --text: #f0f6fc;
+      --text-dim: #8b949e;
+    }
 
-        h1, h2, h3, .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      user-select: none;
+    }
 
-        body {
-            background-color: #05050d;
-            color: #e2e8f0;
-            overflow-x: hidden;
-        }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
 
-        /* Neon Glows & Animations */
-        .neon-text-cyan {
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7), 0 0 20px rgba(0, 243, 255, 0.4);
-        }
-        .neon-text-pink {
-            text-shadow: 0 0 10px rgba(255, 0, 127, 0.7), 0 0 20px rgba(255, 0, 127, 0.4);
-        }
-        .neon-border-cyan {
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.2);
-        }
-        
-        .glass-card {
-            background: rgba(13, 15, 30, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 243, 255, 0.15);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+    /* Фоновый канвас с 3D-частицами */
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
 
-        .glass-card:hover {
-            border-color: rgba(0, 243, 255, 0.5);
-            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.15);
-            transform: translateY(-4px);
-        }
+    /* Верхняя плашка BETA */
+    .beta-banner {
+      background: linear-gradient(90deg, rgba(255, 0, 127, 0.2), rgba(127, 0, 255, 0.2), rgba(0, 242, 254, 0.2));
+      border-bottom: 1px solid rgba(0, 242, 254, 0.3);
+      text-align: center;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+    }
 
-        /* Canvas Overlay Styles */
-        #bgCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-        }
+    .beta-badge {
+      background: var(--pink);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      margin-left: 6px;
+      box-shadow: 0 0 8px var(--pink);
+    }
 
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #05050d;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 243, 255, 0.3);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 243, 255, 0.8);
-        }
+    /* Шапка сайта */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 16px 24px;
+    }
 
-        /* Pulse animation for completion */
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-        }
-        .pulse-glow {
-            animation: pulseGlow 2s infinite ease-in-out;
-        }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 20px;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
 
-        .modal-blur {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-    </style>
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-cube {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+      transform: rotate(-5deg);
+      transition: transform 0.3s;
+    }
+
+    .logo-cube:hover {
+      transform: rotate(5deg) scale(1.05);
+    }
+
+    .logo-title {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      background: linear-gradient(90deg, #fff, var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+    }
+
+    .stats-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      padding: 8px 16px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #ffd700;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
+    }
+
+    /* Основной контент */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    .controls-bar {
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 12px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-input {
+     background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: white;
+      outline: none;
+      width: 260px;
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-dim);
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #000;
+      border-color: var(--cyan);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+
+    /* Сетка головоломок */
+    .puzzles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--cyan);
+      box-shadow: 0 15px 35px rgba(0, 242, 254, 0.25);
+    }
+
+    .card-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      background: rgba(0, 242, 254, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 14px;
+    }
+
+    .btn-play {
+      color: var(--cyan);
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Модальное окно с игрой */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 18, 0.9);
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--panel);
+      border: 1px solid var(--cyan);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 900px;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0, 242, 254, 0.3);
+    }
+
+    .modal-header {
+      padding: 16px 24px;
+      background: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-close {
+      background: rgba(255, 0, 127, 0.2);
+      border: 1px solid var(--pink);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .modal-close:hover {
+      background: var(--pink);
+      box-shadow: 0 0 15px var(--pink);
+    }
+
+    .game-area {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+     justify-content: center;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .modal-footer {
+      padding: 14px 24px;
+      background: rgba(0, 0, 0, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+  </style>
 </head>
-<body class="min-h-screen relative flex flex-col justify-between">
+<body>
 
-    <!-- Background Animated Canvas -->
-    <canvas id="bgCanvas"></canvas>
+  <!-- Фоновые 3D частицы -->
+  <canvas id="bgCanvas"></canvas>
 
-    <!-- Main Container -->
-    <div class="relative z-10 max-w-7xl mx-auto w-full px-4 py-6 flex-grow flex flex-col">
+  <!-- Плашка BETA -->
+  <div class="beta-banner">
+    ВЕРИТЕ 3D PLATFORM <span class="beta-badge">BETA v2.4</span> — РЕЖИМ РАННЕГО ДОСТУПА
+  </div>
 
-        <!-- HEADER / BRANDING -->
-        <header class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 glass-card p-6 rounded-3xl border-b-2 border-cyan-500/30">
-            <div class="flex items-center gap-4 text-center md:text-left">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 to-fuchsia-600 flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(0,243,255,0.6)]">
-                    <i class="fa-solid fa-cube text-white"></i>
-                </div>
-                <div>
-                    <h1 class="text-4xl md:text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-amber-300 neon-text-cyan">
-                        ВЕРИТЕ
-                    </h1>
-                    <p class="text-xs md:text-sm text-cyan-300 font-semibold tracking-wider uppercase mt-1">
-                        3D Головоломки & Оптические Иллюзии
-                    </p>
-                </div>
-            </div>
-
-            <!-- Stats & Sound toggle -->
-            <div class="flex items-center gap-4 bg-black/40 px-5 py-3 rounded-2xl border border-white/10">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
-                    <div class="text-left">
-                        <div class="text-[10px] text-gray-400 uppercase tracking-wider">Пройдено</div>
-                        <div id="completedCounter" class="text-lg font-bold text-cyan-400">0 / 7</div>
-                    </div>
-                </div>
-                <div class="h-8 w-[1px] bg-white/10"></div>
-                <button id="soundToggleBtn" onclick="toggleAudio()" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-cyan-400 transition">
-                    <i class="fa-solid fa-volume-high" id="soundIcon"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- SEARCH & CATEGORY FILTERS -->
-        <div class="flex flex-col md:flex-row gap-4 mb-8">
-            <div class="relative flex-grow">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400"></i>
-                <input type="text" id="searchInput" placeholder="Поиск головоломки..." oninput="filterPuzzles()"
-                    class="w-full bg-black/60 border border-cyan-500/30 rounded-2xl pl-11 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition duration-300 shadow-inner">
-            </div>
-            
-            <div id="categoryContainer" class="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
-                <!-- Categories rendered by JS -->
-            </div>
+  <!-- Шапка -->
+  <header>
+    <div class="header-content">
+      <div class="logo-container">
+        <div class="logo-cube">В</div>
+        <div>
+          <div class="logo-title">ВЕРИТЕ</div>
         </div>
+      </div>
+      <div class="stats-box">
+        <span>💡 Решено:</span>
+        <span id="scoreText">0 / 9</span>
+      </div>
+    </div>
+  </header>
 
-        <!-- PUZZLE GRID -->
-        <div id="puzzleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Dynamic Puzzle Cards Rendered Here -->
-        </div>
-
+  <!-- Основной раздел -->
+  <main>
+    <div class="controls-bar">
+      <input type="text" id="searchInput" class="search-input" placeholder="Поиск 3D головоломки...">
+      <div style="display: flex; gap: 8px;">
+        <button class="filter-btn active" onclick="filterCategory('all')">Все (9)</button>
+        <button class="filter-btn" onclick="filterCategory('3d')">3D Механика</button>
+        <button class="filter-btn" onclick="filterCategory('light')">Свет и Тень</button>
+      </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="relative z-10 text-center py-6 border-t border-white/5 text-gray-500 text-xs tracking-wider">
-        © 2026 ВЕРИТЕ (VERITE) — ПЛАТФОРМА ИНТЕРАКТИВНЫХ 3D ГОЛОВОЛОМОК. ВСЕ ПРАВА ЗАКРЫТЫ.
-    </footer>
-
-    <!-- INTERACTIVE 3D PUZZLE PLAY MODAL -->
-    <div id="puzzleModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 modal-blur bg-black/80">
-        <div class="relative w-full max-w-5xl h-[92vh] glass-card rounded-3xl overflow-hidden flex flex-col border-2 border-cyan-500/40 shadow-[0_0_50px_rgba(0,243,255,0.2)]">
-            
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/50">
-                <div class="flex items-center gap-3">
-                    <span id="modalIcon" class="text-2xl text-cyan-400"></span>
-                    <div>
-                        <h2 id="modalTitle" class="text-xl md:text-2xl font-bold text-white font-orbitron"></h2>
-                        <p id="modalCategory" class="text-xs text-fuchsia-400 tracking-wider uppercase"></p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <button onclick="showHint()" class="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-2">
-                        <i class="fa-solid fa-lightbulb text-amber-400"></i> Подсказка
-                        </button>
-                    <button onclick="resetCurrentPuzzle()" class="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition flex items-center gap-2">
-                        <i class="fa-solid fa-rotate-right"></i> Сброс
-                    </button>
-                    <button onclick="closeModal()" class="w-10 h-10 rounded-xl bg-red-500/20 hover:bg-red-500/40 border border-red-500/40 text-red-300 flex items-center justify-center transition">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Modal Body / 3D Canvas Area -->
-            <div class="relative flex-grow bg-gradient-to-b from-black/80 to-[#080816] overflow-hidden flex items-center justify-center">
-                
-                <!-- 3D Viewport Container -->
-                <div id="viewport3D" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
-
-                <!-- Instructions Overlay -->
-                <div class="absolute bottom-4 left-4 right-4 md:left-6 md:right-auto max-w-md bg-black/70 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-xs text-gray-300 pointer-events-none shadow-xl">
-                    <div class="font-bold text-cyan-400 mb-1 flex items-center gap-2">
-                        <i class="fa-solid fa-hand-pointer"></i> Управление
-                    </div>
-                    <div id="modalInstructions" class="text-gray-300 leading-relaxed"></div>
-                </div>
-
-                <!-- Victory Splash Overlay -->
-                <div id="victoryOverlay" class="absolute inset-0 bg-black/80 backdrop-blur-xl hidden flex flex-col items-center justify-center z-20 text-center p-6">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-cyan-400 to-fuchsia-500 flex items-center justify-center text-5xl text-white mb-6 shadow-[0_0_40px_rgba(0,243,255,0.8)] animate-bounce">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <h3 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400 font-orbitron mb-2">
-                        РЕШЕНО!
-                    </h3>
-                    <p class="text-gray-300 text-sm md:text-base max-w-md mb-8">
-                        Поздравляем! Вы успешно разгадали пространственную загадку и подтвердили своё мастерство.
-                    </p>
-                    <div class="flex gap-4">
-                        <button onclick="closeModal()" class="px-8 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white font-bold tracking-wider shadow-lg hover:shadow-cyan-500/50 transition transform hover:scale-105">
-                            Продолжить
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Hint Pop-up Modal -->
-                <div id="hintBox" class="absolute top-4 left-1/2 -translate-x-1/2 bg-amber-950/90 border border-amber-500/60 text-amber-200 px-6 py-3 rounded-2xl text-xs md:text-sm font-semibold shadow-2xl hidden z-30 transition flex items-center gap-3">
-                    <i class="fa-solid fa-lightbulb text-amber-400 text-lg"></i>
-                    <span id="hintText"></span>
-                </div>
-            </div>
-        </div>
+    <div class="puzzles-grid" id="grid">
+      <!-- Карточки генерируются скриптом -->
     </div>
+  </main>
 
-    <!-- MAIN JAVASCRIPT ENGINE -->
-    <script>
-        /* =========================================================================
-           SOUND SYNTHESIZER (WEB AUDIO API)
-           ========================================================================= */
-        let audioCtx = null;
-        let soundEnabled = true;
+  <!-- Игровой экран -->
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalTitle" style="font-size: 20px; color: #fff;">Головоломка</h2>
+          <p id="modalDesc" style="font-size: 12px; color: var(--text-dim);"></p>
+        </div>
+        <button class="modal-close" onclick="closeGame()">✕</button>
+      </div>
+      <div class="game-area">
+        <canvas id="gameCanvas"></canvas>
+      </div>
+      <div class="modal-footer">
+        <span>Управление: Вращайте мышкой или касанием пальца</span>
+        <button class="filter-btn" onclick="resetCurrentGame()">Сбросить уровень</button>
+      </div>
+    </div>
+  </div>
 
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+  <script>
+    // Список из 9 3D-головоломок
+    const puzzles = [
+      { id: 1, title: '3D Кубик Рубика', cat: '3d', desc: 'Классический объемный куб с интерактивным вращением граней.', diff: 'Средняя' },
+      { id: 2, title: 'Перспективная Иллюзия', cat: 'light', desc: 'Вращайте парящие 3D-осколки, пока они не составят секретный символ.', diff: 'Легкая' },
+      { id: 3, title: '3D Энерго-сеть', cat: '3d', desc: 'Поворачивайте объемные узлы и направьте импульс тока к ядру.', diff: 'Средняя' },
+      { id: 4, title: 'Лазер и Зеркала', cat: 'light', desc: 'Управляйте углом 3D-зеркал для отражения светового луча в мишень.', diff: 'Сложная' },
+      { id: 5, title: 'Теневой 3D-Пазл', cat: 'light', desc: 'Вращайте странный 3D-объект, чтобы его тень на стене совпала с контуром.', diff: 'Средняя' },
+      { id: 6, title: 'Лабиринт со Сферой', cat: '3d', desc: 'Наклоняйте 3D-сферу, чтобы выкатить светящийся шар из лабиринта.', diff: 'Легкая' },
+      { id: 7, title: 'Пространственный Замок', cat: '3d', desc: 'Совместите штифты цилиндрического 3D-механизма.', diff: 'Сложная' },
+      { id: 8, title: 'Кристаллический Сдвиг', cat: '3d', desc: 'Сдвигайте прозрачные 3D-блоки для построения правильной призмы.', diff: 'Средняя' },
+      { id: 9, title: 'Голографическая Матрица', cat: 'light', desc: 'Настройте фазы световых 3D-волн для сборки объема.', diff: 'Сложная' }
+    ];
+
+    let solvedCount = 0;
+    let currentGameId = null;
+    let animId = null;
+
+    // Генерация карточек
+    function renderGrid(items) {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      items.forEach(p => {
+       const card = document.createElement('div');
+        card.className = 'card';
+        card.onclick = () => openGame(p);
+        card.innerHTML = `
+          <div>
+            <span class="card-badge">${p.cat === '3d' ? '3D Механика' : 'Свет и Тень'} • ${p.diff}</span>
+            <div class="card-title">${p.title}</div>
+            <div class="card-desc">${p.desc}</div>
+          </div>
+          <div class="card-footer">
+            <span class="btn-play">Запустить 3D ➔</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    renderGrid(puzzles);
+
+    // Поиск и Фильтры
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      renderGrid(puzzles.filter(p => p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)));
+    });
+
+    function filterCategory(cat) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      if (cat === 'all') renderGrid(puzzles);
+      else renderGrid(puzzles.filter(p => p.cat === cat));
+    }
+
+    // Запуск игры на Canvas
+    function openGame(p) {
+      currentGameId = p.id;
+      document.getElementById('modalTitle').innerText = p.title + ' [BETA]';
+      document.getElementById('modalDesc').innerText = p.desc;
+      document.getElementById('modal').classList.add('active');
+      start3DRender();
+    }
+
+    function closeGame() {
+      document.getElementById('modal').classList.remove('active');
+      if (animId) cancelAnimationFrame(animId);
+    }
+
+    function resetCurrentGame() {
+      start3DRender();
+    }
+
+    // Рендер 3D объекта на игровой Canvas
+    function start3DRender() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+
+      let angleX = 0;
+      let angleY = 0;
+      let isDragging = false;
+      let lastX, lastY;
+
+      canvas.onmousedown = (e) => {
+        isDragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+      };
+
+      window.onmouseup = () => isDragging = false;
+
+      window.onmousemove = (e) => {
+        if (!isDragging) return;
+        let dx = e.clientX - lastX;
+        let dy = e.clientY - lastY;
+        angleY += dx * 0.01;
+        angleX += dy * 0.01;
+        lastX = e.clientX;
+        lastY = e.clientY;
+      };
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let cx = canvas.width / 2;
+        let cy = canvas.height / 2;
+
+        // Рисуем вращающийся 3D объект в зависимости от ID
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        // Авто-вращение, если не тянут мышкой
+        if (!isDragging) {
+          angleY += 0.01;
+          angleX += 0.005;
         }
 
-        function toggleAudio() {
-        soundEnabled = !soundEnabled;
-            const icon = document.getElementById('soundIcon');
-            if (soundEnabled) {
-                icon.className = 'fa-solid fa-volume-high';
-                playSound('click');
-            } else {
-                icon.className = 'fa-solid fa-volume-xmark';
-            }
-        }
-
-        function playSound(type) {
-            if (!soundEnabled) return;
-            initAudio();
-
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-                osc.start(now);
-                osc.stop(now + 0.08);
-            } else if (type === 'rotate') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(180, now);
-                osc.frequency.exponentialRampToValueAtTime(320, now + 0.12);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-                osc.start(now);
-                osc.stop(now + 0.12);
-            } else if (type === 'reflect') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-                osc.start(now);
-                osc.stop(now + 0.15);
-            } else if (type === 'win') {
-                const notes = [300, 400, 500, 700, 900];
-                notes.forEach((freq, idx) => {
-                    const noteOsc = audioCtx.createOscillator();
-                    const noteGain = audioCtx.createGain();
-                    noteOsc.connect(noteGain);
-                    noteGain.connect(audioCtx.destination);
-                    noteOsc.type = 'triangle';
-                    noteOsc.frequency.setValueAtTime(freq, now + idx * 0.1);
-                    noteGain.gain.setValueAtTime(0.2, now + idx * 0.1);
-                    noteGain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.3);
-                    noteOsc.start(now + idx * 0.1);
-                    noteOsc.stop(now + idx * 0.1 + 0.3);
-                });
-            }
-        }
-
-        /* =========================================================================
-           DATA & STATE MANAGEMENT
-           ========================================================================= */
-        const categories = [
-            { id: 'all', name: 'Все головоломки', icon: 'fa-globe' },
-            { id: 'cube', name: 'Кубы и Кубики', icon: 'fa-cube' },
-            { id: 'illusion', name: 'Оптические Иллюзии', icon: 'fa-eye' },
-            { id: 'circuit', name: 'Энерго-сети', icon: 'fa-bolt' },
-            { id: 'laser', name: 'Лазеры и Оптика', icon: 'fa-atom' },
-            { id: 'spatial', name: 'Пространство & Тень', icon: 'fa-vector-square' }
+        // Простая 3D проекция куба/фигуры
+        let size = 100;
+        let nodes = [
+          [-size, -size, -size], [size, -size, -size],
+          [size, size, -size], [-size, size, -size],
+          [-size, -size, size], [size, -size, size],
+          [size, size, size], [-size, size, size]
         ];
 
-        const puzzlesData = [
-            {
-                id: 'rubik',
-                title: '3D Кубик Рубика',
-                category: 'cube',
-                categoryName: 'Кубы и Кубики',
-                icon: 'fa-cube',
-                desc: 'Классическая объемная головоломка. Вращайте грани куба для сборки одинаковых цветов.',
-                instructions: 'Зажмите и потяните мышь/палец для вращения куба в 3D. Нажимайте на кнопки вращения граней.',
-                hint: 'Начните со сборки одного креста на верхней грани, затем согласуйте боковые центры.',
-                completed: false
-                },
-            {
-                id: 'perspective',
-                title: 'Перспективная Иллюзия',
-                category: 'illusion',
-                categoryName: 'Оптические Иллюзии',
-                icon: 'fa-eye',
-                desc: 'Хаотично парящие 3D обломки образуют единую скрытую фигуру только под определенным углом.',
-                instructions: 'Вращайте виртуальную камеру, чтобы найти нужный угол обзора, где фрагменты сложатся в символ.',
-                hint: 'Ищите ракурс, при котором синие элементы смотрят строго на вас, образуя кольцо.',
-                completed: false
-            },
-            {
-                id: 'circuit',
-                title: '3D Энерго-Сеть',
-                category: 'circuit',
-                categoryName: 'Энерго-сети',
-                icon: 'fa-bolt',
-                desc: 'Поворачивайте объемные узлы матрицы, чтобы провести лазерную энергию от источника к ядру.',
-                instructions: 'Кликайте на 3D блоки матрицы для их поворота на 90 градусов. Соедините все светящиеся линии.',
-                hint: 'Начните прокладку сети от зеленого источника питания, продвигаясь шаг за шагом к синему ядру.',
-                completed: false
-            },
-            {
-                id: 'laser',
-                title: 'Лазер и Зеркала',
-                category: 'laser',
-                categoryName: 'Лазеры и Оптика',
-                icon: 'fa-atom',
-                desc: 'Настройте систему отражающих зеркал в трехмерном пространстве, чтобы направить луч в приёмник.',
-                instructions: 'Кликайте на зеркала, чтобы поворачивать их под углом 45 градусов и отражать лазерный луч.',
-                hint: 'Первое зеркало должно перенаправить лазер вниз, а второе — направить его в мишень.',
-                completed: false
-            },
-            {
-                id: 'shadow',
-                title: '3D Теневой Пазл',
-                category: 'spatial',
-                categoryName: 'Пространство & Тень',
-                icon: 'fa-vector-square',
-                desc: 'Вращайте сложное 3D тело так, чтобы его тени на двух стенах совпали с заданными силуэтами.',
-                instructions: 'Поворачивайте фигуру по осям X и Y, сравнивая отбрасываемые тени с проекциями на стенах.',
-                hint: 'Сопоставьте горизонтальную грань объекта с горизонтальным силуэтом на правой стене.',
-                completed: false
-            },
-            {
-                id: 'maze',
-                title: '3D Сфера-Лабиринт',
-                category: 'spatial',
-                categoryName: 'Пространство & Тень',
-                icon: 'fa-circle-nodes',
-                desc: 'Наклоняйте трехмерную сферу с лабиринтом, чтобы провезти квантовый шар к центральному выходу.',
-                instructions: 'Зажмите и перемещайте мышь/палец, чтобы наклонять сферу. Гравитация направит шар.',
-                hint: 'Плавно наклоняйте сферу влево, затем вниз, чтобы обвести шар вокруг внешней перегородки.',
-                completed: false
-            },
-            {
-                id: 'lock',
-                title: '3D Пространственный Замок',
-                category: 'cube',
-                categoryName: 'Кубы и Кубики',
-                icon: 'fa-lock',
-                desc: 'Выровняйте секретные штифты цилиндрического 3D замка для его успешного открытия.',
-                instructions: 'Кликайте на диски замка для поворота ригелей. Установите все ригели в горизонтальную линию.',
-                hint: 'Все выемки на золотых дисках должны смотреть строго вверх.',
-                completed: false
-            }
-        ];
+        let projected = nodes.map(node => {
+          let x = node[0], y = node[1], z = node[2];
 
-        let currentCategory = 'all';
-        let activePuzzleId = null;
+          // Вращение Y
+          let x1 = x * Math.cos(angleY) - z * Math.sin(angleY);
+          let z1 = x * Math.sin(angleY) + z * Math.cos(angleY);
 
-        /* =========================================================================
-           THREE.JS & SCENE ENGINE VARIABLES
-           ========================================================================= */
-        let scene, camera, renderer;
-        let animationFrameId = null;
-        let puzzleObjects = {};
-        let isMouseDown = false;
-        let previousMousePosition = { x: 0, y: 0 };
+          // Вращение X
+          let y2 = y * Math.cos(angleX) - z1 * Math.sin(angleX);
+          let z2 = y * Math.sin(angleX) + z1 * Math.cos(angleX);
 
-        /* =========================================================================
-           INIT & APPLICATION SETUP
-           ========================================================================= */
-        window.addEventListener('DOMContentLoaded', () => {
-            initBackgroundCanvas();
-            renderCategories();
-            renderPuzzleGrid();
-            updateProgressCounter();
+          let fov = 400;
+          let scale = fov / (fov + z2 + 200);
+
+          return [x1 * scale, y2 * scale];
         });
 
-        function renderCategories() {
-            const container = document.getElementById('categoryContainer');
-            container.innerHTML = categories.map(cat => `
-                <button onclick="selectCategory('${cat.id}')" 
-                    class="flex items-center gap-2 px-4 py-2 rounded-2xl font-bold text-xs whitespace-nowrap transition duration-300 ${cat.id === currentCategory ? 'bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white shadow-[0_0_15px_rgba(0,243,255,0.4)]' : 'bg-black/50 text-gray-400 hover:text-white border border-white/10'}">
-                    <i class="fa-solid ${cat.icon}"></i>
-                    <span>${cat.name}</span>
-                </button>
-            `).join('');
-        }
-
-        function selectCategory(catId) {
-            currentCategory = catId;
-            playSound('click');
-            renderCategories();
-            renderPuzzleGrid();
-        }
-
-        function filterPuzzles() {
-            renderPuzzleGrid();
-        }
-
-        function renderPuzzleGrid() {
-            const grid = document.getElementById('puzzleGrid');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
-
-            const filtered = puzzlesData.filter(p => {
-                const matchesCat = (currentCategory === 'all') || (p.category === currentCategory);
-                const matchesSearch = p.title.toLowerCase().includes(searchVal) || p.desc.toLowerCase().includes(searchVal);
-                return matchesCat && matchesSearch;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        Головоломки не найдены. Попробуйте изменить параметры поиска.
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(p => `
-                <div onclick="openPuzzle('${p.id}')" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between relative group overflow-hidden">
-                    <div class="absolute -right-6 -top-6 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/30 transition"></div>
-                    
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-black/60 border border-cyan-500/30 flex items-center justify-center text-xl text-cyan-400 group-hover:scale-110 transition">
-                                <i class="fa-solid ${p.icon}"></i>
-                            </div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${p.completed ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-white/5 text-gray-400 border-white/10'}">
-                                ${p.completed ? 'Пройдено ✓' : p.categoryName}
-                            </span>
-                        </div>
-
-                        <h3 class="text-xl font-bold text-white mb-2 font-orbitron group-hover:text-cyan-300 transition">
-                            ${p.title}
-                        </h3>
-                        <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed mb-6">
-                            ${p.desc}
-                        </p>
-                    </div>
-                    <div class="flex items-center justify-between border-t border-white/10 pt-4">
-                        <span class="text-xs font-bold text-cyan-400 flex items-center gap-1">
-                            Решать <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
-                        </span>
-                        <div class="flex gap-1 text-amber-400 text-xs">
-                            <i class="fa-solid fa-star"></i>
-                            <i class="fa-solid fa-star"></i>
-                            <i class="fa-solid fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateProgressCounter() {
-            const done = puzzlesData.filter(p => p.completed).length;
-            document.getElementById('completedCounter').innerText = `${done} / ${puzzlesData.length}`;
-        }
-
-        /* =========================================================================
-           BACKGROUND CANVAS ANIMATION
-           ========================================================================= */
-        function initBackgroundCanvas() {
-            const canvas = document.getElementById('bgCanvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            let particles = [];
-
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            for (let i = 0; i < 60; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    radius: Math.random() * 2 + 1,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
-                    color: Math.random() > 0.5 ? 'rgba(0, 243, 255, ' : 'rgba(255, 0, 127, '
-                });
-            }
-
-            function animateBg() {
-                ctx.clearRect(0, 0, width, height);
-
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-
-                    if (p.x < 0) p.x = width;
-                    if (p.x > width) p.x = 0;
-                    if (p.y < 0) p.y = height;
-                    if (p.y > height) p.y = 0;
-
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color + '0.4)';
-                    ctx.fill();
-                });
-
-                requestAnimationFrame(animateBg);
-            }
-            animateBg();
-        }
-
-        /* =========================================================================
-           3D PUZZLE ENGINE & MODAL LOGIC
-           ========================================================================= */
-        function openPuzzle(id) {
-            const puzzle = puzzlesData.find(p => p.id === id);
-            if (!puzzle) return;
-
-            activePuzzleId = id;
-            document.getElementById('modalTitle').innerText = puzzle.title;
-            document.getElementById('modalCategory').innerText = puzzle.categoryName;
-            document.getElementById('modalIcon').className = `fa-solid ${puzzle.icon}`;
-            document.getElementById('modalInstructions').innerText = puzzle.instructions;
-            document.getElementById('victoryOverlay').classList.add('hidden');
-            document.getElementById('hintBox').classList.add('hidden');
-
-            document.getElementById('puzzleModal').classList.remove('hidden');
-            playSound('click');
-
-            // Initialize Three.js viewport
-            initThreeViewport();
-            loadPuzzleScene(id);
-        }
-
-        function closeModal() {
-            document.getElementById('puzzleModal').classList.add('hidden');
-            playSound('click');
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-            activePuzzleId = null;
-        }
-
-        function showHint() {
-            const puzzle = puzzlesData.find(p => p.id === activePuzzleId);
-            if (!puzzle) return;
-
-            const hintBox = document.getElementById('hintBox');
-            document.getElementById('hintText').innerText = puzzle.hint;
-            hintBox.classList.remove('hidden');
-            playSound('reflect');
-
-            setTimeout(() => {
-                hintBox.classList.add('hidden');
-            }, 6000);
-        }
-
-        function resetCurrentPuzzle() {
-            if (activePuzzleId) {
-                playSound('rotate');
-                loadPuzzleScene(activePuzzleId);
-            }
-        }
-
-        function triggerVictory() {
-            playSound('win');
-            const puzzle = puzzlesData.find(p => p.id === activePuzzleId);
-            if (puzzle) puzzle.completed = true;
-
-            updateProgressCounter();
-            renderPuzzleGrid();
-
-            document.getElementById('victoryOverlay').classList.remove('hidden');
-        }
-
-        /* =========================================================================
-           THREE.JS CONTAINER & COMMON EVENT LISTENERS
-           ========================================================================= */
-        function initThreeViewport() {
-            const container = document.getElementById('viewport3D');
-            container.innerHTML = '';
-
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x05050d, 0.03);
-
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 0, 8);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            container.appendChild(renderer.domElement);
-
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene.add(ambientLight);
-
-            const dirLight = new THREE.DirectionalLight(0x00f3ff, 1);
-            dirLight.position.set(5, 10, 7);
-            dirLight.castShadow = true;
-            scene.add(dirLight);
-
-            const pointLight = new THREE.PointLight(0xff007f, 1, 10);
-            pointLight.position.set(-5, -5, 5);
-            scene.add(pointLight);
-
-            // Mouse & Touch Interaction Handling
-            const dom = renderer.domElement;
-            
-            dom.addEventListener('mousedown', (e) => {
-                isMouseDown = true;
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-                handlePuzzleClick(e);
-            });
-
-            dom.addEventListener('mousemove', (e) => {
-                if (!isMouseDown) return;
-                const deltaX = e.clientX - previousMousePosition.x;
-                const deltaY = e.clientY - previousMousePosition.y;
-
-                handlePuzzleDrag(deltaX, deltaY);
-
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-            });
-
-            window.addEventListener('mouseup', () => { isMouseDown = false; });
-
-            // Touch events
-            dom.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    isMouseDown = true;
-                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                    handlePuzzleClick(e.touches[0]);
-                }
-            });
-
-            dom.addEventListener('touchmove', (e) => {
-                if (!isMouseDown || e.touches.length !== 1) return;
-                const deltaX = e.touches[0].clientX - previousMousePosition.x;
-                const deltaY = e.touches[0].clientY - previousMousePosition.y;
-
-                handlePuzzleDrag(deltaX, deltaY);
-
-                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            });
-
-            window.addEventListener('touchend', () => { isMouseDown = false; });
-        }
-
-        /* =========================================================================
-           PUZZLE SPECIFIC LOGIC MODULES
-           ========================================================================= */
-        function loadPuzzleScene(id) {
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            puzzleObjects = {};
-
-            switch (id) {
-                case 'rubik': initRubikPuzzle(); break;
-                case 'perspective': initPerspectivePuzzle(); break;
-                case 'circuit': initCircuitPuzzle(); break;
-                case 'laser': initLaserPuzzle(); break;
-                case 'shadow': initShadowPuzzle(); break;
-                case 'maze': initMazePuzzle(); break;
-                case 'lock': initLockPuzzle(); break;
-            }
-
-            function animate() {
-                animationFrameId = requestAnimationFrame(animate);
-                if (puzzleObjects.update) puzzleObjects.update();
-                renderer.render(scene, camera);
-            }
-            animate();
-        }
-
-        function handlePuzzleDrag(dx, dy) {
-            if (puzzleObjects.onDrag) {
-                puzzleObjects.onDrag(dx, dy);
-            }
-        }
-
-        function handlePuzzleClick(event) {
-            if (puzzleObjects.onClick) {
-                const rect = renderer.domElement.getBoundingClientRect();
-                const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-                puzzleObjects.onClick(x, y);
-            }
-        }
-
-        /* --- 1. RUBIK'S CUBE --- */
-        function initRubikPuzzle() {
-            camera.position.set(4, 4, 6);
-            camera.lookAt(0, 0, 0);
-
-            const group = new THREE.Group();
-            const cubies = [];
-            const size = 3;
-            const gap = 1.05;
-
-            const materials = [
-                new THREE.MeshStandardMaterial({ color: 0x00f3ff }), // Right
-                new THREE.MeshStandardMaterial({ color: 0xff007f }), // Left
-                new THREE.MeshStandardMaterial({ color: 0xffca3a }), // Top
-                new THREE.MeshStandardMaterial({ color: 0xffffff }), // Bottom
-                new THREE.MeshStandardMaterial({ color: 0x00ff88 }), // Front
-                new THREE.MeshStandardMaterial({ color: 0xff5900 })  // Back
-            ];
-
-            for (let x = 0; x < size; x++) {
-                for (let y = 0; y < size; y++) {
-                    for (let z = 0; z < size; z++) {
-                        const geom = new THREE.BoxGeometry(0.95, 0.95, 0.95);
-                        const cubie = new THREE.Mesh(geom, materials);
-                        cubie.position.set(
-                            (x - 1) * gap,
-                            (y - 1) * gap,
-                            (z - 1) * gap
-                        );
-                        group.add(cubie);
-                        cubies.push(cubie);
-                    }
-                }
-            }
-            scene.add(group);
-
-            puzzleObjects.group = group;
-            puzzleObjects.onDrag = (dx, dy) => {
-                group.rotation.y += dx * 0.01;
-                group.rotation.x += dy * 0.01;
-            };
-
-            puzzleObjects.onClick = () => {
-                playSound('rotate');
-                // Simulate random face twist
-                const randomCubie = cubies[Math.floor(Math.random() * cubies.length)];
-                randomCubie.rotation.z += Math.PI / 2;
-
-                // Check for completion condition
-                if (Math.random() < 0.15) {
-                    triggerVictory();
-                    }
-            };
-        }
-
-        /* --- 2. PERSPECTIVE ILLUSION --- */
-        function initPerspectivePuzzle() {
-            camera.position.set(0, 0, 8);
-
-            const containerGroup = new THREE.Group();
-            scene.add(containerGroup);
-
-            const ringGroup = new THREE.Group();
-            const count = 30;
-
-            for (let i = 0; i < count; i++) {
-                const angle = (i / count) * Math.PI * 2;
-                const radius = 2;
-
-                const geom = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-                const mat = new THREE.MeshStandardMaterial({
-                    color: 0x00f3ff,
-                    emissive: 0x00aaff,
-                    emissiveIntensity: 0.5
-                });
-                const mesh = new THREE.Mesh(geom, mat);
-
-                // Scatter positions in 3D depth
-                mesh.position.set(
-                    Math.cos(angle) * radius + (Math.random() - 0.5) * 0.2,
-                    Math.sin(angle) * radius + (Math.random() - 0.5) * 0.2,
-                    (Math.random() - 0.5) * 6
-                );
-                ringGroup.add(mesh);
-            }
-
-            containerGroup.add(ringGroup);
-
-            // Random initial rotation
-            containerGroup.rotation.x = Math.PI / 3;
-            containerGroup.rotation.y = Math.PI / 2.5;
-
-            puzzleObjects.onDrag = (dx, dy) => {
-                containerGroup.rotation.y += dx * 0.008;
-                containerGroup.rotation.x += dy * 0.008;
-                playSound('rotate');
-
-                // Check alignment to origin (0, 0)
-                const rx = Math.abs(containerGroup.rotation.x % (Math.PI * 2));
-                const ry = Math.abs(containerGroup.rotation.y % (Math.PI * 2));
-
-                if (rx < 0.2 && ry < 0.2) {
-                    triggerVictory();
-                }
-            };
-        }
-
-        /* --- 3. ENERGY CIRCUIT CONNECT --- */
-        function initCircuitPuzzle() {
-            camera.position.set(0, 0, 7);
-
-            const gridGroup = new THREE.Group();
-            scene.add(gridGroup);
-
-            const size = 3;
-            const tiles = [];
-
-            for (let x = 0; x < size; x++) {
-                for (let y = 0; y < size; y++) {
-                    const tileGeom = new THREE.BoxGeometry(1.2, 1.2, 0.2);
-                    const mat = new THREE.MeshStandardMaterial({ color: 0x1a1a3a });
-                    const tile = new THREE.Mesh(tileGeom, mat);
-
-                    tile.position.set((x - 1) * 1.5, (y - 1) * 1.5, 0);
-
-                    // Glowing path line inside tile
-                    const lineGeom = new THREE.BoxGeometry(1.2, 0.2, 0.25);
-                    const lineMat = new THREE.MeshStandardMaterial({ color: 0xff007f, emissive: 0xff007f, emissiveIntensity: 0.8 });
-                    const line = new THREE.Mesh(lineGeom, lineMat);
-                    tile.add(line);
-
-                    tile.userData = { angle: Math.floor(Math.random() * 4) * (Math.PI / 2) };
-                    tile.rotation.z = tile.userData.angle;
-
-                    gridGroup.add(tile);
-                    tiles.push(tile);
-                }
-            }
-
-            puzzleObjects.onClick = (x, y) => {
-                const raycaster = new THREE.Raycaster();
-                raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
-                const intersects = raycaster.intersectObjects(tiles);
-
-                if (intersects.length > 0) {
-                    const clickedTile = intersects[0].object;
-                    clickedTile.rotation.z += Math.PI / 2;
-                    playSound('click');
-
-                    // Check if all tiles are aligned horizontally
-                    const aligned = tiles.every(t => Math.abs(t.rotation.z % Math.PI) < 0.1);
-                    if (aligned) {
-                        triggerVictory();
-                    }
-                }
-            };
-        }
-
-        /* --- 4. LASER & MIRRORS --- */
-        function initLaserPuzzle() {
-            camera.position.set(0, 0, 8);
-
-            const laserGroup = new THREE.Group();
-            scene.add(laserGroup);
-
-            // Target receiver
-            const targetGeom = new THREE.SphereGeometry(0.5, 32, 32);
-            const targetMat = new THREE.MeshStandardMaterial({ color: 0x00ff88, emissive: 0x00ff88 });
-            const target = new THREE.Mesh(targetGeom, targetMat);
-            target.position.set(2.5, -2, 0);
-            laserGroup.add(target);
-
-            // Rotatable mirror
-            const mirrorGeom = new THREE.BoxGeometry(1.5, 0.1, 0.8);
-            const mirrorMat = new THREE.MeshStandardMaterial({ color: 0x00f3ff, metalness: 0.9, roughness: 0.1 });
-            const mirror = new THREE.Mesh(mirrorGeom, mirrorMat);
-            mirror.position.set(0, 0, 0);
-            laserGroup.add(mirror);
-
-            // Laser Beam
-            const beamGeom = new THREE.CylinderGeometry(0.05, 0.05, 6);
-            const beamMat = new THREE.MeshBasicMaterial({ color: 0xff007f });
-            const beam = new THREE.Mesh(beamGeom, beamMat);
-            beam.position.set(-3, 0, 0);
-            beam.rotation.z = Math.PI / 2;
-            laserGroup.add(beam);
-
-            puzzleObjects.onClick = () => {
-                mirror.rotation.z += Math.PI / 4;
-                playSound('reflect');
-
-                if (Math.abs(mirror.rotation.z % (Math.PI / 2)) < 0.1) {
-                    targetMat.emissiveIntensity = 2;
-                    triggerVictory();
-                }
-            };
-        }
-
-        /* --- 5. SHADOW MATCHER --- */
-        function initShadowPuzzle() {
-            camera.position.set(4, 3, 6);
-            camera.lookAt(0, 0, 0);
-
-            const shapeGroup = new THREE.Group();
-
-            // Unique 3D geometric shape
-            const geom = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
-            const mat = new THREE.MeshStandardMaterial({ color: 0xfuchsias, roughness: 0.2 });
-            const mesh = new THREE.Mesh(geom, mat);
-            shapeGroup.add(mesh);
-            scene.add(shapeGroup);
-
-            puzzleObjects.onDrag = (dx, dy) => {
-                shapeGroup.rotation.y += dx * 0.01;
-                shapeGroup.rotation.x += dy * 0.01;
-
-                if (Math.abs(shapeGroup.rotation.y % Math.PI) < 0.2 && Math.abs(shapeGroup.rotation.x % Math.PI) < 0.2) {
-                    triggerVictory();
-                }
-            };
-        }
-
-        /* --- 6. TILT MAZE SPHERE --- */
-        function initMazePuzzle() {
-            camera.position.set(0, 0, 7);
-
-            const mazeGroup = new THREE.Group();
-
-            // Outer ring
-            const ringGeom = new THREE.TorusGeometry(2.2, 0.1, 16, 100);
-            const ringMat = new THREE.MeshStandardMaterial({ color: 0x00f3ff });
-            mazeGroup.add(new THREE.Mesh(ringGeom, ringMat));
-
-            // Marble
-            const marbleGeom = new THREE.SphereGeometry(0.25, 32, 32);
-            const marbleMat = new THREE.MeshStandardMaterial({ color: 0xffca3a, emissive: 0xffca3a });
-            const marble = new THREE.Mesh(marbleGeom, marbleMat);
-            marble.position.set(-1.8, 0, 0);
-            mazeGroup.add(marble);
-
-            scene.add(mazeGroup);
-
-            puzzleObjects.onDrag = (dx, dy) => {
-                mazeGroup.rotation.z += dx * 0.01;
-                marble.position.x += dx * 0.01;
-
-                if (marble.position.x >= 1.8) {
-                    triggerVictory();
-                }
-            };
-        }
-
-        /* --- 7. SPATIAL KEY LOCK --- */
-        function initLockPuzzle() {
-            camera.position.set(0, 0, 6);
-
-            const lockGroup = new THREE.Group();
-            const discCount = 3;
-            const discs = [];
-
-            for (let i = 0; i < discCount; i++) {
-                const geom = new THREE.CylinderGeometry(1.2 - i * 0.3, 1.2 - i * 0.3, 0.3, 32);
-                const mat = new THREE.MeshStandardMaterial({ color: i % 2 === 0 ? 0x00f3ff : 0xff007f });
-                const disc = new THREE.Mesh(geom, mat);
-                disc.position.z = (i - 1) * 0.5;
-                disc.rotation.x = Math.PI / 2;
-                disc.userData = { angle: Math.random() * Math.PI * 2 };
-                disc.rotation.y = disc.userData.angle;
-
-                lockGroup.add(disc);
-                discs.push(disc);
-            }
-            scene.add(lockGroup);
-
-            puzzleObjects.onClick = () => {
-                discs.forEach(d => {
-                    d.rotation.y += Math.PI / 3;
-                });
-                playSound('click');
-
-                const aligned = discs.every(d => Math.abs(d.rotation.y % (Math.PI * 2)) < 0.3);
-                if (aligned) {
-                    triggerVictory();
-                }
-            };
-        }
-    </script>
+        // Ребра
+        let edges = [
+          [0,1],[1,2],[2,3],[3,0],
+          [4,5],[5,6],[6,7],[7,4],
+          [0,4],[1,5],[2,6],[3,7]
+        ];
+
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 3;
+       ctx.shadowBlur = 15;
+        ctx.shadowColor = '#00f2fe';
+
+        edges.forEach(e => {
+          ctx.beginPath();
+          ctx.moveTo(projected[e[0]][0], projected[e[0]][1]);
+          ctx.lineTo(projected[e[1]][0], projected[e[1]][1]);
+          ctx.stroke();
+        });
+
+        // Вершины (точки)
+        projected.forEach(p => {
+          ctx.fillStyle = '#ff007f';
+          ctx.beginPath();
+          ctx.arc(p[0], p[1], 6, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.restore();
+
+        animId = requestAnimationFrame(draw);
+      }
+
+      if (animId) cancelAnimationFrame(animId);
+      draw();
+    }
+
+    // Фоновая 3D сетка частиц
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+
+    function resizeBg() {
+      bgCanvas.width = window.innerWidth;
+      bgCanvas.height = window.innerHeight;
+    }
+    window.onresize = resizeBg;
+    resizeBg();
+
+    let pts = Array.from({length: 60}, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5
+    }));
+
+    function animBg() {
+      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      bgCtx.fillStyle = 'rgba(0, 242, 254, 0.3)';
+      
+      pts.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > bgCanvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > bgCanvas.height) p.vy *= -1;
+
+        bgCtx.beginPath();
+        bgCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        bgCtx.fill();
+      });
+
+      requestAnimationFrame(animBg);
+    }
+    animBg();
+  </script>
 </body>
 </html>
