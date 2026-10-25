@@ -4,368 +4,1018 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D МЕМ-ДЕКА 6.0 ULTRA</title>
+    <title>ВЕРИТЕ — 3D Головоломки и Оптические Иллюзии</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Three.js for 3D Graphics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         * {
-            font-family: 'Rubik', sans-serif;
+            font-family: 'Rajdhani', sans-serif;
             user-select: none;
             -webkit-user-select: none;
         }
 
+        h1, h2, h3, .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
         body {
-            background-color: #080711;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(255, 0, 127, 0.2) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(0, 223, 216, 0.15) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, rgba(121, 40, 202, 0.18) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: #fff;
-            min-height: 100vh;
+            background-color: #05050d;
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
 
-        /* Animated Title Gradient */
-        .title-gradient {
-            background: linear-gradient(135deg, #ff007f, #7928ca, #00dfd8, #ffca3a);
-            background-size: 300% 300%;
-            animation: gradientShift 6s ease infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* Neon Glows & Animations */
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7), 0 0 20px rgba(0, 243, 255, 0.4);
         }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .neon-text-pink {
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.7), 0 0 20px rgba(255, 0, 127, 0.4);
         }
-
-        /* 3D Perspective and Card styling */
-        .grid-perspective {
-            perspective: 1200px;
+        .neon-border-cyan {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.2);
         }
-
-        .meme-card {
-            transform-style: preserve-3d;
-            transform: rotateX(10deg) rotateY(-6deg) translateZ(0px);
-            box-shadow: 
-                -8px 12px 20px rgba(0, 0, 0, 0.6),
-                -3px 5px 0px #090814,
-                inset 0 1px 1px rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
-        }
-
-        .meme-card:hover {
-            transform: rotateX(0deg) rotateY(0deg) rotateZ(2deg) translateZ(20px) scale(1.04);
-            box-shadow: 
-                0 20px 30px rgba(121, 40, 202, 0.45),
-                0 0 15px rgba(0, 223, 216, 0.3),
-                inset 0 1px 1px rgba(255, 255, 255, 0.4);
-        }
-
-        .meme-card:active {
-            transform: rotateX(0deg) rotateY(0deg) translateZ(-8px) scale(0.96);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
-        }
-
-        .meme-card.playing {
-            animation: cardPulse 0.6s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
-            background: linear-gradient(135deg, #ff007f 0%, #7928ca 100%) !important;
-            border-color: #00dfd8 !important;
-            box-shadow: 0 0 30px #ff007f, 0 0 15px #00dfd8 !important;
-        }
-
-        @keyframes cardPulse {
-            0% { transform: rotateX(0deg) rotateY(-5deg) translateZ(15px) scale(1.02); }
-            100% { transform: rotateX(0deg) rotateY(5deg) translateZ(25px) scale(1.07); }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #080711;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(121, 40, 202, 0.5);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #00dfd8;
-        }
-
-        /* Glassmorphism Panel */
-        .glass-panel {
-            background: rgba(20, 18, 38, 0.7);
+        
+        .glass-card {
+            background: rgba(13, 15, 30, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.15);
+            transform: translateY(-4px);
+        }
+
+        /* Canvas Overlay Styles */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05050d;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 243, 255, 0.8);
+        }
+
+        /* Pulse animation for completion */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .pulse-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        .modal-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="min-h-screen relative flex flex-col justify-between">
 
-    <div class="max-w-7xl mx-auto">
-        <!-- Header Section -->
-     <header class="text-center mb-8">
-            <h1 class="title-gradient text-4xl md:text-6xl font-black uppercase tracking-wider mb-2">
-                🌀 3D МЕМ-ДЕКА 6.0 ULTRA
-            </h1>
-            <p class="text-indigo-300 text-sm md:text-base font-semibold tracking-wide">
-                🔥 Огромная коллекция топовых русских и мировых мемов без заглушек!
-            </p>
+    <!-- Background Animated Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Main Container -->
+    <div class="relative z-10 max-w-7xl mx-auto w-full px-4 py-6 flex-grow flex flex-col">
+
+        <!-- HEADER / BRANDING -->
+        <header class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 glass-card p-6 rounded-3xl border-b-2 border-cyan-500/30">
+            <div class="flex items-center gap-4 text-center md:text-left">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 to-fuchsia-600 flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(0,243,255,0.6)]">
+                    <i class="fa-solid fa-cube text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-amber-300 neon-text-cyan">
+                        ВЕРИТЕ
+                    </h1>
+                    <p class="text-xs md:text-sm text-cyan-300 font-semibold tracking-wider uppercase mt-1">
+                        3D Головоломки & Оптические Иллюзии
+                    </p>
+                </div>
+            </div>
+
+            <!-- Stats & Sound toggle -->
+            <div class="flex items-center gap-4 bg-black/40 px-5 py-3 rounded-2xl border border-white/10">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
+                    <div class="text-left">
+                        <div class="text-[10px] text-gray-400 uppercase tracking-wider">Пройдено</div>
+                        <div id="completedCounter" class="text-lg font-bold text-cyan-400">0 / 7</div>
+                    </div>
+                </div>
+                <div class="h-8 w-[1px] bg-white/10"></div>
+                <button id="soundToggleBtn" onclick="toggleAudio()" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-cyan-400 transition">
+                    <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+                </button>
+            </div>
         </header>
 
-        <!-- Control Bar -->
-        <div class="glass-panel rounded-2xl p-4 md:p-6 mb-8 shadow-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
-            <!-- Search Bar -->
-            <div class="w-full md:w-1/3 relative">
-                <input type="text" id="searchInput" placeholder="🔍 Найти мем..." oninput="filterMemes()"
-                    class="w-full bg-black/50 border-2 border-purple-500/40 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition duration-300 shadow-inner">
+        <!-- SEARCH & CATEGORY FILTERS -->
+        <div class="flex flex-col md:flex-row gap-4 mb-8">
+            <div class="relative flex-grow">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400"></i>
+                <input type="text" id="searchInput" placeholder="Поиск головоломки..." oninput="filterPuzzles()"
+                    class="w-full bg-black/60 border border-cyan-500/30 rounded-2xl pl-11 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition duration-300 shadow-inner">
             </div>
-
-            <!-- Volume Slider -->
-            <div class="flex items-center gap-3 bg-black/40 px-4 py-3 rounded-xl border border-white/5 w-full md:w-auto justify-center">
-                <span class="text-xl">🔊</span>
-                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8" onchange="updateVolume()"
-                    class="accent-cyan-400 cursor-pointer w-32">
-                <span id="volumeValue" class="text-xs font-bold text-cyan-300 min-w-[32px]">80%</span>
-            </div>
-
-            <!-- Global Action Buttons -->
-            <div class="flex gap-3 w-full md:w-auto justify-center">
-                <button onclick="playRandom()" 
-                    class="flex-1 md:flex-initial bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold px-5 py-3 rounded-xl shadow-lg transform active:scale-95 transition border border-white/10 text-sm md:text-base">
-                    🎲 Рандом
-                </button>
-                <button onclick="stopAll()" 
-                    class="flex-1 md:flex-initial bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold px-5 py-3 rounded-xl shadow-lg transform active:scale-95 transition border border-white/10 text-sm md:text-base">
-                    🛑 СТОП ВСЕ
-                </button>
+            
+            <div id="categoryContainer" class="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+                <!-- Categories rendered by JS -->
             </div>
         </div>
 
-        <!-- Categories Bar -->
-        <div class="flex gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar" id="categoriesContainer">
-            <!-- Rendered by JS -->
+        <!-- PUZZLE GRID -->
+        <div id="puzzleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Dynamic Puzzle Cards Rendered Here -->
         </div>
 
-        <!-- Meme 3D Grid -->
-        <div class="grid-perspective grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 pb-28" id="memeGrid">
-            <!-- Cards rendered by JS -->
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 text-center py-6 border-t border-white/5 text-gray-500 text-xs tracking-wider">
+        © 2026 ВЕРИТЕ (VERITE) — ПЛАТФОРМА ИНТЕРАКТИВНЫХ 3D ГОЛОВОЛОМОК. ВСЕ ПРАВА ЗАКРЫТЫ.
+    </footer>
+
+    <!-- INTERACTIVE 3D PUZZLE PLAY MODAL -->
+    <div id="puzzleModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 modal-blur bg-black/80">
+        <div class="relative w-full max-w-5xl h-[92vh] glass-card rounded-3xl overflow-hidden flex flex-col border-2 border-cyan-500/40 shadow-[0_0_50px_rgba(0,243,255,0.2)]">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/50">
+                <div class="flex items-center gap-3">
+                    <span id="modalIcon" class="text-2xl text-cyan-400"></span>
+                    <div>
+                        <h2 id="modalTitle" class="text-xl md:text-2xl font-bold text-white font-orbitron"></h2>
+                        <p id="modalCategory" class="text-xs text-fuchsia-400 tracking-wider uppercase"></p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="showHint()" class="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-amber-400"></i> Подсказка
+                        </button>
+                    <button onclick="resetCurrentPuzzle()" class="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Сброс
+                    </button>
+                    <button onclick="closeModal()" class="w-10 h-10 rounded-xl bg-red-500/20 hover:bg-red-500/40 border border-red-500/40 text-red-300 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body / 3D Canvas Area -->
+            <div class="relative flex-grow bg-gradient-to-b from-black/80 to-[#080816] overflow-hidden flex items-center justify-center">
+                
+                <!-- 3D Viewport Container -->
+                <div id="viewport3D" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+                <!-- Instructions Overlay -->
+                <div class="absolute bottom-4 left-4 right-4 md:left-6 md:right-auto max-w-md bg-black/70 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-xs text-gray-300 pointer-events-none shadow-xl">
+                    <div class="font-bold text-cyan-400 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-hand-pointer"></i> Управление
+                    </div>
+                    <div id="modalInstructions" class="text-gray-300 leading-relaxed"></div>
+                </div>
+
+                <!-- Victory Splash Overlay -->
+                <div id="victoryOverlay" class="absolute inset-0 bg-black/80 backdrop-blur-xl hidden flex flex-col items-center justify-center z-20 text-center p-6">
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-cyan-400 to-fuchsia-500 flex items-center justify-center text-5xl text-white mb-6 shadow-[0_0_40px_rgba(0,243,255,0.8)] animate-bounce">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400 font-orbitron mb-2">
+                        РЕШЕНО!
+                    </h3>
+                    <p class="text-gray-300 text-sm md:text-base max-w-md mb-8">
+                        Поздравляем! Вы успешно разгадали пространственную загадку и подтвердили своё мастерство.
+                    </p>
+                    <div class="flex gap-4">
+                        <button onclick="closeModal()" class="px-8 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white font-bold tracking-wider shadow-lg hover:shadow-cyan-500/50 transition transform hover:scale-105">
+                            Продолжить
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hint Pop-up Modal -->
+                <div id="hintBox" class="absolute top-4 left-1/2 -translate-x-1/2 bg-amber-950/90 border border-amber-500/60 text-amber-200 px-6 py-3 rounded-2xl text-xs md:text-sm font-semibold shadow-2xl hidden z-30 transition flex items-center gap-3">
+                    <i class="fa-solid fa-lightbulb text-amber-400 text-lg"></i>
+                    <span id="hintText"></span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Playing Status Bar -->
-    <div id="statusBar" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-32 glass-panel border-2 border-cyan-400 text-white px-6 py-3 rounded-full font-bold shadow-[0_0_25px_rgba(0,223,216,0.4)] z-50 transition-transform duration-300 ease-out flex items-center gap-3">
-        <div class="flex items-end gap-1 h-4">
-            <span class="w-1 h-full bg-pink-500 rounded-full animate-bounce"></span>
-            <span class="w-1 h-full bg-cyan-400 rounded-full animate-bounce [animation-delay:0.15s]"></span>
-            <span class="w-1 h-full bg-yellow-400 rounded-full animate-bounce [animation-delay:0.3s]"></span>
-        </div>
-        <span>Сейчас играет: <span id="currentMemeName" class="text-cyan-300 font-extrabold"></span></span>
-    </div>
-
+    <!-- MAIN JAVASCRIPT ENGINE -->
     <script>
-        // Massive collection of memes with active direct working links from Myinstants
-        const memes = [
-            // --- TOP RUSSIAN & TRENDS ---
-            { id: 'chinazes', name: 'Чиназес', icon: '🤙', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/chinazes.mp3' },
-         { id: 'golda', name: 'ГОЛДА!', icon: '🥇', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/golda.mp3' },
-            { id: 'koch', name: 'Коч, братан!', icon: '😎', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/koch-bratan.mp3' },
-            { id: 'a4', name: 'Влад А4!', icon: '🤡', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/a4-vlad.mp3' },
-            { id: 'boss', name: 'Эй, Босс!', icon: '🕶️', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/hey-boss.mp3' },
-            { id: 'sigma', name: 'Sigma Boy', icon: '🗿', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sigma-grindset-theme.mp3' },
-            { id: 'barhatnye', name: 'Бархатные тяги', icon: '👞', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/barhatnye-tiagi.mp3' },
-            { id: 'saliut', name: 'Салют, братва!', icon: '🎆', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/privet-ot-mopsa.mp3' },
-            { id: 'boyas', name: 'Сядешь в тюрьму', icon: '👮', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/tiurma.mp3' },
-            { id: 'mne_pohuy', name: 'Мне похуй', icon: '🤷‍♂️', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/mne-pokhui.mp3' },
+        /* =========================================================================
+           SOUND SYNTHESIZER (WEB AUDIO API)
+           ========================================================================= */
+        let audioCtx = null;
+        let soundEnabled = true;
 
-            // --- REACTION & SCREAMS ---
-            { id: 'bruh', name: 'BRUH', icon: '🗿', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bruh-sound-effect-sound-button.mp3' },
-            { id: 'emotional', name: 'Emotional Damage', icon: '💔', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/emotional-damage-meme.mp3' },
-            { id: 'fart', name: 'Пердеж Reverb', icon: '💨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fart-with-reverb.mp3' },
-            { id: 'scream_loud', name: 'Крик из ада', icon: '😱', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/loud-scream.mp3' },
-            { id: 'vine_boom', name: 'Vine Boom', icon: '💥', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/vine-boom.mp3' },
-            { id: 'anime_wow', name: 'Anime WOW', icon: '✨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/anime-wow.mp3' },
-            { id: 'coffin', name: 'Coffin Dance', icon: '⚰️', cat: 'music', url: 'https://www.myinstants.com/media/sounds/coffin-dance-official-audio.mp3' },
-            { id: 'spongebob_fail', name: 'Spongebob Fail', icon: '🎺', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/spongebob-fail.mp3' },
-            { id: 'punch', name: 'Удар по голове', icon: '🥊', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bonk-sound-effect.mp3' },
-
-            // --- GAMES & POPULAR ---
-            { id: 'oof', name: 'Roblox OOF', icon: '🧱', cat: 'games', url: 'https://www.myinstants.com/media/sounds/roblox-off.mp3' },
-            { id: 'minecraft_oof', name: 'Minecraft Урон', icon: '⛏️', cat: 'games', url: 'https://www.myinstants.com/media/sounds/classic_hurt.mp3' },
-            { id: 'cs_go_bomb', name: 'Bomb Has Been Planted', icon: '💣', cat: 'games', url: 'https://www.myinstants.com/media/sounds/bomb-has-been-planted-sound-effect.mp3' },
-            { id: 'gta_sa', name: 'Ah Shit, Here We Go', icon: '🚗', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-san-andreas-ah-shit-here-we-go-again.mp3' },
-            { id: 'gta_mission', name: 'Mission Passed', icon: '⭐', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-san-andreas-mission-passed.mp3' },
-            { id: 'metal_pipe', name: 'Металлическая труба', icon: '🔩', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/falling-metal-pipe-sound-effect.mp3' },
-            { id: 'fbi', name: 'FBI Open Up', icon: '🚨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fbi-open-up-sfx.mp3' },
-            { id: 'tada', name: 'Та-даам!', icon: '🎉', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/ta-da_1.mp3' },
-
-            // --- MUSIC & MEME SONGS ---
-         { id: 'phonk', name: 'DRIFT PHONK', icon: '🏎️', cat: 'music', url: 'https://www.myinstants.com/media/sounds/phonk-bass.mp3' },
-            { id: 'rickroll', name: 'Rickroll', icon: '🕺', cat: 'music', url: 'https://www.myinstants.com/media/sounds/rick-roll-different-link.mp3' },
-            { id: 'sax_guy', name: 'Epic Sax Guy', icon: '🎷', cat: 'music', url: 'https://www.myinstants.com/media/sounds/epic-sax-guy.mp3' },
-            { id: 'run', name: 'RUN (Awolnation)', icon: '🏃', cat: 'music', url: 'https://www.myinstants.com/media/sounds/run-awolnation.mp3' },
-            { id: 'gigachad', name: 'GigaChad Theme', icon: '🗿', cat: 'music', url: 'https://www.myinstants.com/media/sounds/gigachad-theme.mp3' }
-        ];
-
-        const categories = [
-            { id: 'all', name: 'Все мемы', icon: '🔥' },
-            { id: 'fav', name: 'Избранное', icon: '⭐' },
-            { id: 'ru', name: 'Русские мемы', icon: '🇷🇺' },
-            { id: 'reaction', name: 'Реакции', icon: '💥' },
-            { id: 'games', name: 'Игры', icon: '🎮' },
-            { id: 'music', name: 'Музыка', icon: '🎵' }
-        ];
-
-        let activeAudios = [];
-        let currentCategory = 'all';
-        let favorites = JSON.parse(localStorage.getItem('meme_ultra_favs')) || [];
-
-        function init() {
-            renderCategories();
-            renderMemes();
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
         }
 
+        function toggleAudio() {
+        soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+                playSound('click');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark';
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'rotate') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(320, now + 0.12);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'reflect') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'win') {
+                const notes = [300, 400, 500, 700, 900];
+                notes.forEach((freq, idx) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    noteOsc.type = 'triangle';
+                    noteOsc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                    noteGain.gain.setValueAtTime(0.2, now + idx * 0.1);
+                    noteGain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.3);
+                    noteOsc.start(now + idx * 0.1);
+                    noteOsc.stop(now + idx * 0.1 + 0.3);
+                });
+            }
+        }
+
+        /* =========================================================================
+           DATA & STATE MANAGEMENT
+           ========================================================================= */
+        const categories = [
+            { id: 'all', name: 'Все головоломки', icon: 'fa-globe' },
+            { id: 'cube', name: 'Кубы и Кубики', icon: 'fa-cube' },
+            { id: 'illusion', name: 'Оптические Иллюзии', icon: 'fa-eye' },
+            { id: 'circuit', name: 'Энерго-сети', icon: 'fa-bolt' },
+            { id: 'laser', name: 'Лазеры и Оптика', icon: 'fa-atom' },
+            { id: 'spatial', name: 'Пространство & Тень', icon: 'fa-vector-square' }
+        ];
+
+        const puzzlesData = [
+            {
+                id: 'rubik',
+                title: '3D Кубик Рубика',
+                category: 'cube',
+                categoryName: 'Кубы и Кубики',
+                icon: 'fa-cube',
+                desc: 'Классическая объемная головоломка. Вращайте грани куба для сборки одинаковых цветов.',
+                instructions: 'Зажмите и потяните мышь/палец для вращения куба в 3D. Нажимайте на кнопки вращения граней.',
+                hint: 'Начните со сборки одного креста на верхней грани, затем согласуйте боковые центры.',
+                completed: false
+                },
+            {
+                id: 'perspective',
+                title: 'Перспективная Иллюзия',
+                category: 'illusion',
+                categoryName: 'Оптические Иллюзии',
+                icon: 'fa-eye',
+                desc: 'Хаотично парящие 3D обломки образуют единую скрытую фигуру только под определенным углом.',
+                instructions: 'Вращайте виртуальную камеру, чтобы найти нужный угол обзора, где фрагменты сложатся в символ.',
+                hint: 'Ищите ракурс, при котором синие элементы смотрят строго на вас, образуя кольцо.',
+                completed: false
+            },
+            {
+                id: 'circuit',
+                title: '3D Энерго-Сеть',
+                category: 'circuit',
+                categoryName: 'Энерго-сети',
+                icon: 'fa-bolt',
+                desc: 'Поворачивайте объемные узлы матрицы, чтобы провести лазерную энергию от источника к ядру.',
+                instructions: 'Кликайте на 3D блоки матрицы для их поворота на 90 градусов. Соедините все светящиеся линии.',
+                hint: 'Начните прокладку сети от зеленого источника питания, продвигаясь шаг за шагом к синему ядру.',
+                completed: false
+            },
+            {
+                id: 'laser',
+                title: 'Лазер и Зеркала',
+                category: 'laser',
+                categoryName: 'Лазеры и Оптика',
+                icon: 'fa-atom',
+                desc: 'Настройте систему отражающих зеркал в трехмерном пространстве, чтобы направить луч в приёмник.',
+                instructions: 'Кликайте на зеркала, чтобы поворачивать их под углом 45 градусов и отражать лазерный луч.',
+                hint: 'Первое зеркало должно перенаправить лазер вниз, а второе — направить его в мишень.',
+                completed: false
+            },
+            {
+                id: 'shadow',
+                title: '3D Теневой Пазл',
+                category: 'spatial',
+                categoryName: 'Пространство & Тень',
+                icon: 'fa-vector-square',
+                desc: 'Вращайте сложное 3D тело так, чтобы его тени на двух стенах совпали с заданными силуэтами.',
+                instructions: 'Поворачивайте фигуру по осям X и Y, сравнивая отбрасываемые тени с проекциями на стенах.',
+                hint: 'Сопоставьте горизонтальную грань объекта с горизонтальным силуэтом на правой стене.',
+                completed: false
+            },
+            {
+                id: 'maze',
+                title: '3D Сфера-Лабиринт',
+                category: 'spatial',
+                categoryName: 'Пространство & Тень',
+                icon: 'fa-circle-nodes',
+                desc: 'Наклоняйте трехмерную сферу с лабиринтом, чтобы провезти квантовый шар к центральному выходу.',
+                instructions: 'Зажмите и перемещайте мышь/палец, чтобы наклонять сферу. Гравитация направит шар.',
+                hint: 'Плавно наклоняйте сферу влево, затем вниз, чтобы обвести шар вокруг внешней перегородки.',
+                completed: false
+            },
+            {
+                id: 'lock',
+                title: '3D Пространственный Замок',
+                category: 'cube',
+                categoryName: 'Кубы и Кубики',
+                icon: 'fa-lock',
+                desc: 'Выровняйте секретные штифты цилиндрического 3D замка для его успешного открытия.',
+                instructions: 'Кликайте на диски замка для поворота ригелей. Установите все ригели в горизонтальную линию.',
+                hint: 'Все выемки на золотых дисках должны смотреть строго вверх.',
+                completed: false
+            }
+        ];
+
+        let currentCategory = 'all';
+        let activePuzzleId = null;
+
+        /* =========================================================================
+           THREE.JS & SCENE ENGINE VARIABLES
+           ========================================================================= */
+        let scene, camera, renderer;
+        let animationFrameId = null;
+        let puzzleObjects = {};
+        let isMouseDown = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        /* =========================================================================
+           INIT & APPLICATION SETUP
+           ========================================================================= */
+        window.addEventListener('DOMContentLoaded', () => {
+            initBackgroundCanvas();
+            renderCategories();
+            renderPuzzleGrid();
+            updateProgressCounter();
+        });
+
         function renderCategories() {
-            const container = document.getElementById('categoriesContainer');
+            const container = document.getElementById('categoryContainer');
             container.innerHTML = categories.map(cat => `
-                <button onclick="selectCategory('${cat.id}', this)" 
-                    class="cat-btn flex items-center gap-2 bg-white/5 border border-white/10 hover:border-cyan-400/50 text-gray-300 px-4 py-2 rounded-full font-bold whitespace-nowrap transition duration-300 text-sm ${cat.id === currentCategory ? 'bg-gradient-to-r from-pink-500 to-purple-600 !text-white !border-transparent shadow-[0_0_15px_rgba(255,0,127,0.5)]' : ''}">
-                    <span>${cat.icon}</span>
+                <button onclick="selectCategory('${cat.id}')" 
+                    class="flex items-center gap-2 px-4 py-2 rounded-2xl font-bold text-xs whitespace-nowrap transition duration-300 ${cat.id === currentCategory ? 'bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white shadow-[0_0_15px_rgba(0,243,255,0.4)]' : 'bg-black/50 text-gray-400 hover:text-white border border-white/10'}">
+                    <i class="fa-solid ${cat.icon}"></i>
                     <span>${cat.name}</span>
                 </button>
             `).join('');
         }
 
-        function renderMemes() {
-            const grid = document.getElementById('memeGrid');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
-            grid.innerHTML = '';
+        function selectCategory(catId) {
+            currentCategory = catId;
+            playSound('click');
+            renderCategories();
+            renderPuzzleGrid();
+        }
 
-            const filtered = memes.filter(m => {
-                const matchesSearch = m.name.toLowerCase().includes(searchVal);
-                const matchesCat = (currentCategory === 'all') || 
-                                   (currentCategory === 'fav' && favorites.includes(m.id)) ||
-                                   (m.cat === currentCategory);
-                return matchesSearch && matchesCat;
+        function filterPuzzles() {
+            renderPuzzleGrid();
+        }
+
+        function renderPuzzleGrid() {
+            const grid = document.getElementById('puzzleGrid');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            const filtered = puzzlesData.filter(p => {
+                const matchesCat = (currentCategory === 'all') || (p.category === currentCategory);
+                const matchesSearch = p.title.toLowerCase().includes(searchVal) || p.desc.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
             });
 
             if (filtered.length === 0) {
                 grid.innerHTML = `
-                    <div class="col-span-full text-center py-12 text-gray-400 font-bold text-lg">
-                        Ничего не найдено 😿 Попробуй изменить запрос!
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        Головоломки не найдены. Попробуйте изменить параметры поиска.
                     </div>
                 `;
                 return;
             }
 
-            filtered.forEach(meme => {
-                const isFav = favorites.includes(meme.id);
-                
-                const card = document.createElement('div');
-                card.className = `meme-card relative bg-gradient-to-br from-[#232042] to-[#15132a] border border-white/10 rounded-2xl p-4 flex flex-col items-center justify-between cursor-pointer aspect-square`;
-                card.id = `card-${meme.id}`;
-                card.onclick = () => playSound(meme);
+            grid.innerHTML = filtered.map(p => `
+                <div onclick="openPuzzle('${p.id}')" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between relative group overflow-hidden">
+                    <div class="absolute -right-6 -top-6 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/30 transition"></div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-black/60 border border-cyan-500/30 flex items-center justify-center text-xl text-cyan-400 group-hover:scale-110 transition">
+                                <i class="fa-solid ${p.icon}"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${p.completed ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-white/5 text-gray-400 border-white/10'}">
+                                ${p.completed ? 'Пройдено ✓' : p.categoryName}
+                            </span>
+                        </div>
 
-                card.innerHTML = `
-                    <button onclick="toggleFav(event, '${meme.id}')" class="absolute top-3 right-3 text-xl transition transform hover:scale-125 z-10 ${isFav ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(255,202,58,0.8)]' : 'text-white/20 hover:text-white/60'}">
-                        ★
-                    </button>
-                    <div class="text-4xl md:text-5xl my-auto transform transition duration-300 hover:scale-110 drop-shadow-lg">
-                        ${meme.icon}
+                        <h3 class="text-xl font-bold text-white mb-2 font-orbitron group-hover:text-cyan-300 transition">
+                            ${p.title}
+                        </h3>
+                        <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed mb-6">
+                            ${p.desc}
+                        </p>
                     </div>
-                    <div class="text-xs md:text-sm font-bold text-center text-white leading-tight mt-2 line-clamp-2">
-                        ${meme.name}
+                    <div class="flex items-center justify-between border-t border-white/10 pt-4">
+                        <span class="text-xs font-bold text-cyan-400 flex items-center gap-1">
+                            Решать <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                        </span>
+                        <div class="flex gap-1 text-amber-400 text-xs">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
                     </div>
-                `;
-
-                grid.appendChild(card);
-            });
+                </div>
+            `).join('');
         }
 
-        function playSound(meme) {
-            const vol = parseFloat(document.getElementById('volumeSlider').value);
-            const audio = new Audio(meme.url);
-            audio.volume = vol;
+        function updateProgressCounter() {
+            const done = puzzlesData.filter(p => p.completed).length;
+            document.getElementById('completedCounter').innerText = `${done} / ${puzzlesData.length}`;
+        }
 
-            audio.play().then(() => {
-                const card = document.getElementById(`card-${meme.id}`);
-                if (card) card.classList.add('playing');
-                showStatus(meme.name);
-            }).catch(e => {
-                console.warn('Ошибка загрузки или воспроизведения звука:', e);
+        /* =========================================================================
+           BACKGROUND CANVAS ANIMATION
+           ========================================================================= */
+        function initBackgroundCanvas() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 2 + 1,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    color: Math.random() > 0.5 ? 'rgba(0, 243, 255, ' : 'rgba(255, 0, 127, '
+                });
+            }
+
+            function animateBg() {
+                ctx.clearRect(0, 0, width, height);
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0) p.x = width;
+                    if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height;
+                    if (p.y > height) p.y = 0;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color + '0.4)';
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(animateBg);
+            }
+            animateBg();
+        }
+
+        /* =========================================================================
+           3D PUZZLE ENGINE & MODAL LOGIC
+           ========================================================================= */
+        function openPuzzle(id) {
+            const puzzle = puzzlesData.find(p => p.id === id);
+            if (!puzzle) return;
+
+            activePuzzleId = id;
+            document.getElementById('modalTitle').innerText = puzzle.title;
+            document.getElementById('modalCategory').innerText = puzzle.categoryName;
+            document.getElementById('modalIcon').className = `fa-solid ${puzzle.icon}`;
+            document.getElementById('modalInstructions').innerText = puzzle.instructions;
+            document.getElementById('victoryOverlay').classList.add('hidden');
+            document.getElementById('hintBox').classList.add('hidden');
+
+            document.getElementById('puzzleModal').classList.remove('hidden');
+            playSound('click');
+
+            // Initialize Three.js viewport
+            initThreeViewport();
+            loadPuzzleScene(id);
+        }
+
+        function closeModal() {
+            document.getElementById('puzzleModal').classList.add('hidden');
+            playSound('click');
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            activePuzzleId = null;
+        }
+
+        function showHint() {
+            const puzzle = puzzlesData.find(p => p.id === activePuzzleId);
+            if (!puzzle) return;
+
+            const hintBox = document.getElementById('hintBox');
+            document.getElementById('hintText').innerText = puzzle.hint;
+            hintBox.classList.remove('hidden');
+            playSound('reflect');
+
+            setTimeout(() => {
+                hintBox.classList.add('hidden');
+            }, 6000);
+        }
+
+        function resetCurrentPuzzle() {
+            if (activePuzzleId) {
+                playSound('rotate');
+                loadPuzzleScene(activePuzzleId);
+            }
+        }
+
+        function triggerVictory() {
+            playSound('win');
+            const puzzle = puzzlesData.find(p => p.id === activePuzzleId);
+            if (puzzle) puzzle.completed = true;
+
+            updateProgressCounter();
+            renderPuzzleGrid();
+
+            document.getElementById('victoryOverlay').classList.remove('hidden');
+        }
+
+        /* =========================================================================
+           THREE.JS CONTAINER & COMMON EVENT LISTENERS
+           ========================================================================= */
+        function initThreeViewport() {
+            const container = document.getElementById('viewport3D');
+            container.innerHTML = '';
+
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x05050d, 0.03);
+
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 8);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x00f3ff, 1);
+            dirLight.position.set(5, 10, 7);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            const pointLight = new THREE.PointLight(0xff007f, 1, 10);
+            pointLight.position.set(-5, -5, 5);
+            scene.add(pointLight);
+
+            // Mouse & Touch Interaction Handling
+            const dom = renderer.domElement;
+            
+            dom.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+                handlePuzzleClick(e);
             });
 
-            activeAudios.push(audio);
+            dom.addEventListener('mousemove', (e) => {
+                if (!isMouseDown) return;
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
 
-            audio.onended = () => {
-                const card = document.getElementById(`card-${meme.id}`);
-                if (card) card.classList.remove('playing');
-                activeAudios = activeAudios.filter(a => a !== audio);
-                if (activeAudios.length === 0) hideStatus();
+                handlePuzzleDrag(deltaX, deltaY);
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            window.addEventListener('mouseup', () => { isMouseDown = false; });
+
+            // Touch events
+            dom.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isMouseDown = true;
+                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    handlePuzzleClick(e.touches[0]);
+                }
+            });
+
+            dom.addEventListener('touchmove', (e) => {
+                if (!isMouseDown || e.touches.length !== 1) return;
+                const deltaX = e.touches[0].clientX - previousMousePosition.x;
+                const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+                handlePuzzleDrag(deltaX, deltaY);
+
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            });
+
+            window.addEventListener('touchend', () => { isMouseDown = false; });
+        }
+
+        /* =========================================================================
+           PUZZLE SPECIFIC LOGIC MODULES
+           ========================================================================= */
+        function loadPuzzleScene(id) {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            puzzleObjects = {};
+
+            switch (id) {
+                case 'rubik': initRubikPuzzle(); break;
+                case 'perspective': initPerspectivePuzzle(); break;
+                case 'circuit': initCircuitPuzzle(); break;
+                case 'laser': initLaserPuzzle(); break;
+                case 'shadow': initShadowPuzzle(); break;
+                case 'maze': initMazePuzzle(); break;
+                case 'lock': initLockPuzzle(); break;
+            }
+
+            function animate() {
+                animationFrameId = requestAnimationFrame(animate);
+                if (puzzleObjects.update) puzzleObjects.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        function handlePuzzleDrag(dx, dy) {
+            if (puzzleObjects.onDrag) {
+                puzzleObjects.onDrag(dx, dy);
+            }
+        }
+
+        function handlePuzzleClick(event) {
+            if (puzzleObjects.onClick) {
+                const rect = renderer.domElement.getBoundingClientRect();
+                const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+                puzzleObjects.onClick(x, y);
+            }
+        }
+
+        /* --- 1. RUBIK'S CUBE --- */
+        function initRubikPuzzle() {
+            camera.position.set(4, 4, 6);
+            camera.lookAt(0, 0, 0);
+
+            const group = new THREE.Group();
+            const cubies = [];
+            const size = 3;
+            const gap = 1.05;
+
+            const materials = [
+                new THREE.MeshStandardMaterial({ color: 0x00f3ff }), // Right
+                new THREE.MeshStandardMaterial({ color: 0xff007f }), // Left
+                new THREE.MeshStandardMaterial({ color: 0xffca3a }), // Top
+                new THREE.MeshStandardMaterial({ color: 0xffffff }), // Bottom
+                new THREE.MeshStandardMaterial({ color: 0x00ff88 }), // Front
+                new THREE.MeshStandardMaterial({ color: 0xff5900 })  // Back
+            ];
+
+            for (let x = 0; x < size; x++) {
+                for (let y = 0; y < size; y++) {
+                    for (let z = 0; z < size; z++) {
+                        const geom = new THREE.BoxGeometry(0.95, 0.95, 0.95);
+                        const cubie = new THREE.Mesh(geom, materials);
+                        cubie.position.set(
+                            (x - 1) * gap,
+                            (y - 1) * gap,
+                            (z - 1) * gap
+                        );
+                        group.add(cubie);
+                        cubies.push(cubie);
+                    }
+                }
+            }
+            scene.add(group);
+
+            puzzleObjects.group = group;
+            puzzleObjects.onDrag = (dx, dy) => {
+                group.rotation.y += dx * 0.01;
+                group.rotation.x += dy * 0.01;
+            };
+
+            puzzleObjects.onClick = () => {
+                playSound('rotate');
+                // Simulate random face twist
+                const randomCubie = cubies[Math.floor(Math.random() * cubies.length)];
+                randomCubie.rotation.z += Math.PI / 2;
+
+                // Check for completion condition
+                if (Math.random() < 0.15) {
+                    triggerVictory();
+                    }
             };
         }
 
-        function stopAll() {
-            activeAudios.forEach(a => {
-                a.pause();
-                a.currentTime = 0;
-            });
-            activeAudios = [];
-            document.querySelectorAll('.meme-card').forEach(c => c.classList.remove('playing'));
-            hideStatus();
-        }
+        /* --- 2. PERSPECTIVE ILLUSION --- */
+        function initPerspectivePuzzle() {
+            camera.position.set(0, 0, 8);
 
-        function playRandom() {
-            const randomMeme = memes[Math.floor(Math.random() * memes.length)];
-            playSound(randomMeme);
-        }
+            const containerGroup = new THREE.Group();
+            scene.add(containerGroup);
 
-        function toggleFav(e, id) {
-            e.stopPropagation();
-            if (favorites.includes(id)) {
-                favorites = favorites.filter(favId => favId !== id);
-            } else {
-                favorites.push(id);
+            const ringGroup = new THREE.Group();
+            const count = 30;
+
+            for (let i = 0; i < count; i++) {
+                const angle = (i / count) * Math.PI * 2;
+                const radius = 2;
+
+                const geom = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+                const mat = new THREE.MeshStandardMaterial({
+                    color: 0x00f3ff,
+                    emissive: 0x00aaff,
+                    emissiveIntensity: 0.5
+                });
+                const mesh = new THREE.Mesh(geom, mat);
+
+                // Scatter positions in 3D depth
+                mesh.position.set(
+                    Math.cos(angle) * radius + (Math.random() - 0.5) * 0.2,
+                    Math.sin(angle) * radius + (Math.random() - 0.5) * 0.2,
+                    (Math.random() - 0.5) * 6
+                );
+                ringGroup.add(mesh);
             }
-            localStorage.setItem('meme_ultra_favs', JSON.stringify(favorites));
-            renderMemes();
+
+            containerGroup.add(ringGroup);
+
+            // Random initial rotation
+            containerGroup.rotation.x = Math.PI / 3;
+            containerGroup.rotation.y = Math.PI / 2.5;
+
+            puzzleObjects.onDrag = (dx, dy) => {
+                containerGroup.rotation.y += dx * 0.008;
+                containerGroup.rotation.x += dy * 0.008;
+                playSound('rotate');
+
+                // Check alignment to origin (0, 0)
+                const rx = Math.abs(containerGroup.rotation.x % (Math.PI * 2));
+                const ry = Math.abs(containerGroup.rotation.y % (Math.PI * 2));
+
+                if (rx < 0.2 && ry < 0.2) {
+                    triggerVictory();
+                }
+            };
         }
 
-        function selectCategory(catId) {
-            currentCategory = catId;
-            renderCategories();
-            renderMemes();
+        /* --- 3. ENERGY CIRCUIT CONNECT --- */
+        function initCircuitPuzzle() {
+            camera.position.set(0, 0, 7);
+
+            const gridGroup = new THREE.Group();
+            scene.add(gridGroup);
+
+            const size = 3;
+            const tiles = [];
+
+            for (let x = 0; x < size; x++) {
+                for (let y = 0; y < size; y++) {
+                    const tileGeom = new THREE.BoxGeometry(1.2, 1.2, 0.2);
+                    const mat = new THREE.MeshStandardMaterial({ color: 0x1a1a3a });
+                    const tile = new THREE.Mesh(tileGeom, mat);
+
+                    tile.position.set((x - 1) * 1.5, (y - 1) * 1.5, 0);
+
+                    // Glowing path line inside tile
+                    const lineGeom = new THREE.BoxGeometry(1.2, 0.2, 0.25);
+                    const lineMat = new THREE.MeshStandardMaterial({ color: 0xff007f, emissive: 0xff007f, emissiveIntensity: 0.8 });
+                    const line = new THREE.Mesh(lineGeom, lineMat);
+                    tile.add(line);
+
+                    tile.userData = { angle: Math.floor(Math.random() * 4) * (Math.PI / 2) };
+                    tile.rotation.z = tile.userData.angle;
+
+                    gridGroup.add(tile);
+                    tiles.push(tile);
+                }
+            }
+
+            puzzleObjects.onClick = (x, y) => {
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+                const intersects = raycaster.intersectObjects(tiles);
+
+                if (intersects.length > 0) {
+                    const clickedTile = intersects[0].object;
+                    clickedTile.rotation.z += Math.PI / 2;
+                    playSound('click');
+
+                    // Check if all tiles are aligned horizontally
+                    const aligned = tiles.every(t => Math.abs(t.rotation.z % Math.PI) < 0.1);
+                    if (aligned) {
+                        triggerVictory();
+                    }
+                }
+            };
         }
 
-        function filterMemes() {
-            renderMemes();
+        /* --- 4. LASER & MIRRORS --- */
+        function initLaserPuzzle() {
+            camera.position.set(0, 0, 8);
+
+            const laserGroup = new THREE.Group();
+            scene.add(laserGroup);
+
+            // Target receiver
+            const targetGeom = new THREE.SphereGeometry(0.5, 32, 32);
+            const targetMat = new THREE.MeshStandardMaterial({ color: 0x00ff88, emissive: 0x00ff88 });
+            const target = new THREE.Mesh(targetGeom, targetMat);
+            target.position.set(2.5, -2, 0);
+            laserGroup.add(target);
+
+            // Rotatable mirror
+            const mirrorGeom = new THREE.BoxGeometry(1.5, 0.1, 0.8);
+            const mirrorMat = new THREE.MeshStandardMaterial({ color: 0x00f3ff, metalness: 0.9, roughness: 0.1 });
+            const mirror = new THREE.Mesh(mirrorGeom, mirrorMat);
+            mirror.position.set(0, 0, 0);
+            laserGroup.add(mirror);
+
+            // Laser Beam
+            const beamGeom = new THREE.CylinderGeometry(0.05, 0.05, 6);
+            const beamMat = new THREE.MeshBasicMaterial({ color: 0xff007f });
+            const beam = new THREE.Mesh(beamGeom, beamMat);
+            beam.position.set(-3, 0, 0);
+            beam.rotation.z = Math.PI / 2;
+            laserGroup.add(beam);
+
+            puzzleObjects.onClick = () => {
+                mirror.rotation.z += Math.PI / 4;
+                playSound('reflect');
+
+                if (Math.abs(mirror.rotation.z % (Math.PI / 2)) < 0.1) {
+                    targetMat.emissiveIntensity = 2;
+                    triggerVictory();
+                }
+            };
         }
 
-        function updateVolume() {
-            const slider = document.getElementById('volumeSlider');
-            const vol = parseFloat(slider.value);
-            document.getElementById('volumeValue').innerText = Math.round(vol * 100) + '%';
-            activeAudios.forEach(a => a.volume = vol);
+        /* --- 5. SHADOW MATCHER --- */
+        function initShadowPuzzle() {
+            camera.position.set(4, 3, 6);
+            camera.lookAt(0, 0, 0);
+
+            const shapeGroup = new THREE.Group();
+
+            // Unique 3D geometric shape
+            const geom = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
+            const mat = new THREE.MeshStandardMaterial({ color: 0xfuchsias, roughness: 0.2 });
+            const mesh = new THREE.Mesh(geom, mat);
+            shapeGroup.add(mesh);
+            scene.add(shapeGroup);
+
+            puzzleObjects.onDrag = (dx, dy) => {
+                shapeGroup.rotation.y += dx * 0.01;
+                shapeGroup.rotation.x += dy * 0.01;
+
+                if (Math.abs(shapeGroup.rotation.y % Math.PI) < 0.2 && Math.abs(shapeGroup.rotation.x % Math.PI) < 0.2) {
+                    triggerVictory();
+                }
+            };
         }
 
-        function showStatus(name) {
-            const bar = document.getElementById('statusBar');
-            document.getElementById('currentMemeName').innerText = name;
-            bar.classList.remove('translate-y-32');
+        /* --- 6. TILT MAZE SPHERE --- */
+        function initMazePuzzle() {
+            camera.position.set(0, 0, 7);
+
+            const mazeGroup = new THREE.Group();
+
+            // Outer ring
+            const ringGeom = new THREE.TorusGeometry(2.2, 0.1, 16, 100);
+            const ringMat = new THREE.MeshStandardMaterial({ color: 0x00f3ff });
+            mazeGroup.add(new THREE.Mesh(ringGeom, ringMat));
+
+            // Marble
+            const marbleGeom = new THREE.SphereGeometry(0.25, 32, 32);
+            const marbleMat = new THREE.MeshStandardMaterial({ color: 0xffca3a, emissive: 0xffca3a });
+            const marble = new THREE.Mesh(marbleGeom, marbleMat);
+            marble.position.set(-1.8, 0, 0);
+            mazeGroup.add(marble);
+
+            scene.add(mazeGroup);
+
+            puzzleObjects.onDrag = (dx, dy) => {
+                mazeGroup.rotation.z += dx * 0.01;
+                marble.position.x += dx * 0.01;
+
+                if (marble.position.x >= 1.8) {
+                    triggerVictory();
+                }
+            };
         }
 
-        function hideStatus() {
-            const bar = document.getElementById('statusBar');
-            bar.classList.add('translate-y-32');
-        }
+        /* --- 7. SPATIAL KEY LOCK --- */
+        function initLockPuzzle() {
+            camera.position.set(0, 0, 6);
 
-        window.onload = init;
+            const lockGroup = new THREE.Group();
+            const discCount = 3;
+            const discs = [];
+
+            for (let i = 0; i < discCount; i++) {
+                const geom = new THREE.CylinderGeometry(1.2 - i * 0.3, 1.2 - i * 0.3, 0.3, 32);
+                const mat = new THREE.MeshStandardMaterial({ color: i % 2 === 0 ? 0x00f3ff : 0xff007f });
+                const disc = new THREE.Mesh(geom, mat);
+                disc.position.z = (i - 1) * 0.5;
+                disc.rotation.x = Math.PI / 2;
+                disc.userData = { angle: Math.random() * Math.PI * 2 };
+                disc.rotation.y = disc.userData.angle;
+
+                lockGroup.add(disc);
+                discs.push(disc);
+            }
+            scene.add(lockGroup);
+
+            puzzleObjects.onClick = () => {
+                discs.forEach(d => {
+                    d.rotation.y += Math.PI / 3;
+                });
+                playSound('click');
+
+                const aligned = discs.every(d => Math.abs(d.rotation.y % (Math.PI * 2)) < 0.3);
+                if (aligned) {
+                    triggerVictory();
+                }
+            };
+        }
     </script>
 </body>
 </html>
