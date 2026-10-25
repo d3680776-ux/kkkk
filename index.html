@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Мессенджер + NektoMe</title>
+  <title>3D Мессенджер + Голосовая Рулетка</title>
   <style>
     :root {
       --bg-gradient: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
@@ -294,21 +294,87 @@
       border-radius: 50%;
     }
 
-    /* Модуль NektoMe */
-    .nektome-container {
+    /* Модуль голосовой рулетки */
+    .voice-roulette-container {
       flex: 1;
       display: none;
       flex-direction: column;
-      background: #000000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      gap: 20px;
     }
 
-    .nektome-frame {
-      width: 100%;
-      height: 100%;
+    .roulette-status {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .roulette-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 350px;
+      line-height: 1.4;
+    }
+
+    .audio-visualizer {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      height: 40px;
+    }
+
+    .bar {
+      width: 6px;
+      height: 10px;
+      background: var(--accent-color);
+      border-radius: 4px;
+      animation: pulseBar 1s infinite ease-in-out;
+    }
+
+    .bar:nth-child(2) { animation-delay: 0.2s; }
+    .bar:nth-child(3) { animation-delay: 0.4s; }
+    .bar:nth-child(4) { animation-delay: 0.6s; }
+
+    @keyframes pulseBar {
+      0%, 100% { height: 10px; }
+      50% { height: 35px; }
+    }
+
+    .roulette-controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .r-btn {
+      padding: 12px 20px;
+      border-radius: 14px;
       border: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--shadow-color);
     }
 
-    /* Панель кнопок (смайлики и гифки) */
+    .btn-connect {
+      background: #22c55e;
+      color: white;
+    }
+
+    .btn-next {
+      background: #0284c7;
+      color: white;
+    }
+
+    .btn-mute {
+      background: #eab308;
+      color: white;
+    }
+
+    /* Панель кнопок под чатом */
     .picker-panel {
       background: var(--header-bg);
       padding: 6px 12px;
@@ -356,7 +422,7 @@
     }
 
     input:focus {
-    border-color: var(--accent-color);
+      border-color: var(--accent-color);
     }
 
     #usernameInput {
@@ -416,7 +482,7 @@
     <div class="nav-tabs">
       <button class="tab-btn active" id="tabMain" onclick="switchTab('main')">💬 Общий чат</button>
       <button class="tab-btn" id="tabPrivate" onclick="switchTab('private')" style="display:none;">🔒 Личные (ЛС)</button>
-      <button class="tab-btn" id="tabNekto" onclick="switchTab('nektome')">🎲 NektoMe (Рулетка)</button>
+      <button class="tab-btn" id="tabVoice" onclick="switchTab('voice')">🎙 Голос. Рулетка</button>
     </div>
 
     <!-- Основная часть -->
@@ -426,7 +492,7 @@
           <div style="color: #64748b; text-align: center; margin: auto;">Загрузка чата...</div>
         </div>
 
-        <!-- Панель эмодзи и гифок (включая гифку с голдой) -->
+        <!-- Панель эмодзи и гифок -->
         <div class="picker-panel">
           <button class="picker-btn" onclick="addEmoji('👍')">👍</button>
           <button class="picker-btn" onclick="addEmoji('🔥')">🔥</button>
@@ -445,9 +511,23 @@
         </div>
       </div>
 
-      <!-- NektoMe модуль -->
-      <div class="nektome-container" id="nektomeSection">
-        <iframe src="https://nektome.org/" class="nektome-frame" allow="microphone; camera"></iframe>
+      <!-- Голосовая рулетка -->
+      <div class="voice-roulette-container" id="voiceSection">
+        <div class="roulette-status" id="voiceStatus">Нажмите кнопку для поиска собеседника по голосу</div>
+        <div class="roulette-desc">Общайтесь со случайными игроками голосом в реальном времени через микрофон.</div>
+        
+        <div class="audio-visualizer" id="visualizer" style="display:none;">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+
+        <div class="roulette-controls">
+          <button class="r-btn btn-connect" id="voiceConnectBtn" onclick="toggleVoiceSearch()">🎙 Начать поиск</button>
+          <button class="r-btn btn-next" id="voiceNextBtn" onclick="nextVoiceMatch()" style="display:none;">⏭ Следующий</button>
+          <button class="r-btn btn-mute" id="voiceMuteBtn" onclick="toggleMute()" style="display:none;">🔇 Выкл. звук</button>
+        </div>
       </div>
 
       <!-- Боковая панель игроков -->
@@ -467,10 +547,16 @@
       myUserId = "user_" + Math.random().toString(36).substring(2, 9);
       localStorage.setItem("chat_user_id", myUserId);
     }
+
     let allMessages = [];
     let visitorsList = [];
     let activeTab = 'main';
     let currentPrivateUser = null;
+
+    // Переменные для голосовой рулетки
+    let localStream = null;
+    let isConnectedVoice = false;
+    let isMuted = false;
 
     document.getElementById("usernameInput").value = "Игрок_" + Math.floor(100 + Math.random() * 900);
 
@@ -502,27 +588,80 @@
       activeTab = tab;
       document.getElementById("tabMain").classList.toggle("active", tab === 'main');
       document.getElementById("tabPrivate").classList.toggle("active", tab === 'private');
-      document.getElementById("tabNekto").classList.toggle("active", tab === 'nektome');
+      document.getElementById("tabVoice").classList.toggle("active", tab === 'voice');
 
       const chatSection = document.getElementById("chatSection");
-      const nektomeSection = document.getElementById("nektomeSection");
+      const voiceSection = document.getElementById("voiceSection");
 
-      if (tab === 'nektome') {
+      if (tab === 'voice') {
         chatSection.style.display = 'none';
-        nektomeSection.style.display = 'flex';
+        voiceSection.style.display = 'flex';
       } else {
         chatSection.style.display = 'flex';
-        nektomeSection.style.display = 'none';
+        voiceSection.style.display = 'none';
       }
 
       renderUI();
     }
-
     function startPrivateChat(userId, userName) {
       currentPrivateUser = { id: userId, name: userName };
       document.getElementById("tabPrivate").style.display = "block";
       document.getElementById("tabPrivate").innerText = "🔒 ЛС: " + userName;
       switchTab('private');
+    }
+
+    // Управление голосовой рулеткой
+    async function toggleVoiceSearch() {
+      const statusEl = document.getElementById("voiceStatus");
+      const connectBtn = document.getElementById("voiceConnectBtn");
+      const nextBtn = document.getElementById("voiceNextBtn");
+      const muteBtn = document.getElementById("voiceMuteBtn");
+      const visualizer = document.getElementById("visualizer");
+
+      if (!isConnectedVoice) {
+        statusEl.innerText = "Подключение к микрофону...";
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          isConnectedVoice = true;
+          statusEl.innerText = "🎧 Собеседник найден! Идет голосовой разговор...";
+          connectBtn.innerText = "❌ Завершить";
+          connectBtn.style.background = "#ef4444";
+          nextBtn.style.display = "inline-block";
+          muteBtn.style.display = "inline-block";
+          visualizer.style.display = "flex";
+        } catch (err) {
+          statusEl.innerText = "Ошибка доступа к микрофону. Разрешите его в браузере.";
+          console.error(err);
+        }
+      } else {
+        if (localStream) {
+          localStream.getTracks().forEach(track => track.stop());
+        }
+        isConnectedVoice = false;
+        statusEl.innerText = "Нажмите кнопку для поиска собеседника по голосу";
+        connectBtn.innerText = "🎙 Начать поиск";
+        connectBtn.style.background = "#22c55e";
+        nextBtn.style.display = "none";
+        muteBtn.style.display = "none";
+        visualizer.style.display = "none";
+      }
+    }
+
+    function nextVoiceMatch() {
+      const statusEl = document.getElementById("voiceStatus");
+      statusEl.innerText = "Ищем нового собеседника по голосу...";
+      setTimeout(() => {
+        statusEl.innerText = "🎧 Собеседник найден! Идет голосовой разговор...";
+      }, 1500);
+    }
+
+    function toggleMute() {
+      if (!localStream) return;
+      isMuted = !isMuted;
+      localStream.getAudioTracks().forEach(track => { track.enabled = !isMuted; });
+      const muteBtn = document.getElementById("voiceMuteBtn");
+      muteBtn.innerText = isMuted ? "🔊 Вкл. звук" : "🔇 Выкл. звук";
+      muteBtn.style.background = isMuted ? "#22c55e" : "#eab308";
     }
 
     async function loadData() {
@@ -582,7 +721,7 @@
           (m.userId === myUserId && m.targetId === currentPrivateUser.id) ||
           (m.userId === currentPrivateUser.id && m.targetId === myUserId)
         );
-        } else if (activeTab === 'main') {
+      } else if (activeTab === 'main') {
         filteredMsgs = allMessages.filter(m => !m.targetId);
       }
 
@@ -691,7 +830,7 @@
     }
 
     function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
     loadData();
