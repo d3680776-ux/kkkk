@@ -17,8 +17,8 @@
       color: #f8fafc;
       min-height: 100vh;
       display: flex;
-      justify-content: center; /* Центрирование по горизонтали */
-      align-items: center;     /* Центрирование по вертикали */
+      justify-content: center;
+      align-items: center;
       padding: 16px;
     }
 
@@ -156,19 +156,17 @@
   </div>
 
   <script>
-    // Твой уникальный ID из npoint.io уже подставлен!
     const BIN_ID = "fb49ce2087440a661a3d"; 
     const API_URL = `https://api.npoint.io/${BIN_ID}`;
 
     let allMessages = [];
 
-    // Генерируем имя по умолчанию
     document.getElementById("usernameInput").value = "Игрок_" + Math.floor(100 + Math.random() * 900);
 
-    // Загрузка сообщений из базы
+    // Загрузка сообщений с защитой от кэша через ?t=
     async function loadMessages() {
       try {
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL + "?t=" + Date.now());
         const data = await response.json();
         allMessages = data.messages || [];
         renderUI();
@@ -177,11 +175,10 @@
       }
     }
 
-    // Отображение сообщений на экране
     function renderUI() {
       const container = document.getElementById("msgContainer");
       if (allMessages.length === 0) {
-      container.innerHTML = '<div style="color: #64748b; text-align: center;">Сообщений пока нет. Напиши первым!</div>';
+        container.innerHTML = '<div style="color: #64748b; text-align: center;">Сообщений пока нет. Напиши первым!</div>';
         return;
       }
 
@@ -202,7 +199,6 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    // Отправка нового сообщения
     async function sendMsg() {
       const msgInput = document.getElementById("messageInput");
       const usernameInput = document.getElementById("usernameInput");
@@ -237,7 +233,6 @@
       return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
-    // Загружаем при старте и обновляем каждые 3 секунды
     loadMessages();
     setInterval(loadMessages, 3000);
   </script>
