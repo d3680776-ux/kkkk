@@ -1,1 +1,401 @@
-nt/a-gde-ia-i-kazhetsia-ia-v-mire-main-pokhozhe-na-to-72051/embed/" frameborder="0" scrolling="no"></iframe>
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мем-Дека 3000 — Звуковая панель</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f7f2ea;
+            color: #111;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0px #ff595e;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #555;
+            font-weight: 600;
+        }
+
+        /* Панель управления */
+        .controls {
+            background: #fff;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0px #000;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 3px solid #000;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #ffca3a;
+            border: 3px solid #000;
+            box-shadow: 3px 3px 0px #000;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.1s ease;
+        }
+
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000;
+        }
+
+        .btn-stop {
+            background: #ff595e;
+            color: #fff;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+
+        /* Категории */
+        .categories {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cat-btn {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .cat-btn.active {
+            background: #8ac926;
+            color: #000;
+        }
+
+        /* Сетка мемов */
+        .meme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .meme-card {
+            background: #fff;
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            border-radius: 12px;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.1s, box-shadow 0.1s;
+            user-select: none;
+        }
+
+        .meme-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .meme-card:active, .meme-card.playing {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000;
+            background-color: #1982c4;
+            color: #fff;
+    
+
+        .meme-emoji {
+        font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .meme-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .fav-star {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 1.1rem;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .fav-star.active {
+            color: #ffca3a;
+        }
+
+        /* Плеер снизу */
+        .status-bar {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🗿 Мем-Дека 3000</h1>
+            <p>Жми на кнопки и запускай топовые мемы!</p>
+        </header>
+
+        <!-- Управление -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Поиск мема..." oninput="filterMemes()">
+            </div>
+            
+            <div class="volume-control">
+                🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8" onchange="updateVolume()">
+            </div>
+
+            <div class="action-btns">
+                <button class="btn" onclick="playRandom()">🎲 Рандом</button>
+                <button class="btn btn-stop" onclick="stopAll()">🛑 СТОП</button>
+            </div>
+        </div>
+
+        <!-- Категории -->
+        <div class="categories" id="categoriesContainer">
+            <button class="cat-btn active" onclick="selectCategory('all', this)">Все</button>
+            <button class="cat-btn" onclick="selectCategory('fav', this)">⭐ Избранное</button>
+            <button class="cat-btn" onclick="selectCategory('reaction', this)">Реакции</button>
+            <button class="cat-btn" onclick="selectCategory('games', this)">Игры</button>
+            <button class="cat-btn" onclick="selectCategory('music', this)">Музыка</button>
+        </div>
+
+        <!-- Сетка кнопок -->
+        <div class="meme-grid" id="memeGrid"></div>
+    </div>
+
+    <!-- Индикатор игры -->
+    <div class="status-bar" id="statusBar">▶ Играет: <span id="currentMemeName"></span></div>
+
+    <script>
+        // База данных мемов
+        const memes = [
+            { id: 'bruh', name: 'BRUH', emoji: '🗿', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bruh-sound-effect-sound-button.mp3' },
+            { id: 'emotional', name: 'Emotional Damage', emoji: '💥', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/emotional-damage-meme.mp3' },
+            { id: 'pipe', name: 'Металлическая Труба', emoji: '🏗️', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/metal-pipe-clang.mp3' },
+            { id: 'fbi', name: 'FBI Open Up!', emoji: '🚨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fbi-open-up_s1.mp3' },
+            { id: 'airhorn', name: 'MLG Airhorn', emoji: '📢', cat: 'music', url: 'https://www.myinstants.com/media/sounds/mlg-airhorn.mp3' },
+            { id: 'badumtss', name: 'Ba-Dum-Tss', emoji: '🥁', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/ba-dum-tss.mp3' },
+            { id: 'oof', name: 'Roblox Oof', emoji: '🩹', cat: 'games', url: 'https://www.myinstants.com/media/sounds/roblox-off.mp3' },
+            { id: 'win_error', name: 'Windows Error', emoji: '💻', cat: 'games', url: 'https://www.myinstants.com/media/sounds/windows-error.mp3' },
+            { id: 'huh', name: 'Huh? Кот', emoji: '🐱', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/huh-cat.mp3' },
+            { id: 'sad_violin', name: 'Sad Violin', emoji: '🎻', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sad-violin.mp3' },
+            { id: 'coffin', name: 'Coffin Dance', emoji: '0⚰️', cat: 'music', url: 'https://www.myinstants.com/media/sounds/coffin-dance-official-music-video-hd.mp3' },
+            { id: 'amongus', name: 'Among Us Report', emoji: 'ඞ', cat: 'games', url: 'https://www.myinstants.com/media/sounds/emergency-meeting-among-us.mp3' },
+            { id: 'vine_boom', name: 'Vine Boom', emoji: '💣', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/vine-boom.mp3' },
+            { id: 'quack', name: 'Кряк', emoji: '🦆', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/quack.mp3' },
+            { id: 'fart', name: 'Wet Fart', emoji: '💨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/dry-fart.mp3' },
+            { id: 'screaming_goat', name: 'Орущая Коза', emoji: '🐐', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/screaming-goat.mp3' },
+            { id: 'gta_wasted', name: 'GTA Wasted', emoji: '💀', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-v-wasted-sound-effect.mp3' },
+            { id: 'mario_jump', name: 'Mario Jump', emoji: '🍄', cat: 'games', url: 'https://www.myinstants.com/media/sounds/maro-jump.mp3' },
+            { id: 'spongebob', name: 'Spongebob Fail', emoji: '🧽', cat: 'music', url: 'https://www.myinstants.com/media/sounds/spongebob-fail.mp3' },
+            { id: 'victory', name: 'Victory Fanfare', emoji: '🏆', cat: 'games', url: 'https://www.myinstants.com/media/sounds/ff7-victory-fanfare.mp3' }
+        ];
+
+        let activeAudios = [];
+        let currentCategory = 'all';
+        let favorites = JSON.parse(localStorage.getItem('meme_favs')) || [];
+
+        // Инициализация
+        function init() {
+            renderMemes();
+        }
+
+        // Отображение карточек
+        function renderMemes() {
+            const grid = document.getElementById('memeGrid');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            grid.innerHTML = '';
+
+            const filtered = memes.filter(m => {
+                const matchesSearch = m.name.toLowerCase().includes(searchVal);
+                const matchesCat = (currentCategory === 'all') || 
+                                   (currentCategory === 'fav' && favorites.includes(m.id)) ||
+                                   (m.cat === currentCategory);
+                return matchesSearch && matchesCat;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 20px;">Мемы не найдены 😿</p>';
+                return;
+            }
+
+            filtered.forEach(meme => {
+                const isFav = favorites.includes(meme.id);
+                const card = document.createElement('div');
+                card.className = 'meme-card';
+                card.id = `card-${meme.id}`;
+                card.onclick = () => playSound(meme);
+
+                card.innerHTML = `
+                    <span class="fav-star ${isFav ? 'active' : ''}" onclick="toggleFav(event, '${meme.id}')">★</span>
+                    <div class="meme-emoji">${meme.emoji}</div>
+                    <div class="meme-title">${meme.name}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Воспроизведение звука
+        function playSound(meme) {
+            const vol = parseFloat(document.getElementById('volumeSlider').value);
+            const audio = new Audio(meme.url);
+            audio.volume = vol;
+
+            audio.play().then(() => {
+                const card = document.getElementById(`card-${meme.id}`);
+                if (card) card.classList.add('playing');
+                showStatus(meme.name);
+            }).catch(e => {
+                console.warn('Ошибка аудио:', e);
+            });
+            activeAudios.push(audio);
+
+            audio.onended = () => {
+                const card = document.getElementById(`card-${meme.id}`);
+                if (card) card.classList.remove('playing');
+                activeAudios = activeAudios.filter(a => a !== audio);
+                if (activeAudios.length === 0) hideStatus();
+            };
+        }
+
+        // Остановка всех звуков
+        function stopAll() {
+            activeAudios.forEach(a => {
+                a.pause();
+                a.currentTime = 0;
+            });
+            activeAudios = [];
+            document.querySelectorAll('.meme-card').forEach(c => c.classList.remove('playing'));
+            hideStatus();
+        }
+
+        // Воспроизведение рандомного звука
+        function playRandom() {
+            const randomMeme = memes[Math.floor(Math.random() * memes.length)];
+            playSound(randomMeme);
+        }
+
+        // Избранное
+        function toggleFav(e, id) {
+            e.stopPropagation(); // Чтобы не срабатывал клик по карте
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(favId => favId !== id);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('meme_favs', JSON.stringify(favorites));
+            renderMemes();
+        }
+
+        // Категории
+        function selectCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMemes();
+        }
+
+        // Фильтрация при поиске
+        function filterMemes() {
+            renderMemes();
+        }
+
+        // Обновление громкости у всех играющих звуков
+        function updateVolume() {
+            const vol = parseFloat(document.getElementById('volumeSlider').value);
+            activeAudios.forEach(a => a.volume = vol);
+        }
+
+        // Статус бар
+        function showStatus(name) {
+            const bar = document.getElementById('statusBar');
+            document.getElementById('currentMemeName').innerText = name;
+            bar.style.display = 'block';
+        }
+
+        function hideStatus() {
+            document.getElementById('statusBar').style.display = 'none';
+        }
+
+        init();
+    </script>
+</body>
+</html>
