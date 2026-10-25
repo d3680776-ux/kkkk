@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Мессенджер + Голосовая Рулетка</title>
+  <title>3D Мессенджер</title>
   <style>
     :root {
       --bg-gradient: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
@@ -66,7 +66,6 @@
       box-shadow: 0 25px 50px -12px var(--shadow-color);
     }
 
-    /* Шапка сайта */
     .chat-header {
       background: var(--header-bg);
       padding: 12px 16px;
@@ -120,7 +119,6 @@
       color: #4ade80;
     }
 
-    /* Вкладки переключения */
     .nav-tabs {
       display: flex;
       background: var(--header-bg);
@@ -138,6 +136,7 @@
       font-size: 13px;
       cursor: pointer;
       border-bottom: 2px solid transparent;
+      position: relative;
     }
 
     .tab-btn.active {
@@ -145,7 +144,18 @@
       border-bottom-color: var(--accent-color);
     }
 
-    /* Главная рабочая область */
+    /* Значок пропущенных сообщений */
+    .badge {
+      background: #ef4444;
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: 6px;
+      display: inline-block;
+    }
+
     .main-body {
       flex: 1;
       display: flex;
@@ -170,7 +180,6 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    /* Сообщения */
     .msg-item {
       max-width: 82%;
       padding: 10px 14px;
@@ -244,7 +253,6 @@
       display: block;
     }
 
-    /* Боковая панель участников */
     .sidebar-users {
       width: 220px;
       background: var(--header-bg);
@@ -294,7 +302,6 @@
       border-radius: 50%;
     }
 
-    /* Модуль голосовой рулетки */
     .voice-roulette-container {
       flex: 1;
       display: none;
@@ -374,7 +381,6 @@
       color: white;
     }
 
-    /* Панель кнопок под чатом */
     .picker-panel {
       background: var(--header-bg);
       padding: 6px 12px;
@@ -400,7 +406,6 @@
       background: rgba(56, 189, 248, 0.2);
     }
 
-    /* Футер ввода */
     .chat-footer {
       padding: 10px 12px;
       background: var(--header-bg);
@@ -463,7 +468,6 @@
 <body data-theme="dark">
 
   <div class="chat-card">
-    <!-- Шапка -->
     <div class="chat-header">
       <div class="header-info">
         <h1 id="chatTitle">💬 3D Мессенджер</h1>
@@ -478,21 +482,23 @@
       </div>
     </div>
 
-    <!-- Вкладки -->
+    <!-- Вкладки со счетчиками пропущенных -->
     <div class="nav-tabs">
-      <button class="tab-btn active" id="tabMain" onclick="switchTab('main')">💬 Общий чат</button>
-      <button class="tab-btn" id="tabPrivate" onclick="switchTab('private')" style="display:none;">🔒 Личные (ЛС)</button>
+      <button class="tab-btn active" id="tabMain" onclick="switchTab('main')">
+        💬 Общий чат <span class="badge" id="unreadMainBadge" style="display:none;">0</span>
+      </button>
+      <button class="tab-btn" id="tabPrivate" onclick="switchTab('private')" style="display:none;">
+        🔒 Личные (ЛС) <span class="badge" id="unreadPrivateBadge" style="display:none;">0</span>
+      </button>
       <button class="tab-btn" id="tabVoice" onclick="switchTab('voice')">🎙 Голос. Рулетка</button>
     </div>
 
-    <!-- Основная часть -->
     <div class="main-body">
       <div class="chat-section" id="chatSection">
         <div class="messages-box" id="msgContainer">
           <div style="color: #64748b; text-align: center; margin: auto;">Загрузка чата...</div>
         </div>
 
-        <!-- Панель эмодзи и гифок -->
         <div class="picker-panel">
           <button class="picker-btn" onclick="addEmoji('👍')">👍</button>
           <button class="picker-btn" onclick="addEmoji('🔥')">🔥</button>
@@ -511,7 +517,6 @@
         </div>
       </div>
 
-      <!-- Голосовая рулетка -->
       <div class="voice-roulette-container" id="voiceSection">
         <div class="roulette-status" id="voiceStatus">Нажмите кнопку для поиска собеседника по голосу</div>
         <div class="roulette-desc">Общайтесь со случайными игроками голосом в реальном времени через микрофон.</div>
@@ -530,7 +535,6 @@
         </div>
       </div>
 
-      <!-- Боковая панель игроков -->
       <div class="sidebar-users" id="sidebarUsers">
         <div class="sidebar-title">Игроки в сети</div>
         <div class="users-list" id="usersList"></div>
@@ -553,12 +557,19 @@
     let activeTab = 'main';
     let currentPrivateUser = null;
 
-    // Переменные для голосовой рулетки
+    let unreadMainCount = 0;
+    let unreadPrivateCount = 0;
+
     let localStream = null;
     let isConnectedVoice = false;
     let isMuted = false;
 
     document.getElementById("usernameInput").value = "Игрок_" + Math.floor(100 + Math.random() * 900);
+
+    // Запрос разрешения на Push-уведомления
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
 
     let currentTheme = localStorage.getItem("chat_theme") || "dark";
     applyTheme(currentTheme);
@@ -592,7 +603,6 @@
 
       const chatSection = document.getElementById("chatSection");
       const voiceSection = document.getElementById("voiceSection");
-
       if (tab === 'voice') {
         chatSection.style.display = 'none';
         voiceSection.style.display = 'flex';
@@ -601,8 +611,36 @@
         voiceSection.style.display = 'none';
       }
 
+      if (tab === 'main') {
+        unreadMainCount = 0;
+        updateBadges();
+      } else if (tab === 'private') {
+        unreadPrivateCount = 0;
+        updateBadges();
+      }
+
       renderUI();
     }
+
+    function updateBadges() {
+      const mainBadge = document.getElementById("unreadMainBadge");
+      const privBadge = document.getElementById("unreadPrivateBadge");
+
+      if (unreadMainCount > 0) {
+        mainBadge.innerText = unreadMainCount;
+        mainBadge.style.display = "inline-block";
+      } else {
+        mainBadge.style.display = "none";
+      }
+
+      if (unreadPrivateCount > 0) {
+        privBadge.innerText = unreadPrivateCount;
+        privBadge.style.display = "inline-block";
+      } else {
+        privBadge.style.display = "none";
+      }
+    }
+
     function startPrivateChat(userId, userName) {
       currentPrivateUser = { id: userId, name: userName };
       document.getElementById("tabPrivate").style.display = "block";
@@ -610,7 +648,6 @@
       switchTab('private');
     }
 
-    // Управление голосовой рулеткой
     async function toggleVoiceSearch() {
       const statusEl = document.getElementById("voiceStatus");
       const connectBtn = document.getElementById("voiceConnectBtn");
@@ -669,8 +706,31 @@
         const response = await fetch(API_URL + "?t=" + Date.now());
         const data = await response.json();
         
-        allMessages = data.messages || [];
+        const newMsgs = data.messages || [];
         visitorsList = data.visitors || [];
+
+        // Проверка новых сообщений для уведомлений и бейджей
+        if (newMsgs.length > allMessages.length) {
+          const addedCount = newMsgs.length - allMessages.length;
+          const latestMsg = newMsgs[newMsgs.length - 1];
+
+          if (latestMsg.userId !== myUserId) {
+            // Если сообщение пришло в общий чат, а ты в ЛС или голосовой рулетке
+            if (!latestMsg.targetId && activeTab !== 'main') {
+              unreadMainCount += addedCount;
+              updateBadges();
+              sendPushNotification("Сообщение в Общем чате", `${latestMsg.author}: ${latestMsg.text}`);
+            } 
+            // Если сообщение пришло в ЛС
+            else if (latestMsg.targetId === myUserId && activeTab !== 'private') {
+              unreadPrivateCount += addedCount;
+              updateBadges();
+              sendPushNotification("Новое личное сообщение", `${latestMsg.author}: ${latestMsg.text}`);
+            }
+          }
+        }
+
+        allMessages = newMsgs;
 
         const existingUser = visitorsList.find(u => u.id === myUserId);
         const myName = document.getElementById("usernameInput").value.trim() || "Аноним";
@@ -692,6 +752,15 @@
         renderUI();
       } catch (err) {
         console.error("Ошибка загрузки:", err);
+      }
+    }
+
+    function sendPushNotification(title, body) {
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, {
+          body: body,
+          icon: "https://cdn-icons-png.flaticon.com/512/1041/1041916.png"
+        });
       }
     }
 
@@ -749,7 +818,7 @@
 
           msgEl.innerHTML = `
             <div class="msg-header">
-              <span class="msg-author">${escapeHTML(msg.author)}</span>
+            <span class="msg-author">${escapeHTML(msg.author)}</span>
               <div style="display: flex; align-items: center; gap: 4px;">
                 <span class="msg-time">${msg.time}</span>
                 ${deleteBtnHTML}
@@ -830,7 +899,7 @@
     }
 
     function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;'> '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
     loadData();
