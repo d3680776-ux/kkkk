@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Онлайн Чат</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>3D Мессенджер</title>
   <style>
     * {
       box-sizing: border-box;
@@ -15,100 +15,91 @@
     body {
       background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
       color: #f8fafc;
-      min-height: 100vh;
+      height: 100vh;
+      height: 100dvh; /* Корректная высота для мобильных браузеров */
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 16px;
-      perspective: 1000px;
+      padding: 10px;
+      overflow: hidden;
     }
 
     .chat-card {
-      background: rgba(30, 41, 59, 0.75);
+      background: rgba(30, 41, 59, 0.85);
       backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
+      border-radius: 20px;
       width: 100%;
       max-width: 550px;
-      height: 85vh;
+      height: 100%;
+      max-height: 90vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 
                   0 0 30px rgba(56, 189, 248, 0.15);
-      transform: rotateX(1deg);
-      transition: transform 0.3s ease;
-    }
-
-    .chat-card:hover {
-      transform: rotateX(0deg) scale(1.005);
     }
 
     .chat-header {
-      background: rgba(15, 23, 42, 0.8);
-      padding: 18px 24px;
+      background: rgba(15, 23, 42, 0.95);
+      padding: 14px 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .header-info h1 {
-      font-size: 18px;
+      font-size: 16px;
       color: #38bdf8;
       font-weight: 700;
-      letter-spacing: 0.5px;
     }
 
     .header-stats {
-      font-size: 11px;
+      font-size: 10px;
       color: #94a3b8;
       margin-top: 2px;
     }
 
-    .status-container {
+    .header-actions {
       display: flex;
-      align-items: center;
       gap: 8px;
-      font-size: 12px;
-      color: #4ade80;
-      background: rgba(74, 222, 128, 0.1);
-      border: 1px solid rgba(74, 222, 128, 0.2);
-      padding: 4px 10px;
-      border-radius: 12px;
+      align-items: center;
     }
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      background: #4ade80;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #4ade80;
+    .call-btn {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .messages-box {
       flex: 1;
-      padding: 20px;
+      padding: 16px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      scroll-behavior: smooth;
+      gap: 12px;
+      -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS и Android */
     }
 
     .msg-item {
-      max-width: 75%;
-      padding: 12px 16px;
-      border-radius: 18px;
+      max-width: 82%;
+      padding: 10px 14px;
+      border-radius: 16px;
       word-wrap: break-word;
       position: relative;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      animation: fadeIn 0.3s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .msg-item.theirs {
@@ -128,80 +119,89 @@
     .msg-header {
       display: flex;
       justify-content: space-between;
-      gap: 16px;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 4px;
-      font-size: 11px;
-      opacity: 0.8;
+      font-size: 10px;
+      opacity: 0.85;
     }
 
     .msg-author {
       font-weight: 700;
     }
 
+    .delete-btn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 2px;
+    }
+
+    .delete-btn:hover {
+      color: #f87171;
+    }
+
     .msg-text {
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1.4;
     }
 
     .msg-text img {
       max-width: 100%;
-      border-radius: 12px;
+      border-radius: 10px;
       margin-top: 6px;
       display: block;
     }
 
     .picker-panel {
-      background: rgba(15, 23, 42, 0.9);
-      padding: 8px 16px;
+      background: rgba(15, 23, 42, 0.95);
+      padding: 8px 12px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       overflow-x: auto;
+      flex-shrink: 0;
     }
 
     .picker-btn {
       background: rgba(255, 255, 255, 0.07);
       border: none;
       border-radius: 8px;
-      padding: 6px 10px;
+      padding: 5px 8px;
       color: white;
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
-
-    .picker-btn:hover {
-      background: rgba(56, 189, 248, 0.3);
-      transform: scale(1.1);
+      white-space: nowrap;
     }
 
     .chat-footer {
-      padding: 16px;
-      background: rgba(15, 23, 42, 0.9);
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.95);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
+      flex-shrink: 0;
     }
 
     input {
-      background: rgba(30, 41, 59, 0.8);
+      background: rgba(30, 41, 59, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: white;
-      border-radius: 12px;
-      padding: 12px 16px;
+      border-radius: 10px;
+      padding: 10px 12px;
       font-size: 14px;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     input:focus {
       border-color: #38bdf8;
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
     }
 
     #usernameInput {
-      width: 110px;
+      width: 90px;
     }
 
     #messageInput {
@@ -212,17 +212,10 @@
       background: linear-gradient(135deg, #38bdf8, #0284c7);
       color: white;
       border: none;
-      border-radius: 12px;
-      padding: 12px 20px;
+      border-radius: 10px;
+      padding: 10px 16px;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
-      transition: transform 0.1s, box-shadow 0.2s;
-    }
-
-    button.send-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6);
     }
   </style>
 </head>
@@ -231,12 +224,13 @@
   <div class="chat-card">
     <div class="chat-header">
       <div class="header-info">
-        <h1>💬 3D Мессенджер</h1>
+        <h1>💬 Мессенджер</h1>
         <div class="header-stats" id="statsText">Участников: 0</div>
       </div>
-      <div class="status-container">
-        <div class="status-dot"></div>
-        <span>Онлайн</span>
+      <div class="header-actions">
+        <a href="https://meet.jit.si/3d-messenger-room-shushenskoe" target="_blank" class="call-btn">
+          📹 Видео
+        </a>
       </div>
     </div>
 
@@ -251,8 +245,8 @@
       <button class="picker-btn" onclick="addEmoji('❤️')">❤️</button>
       <button class="picker-btn" onclick="addEmoji('😎')">😎</button>
       <button class="picker-btn" onclick="addEmoji('🎉')">🎉</button>
-      <button class="picker-btn" onclick="sendGif('https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif')">🔥 GIF</button>
-      <button class="picker-btn" onclick="sendGif('https://media.giphy.com/media/LmNwrBhejkK9EFP504/giphy.gif')">🐱 GIF</button>
+      <button class="picker-btn" onclick="sendGif('https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif')">🔥 Огонь GIF</button>
+      <button class="picker-btn" onclick="sendGif('https://media.giphy.com/media/LmNwrBhejkK9EFP504/giphy.gif')">🐱 Котик GIF</button>
     </div>
 
     <div class="chat-footer">
@@ -291,10 +285,9 @@
         allMessages = data.messages || [];
         visitorsList = data.visitors || [];
 
-        // Регистрируем текущего пользователя как посетителя, если его еще нет в базе
         if (!visitorsList.includes(myUserId)) {
           visitorsList.push(myUserId);
-          saveToCloud(); // отправляем обновленный список посетителей
+          saveToCloud();
         }
 
         renderUI();
@@ -304,8 +297,7 @@
     }
 
     function renderUI() {
-      // Обновляем счетчик зашедших людей
-    document.getElementById("statsText").innerText = `Всего заходило: ${visitorsList.length}`;
+      document.getElementById("statsText").innerText = `Заходило: ${visitorsList.length}`;
 
       const container = document.getElementById("msgContainer");
       if (allMessages.length === 0) {
@@ -314,8 +306,8 @@
       }
 
       container.innerHTML = "";
-      allMessages.forEach(msg => {
-        const msgEl = document.createElement("div");
+      allMessages.forEach((msg, index) => {
+      const msgEl = document.createElement("div");
         const isMine = msg.userId === myUserId;
         msgEl.className = `msg-item ${isMine ? 'mine' : 'theirs'}`;
 
@@ -324,10 +316,18 @@
           contentHTML = `<div class="msg-text"><img src="${escapeHTML(msg.gifUrl)}" alt="GIF"></div>`;
         }
 
+        let deleteBtnHTML = '';
+        if (isMine) {
+          deleteBtnHTML = `<button class="delete-btn" onclick="deleteMsg(${index})">✕</button>`;
+        }
+
         msgEl.innerHTML = `
           <div class="msg-header">
             <span class="msg-author">${escapeHTML(msg.author)}</span>
-            <span class="msg-time">${msg.time}</span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span class="msg-time">${msg.time}</span>
+              ${deleteBtnHTML}
+            </div>
           </div>
           ${contentHTML}
         `;
@@ -374,6 +374,12 @@
       };
 
       allMessages.push(newMsg);
+      renderUI();
+      saveToCloud();
+    }
+
+    function deleteMsg(index) {
+      allMessages.splice(index, 1);
       renderUI();
       saveToCloud();
     }
