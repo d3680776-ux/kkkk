@@ -1,9 +1,149 @@
- shadow-lg transform active:scale-95 transition border border-white/10 text-sm md:text-base">
-                    🎲  Рандом
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D МЕМ-ДЕКА 6.0 ULTRA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Rubik', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: #080711;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 0, 127, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 223, 216, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(121, 40, 202, 0.18) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Animated Title Gradient */
+        .title-gradient {
+            background: linear-gradient(135deg, #ff007f, #7928ca, #00dfd8, #ffca3a);
+            background-size: 300% 300%;
+            animation: gradientShift 6s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 3D Perspective and Card styling */
+        .grid-perspective {
+            perspective: 1200px;
+        }
+
+        .meme-card {
+            transform-style: preserve-3d;
+            transform: rotateX(10deg) rotateY(-6deg) translateZ(0px);
+            box-shadow: 
+                -8px 12px 20px rgba(0, 0, 0, 0.6),
+                -3px 5px 0px #090814,
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .meme-card:hover {
+            transform: rotateX(0deg) rotateY(0deg) rotateZ(2deg) translateZ(20px) scale(1.04);
+            box-shadow: 
+                0 20px 30px rgba(121, 40, 202, 0.45),
+                0 0 15px rgba(0, 223, 216, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+
+        .meme-card:active {
+            transform: rotateX(0deg) rotateY(0deg) translateZ(-8px) scale(0.96);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .meme-card.playing {
+            animation: cardPulse 0.6s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            background: linear-gradient(135deg, #ff007f 0%, #7928ca 100%) !important;
+            border-color: #00dfd8 !important;
+            box-shadow: 0 0 30px #ff007f, 0 0 15px #00dfd8 !important;
+        }
+
+        @keyframes cardPulse {
+            0% { transform: rotateX(0deg) rotateY(-5deg) translateZ(15px) scale(1.02); }
+            100% { transform: rotateX(0deg) rotateY(5deg) translateZ(25px) scale(1.07); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080711;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(121, 40, 202, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00dfd8;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(20, 18, 38, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+     <header class="text-center mb-8">
+            <h1 class="title-gradient text-4xl md:text-6xl font-black uppercase tracking-wider mb-2">
+                🌀 3D МЕМ-ДЕКА 6.0 ULTRA
+            </h1>
+            <p class="text-indigo-300 text-sm md:text-base font-semibold tracking-wide">
+                🔥 Огромная коллекция топовых русских и мировых мемов без заглушек!
+            </p>
+        </header>
+
+        <!-- Control Bar -->
+        <div class="glass-panel rounded-2xl p-4 md:p-6 mb-8 shadow-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+            <!-- Search Bar -->
+            <div class="w-full md:w-1/3 relative">
+                <input type="text" id="searchInput" placeholder="🔍 Найти мем..." oninput="filterMemes()"
+                    class="w-full bg-black/50 border-2 border-purple-500/40 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition duration-300 shadow-inner">
+            </div>
+
+            <!-- Volume Slider -->
+            <div class="flex items-center gap-3 bg-black/40 px-4 py-3 rounded-xl border border-white/5 w-full md:w-auto justify-center">
+                <span class="text-xl">🔊</span>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8" onchange="updateVolume()"
+                    class="accent-cyan-400 cursor-pointer w-32">
+                <span id="volumeValue" class="text-xs font-bold text-cyan-300 min-w-[32px]">80%</span>
+            </div>
+
+            <!-- Global Action Buttons -->
+            <div class="flex gap-3 w-full md:w-auto justify-center">
+                <button onclick="playRandom()" 
+                    class="flex-1 md:flex-initial bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold px-5 py-3 rounded-xl shadow-lg transform active:scale-95 transition border border-white/10 text-sm md:text-base">
+                    🎲 Рандом
                 </button>
                 <button onclick="stopAll()" 
                     class="flex-1 md:flex-initial bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold px-5 py-3 rounded-xl shadow-lg transform active:scale-95 transition border border-white/10 text-sm md:text-base">
-                    🛑  СТОП ВСЕ
+                    🛑 СТОП ВСЕ
                 </button>
             </div>
         </div>
@@ -33,55 +173,53 @@
         // Massive collection of memes with active direct working links from Myinstants
         const memes = [
             // --- TOP RUSSIAN & TRENDS ---
-            { id: 'chinazes', name: 'Чиназес', icon: '🤙 ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/chinazes.mp3' },
-17:55
-{ id: 'golda', name: 'ГОЛДА!', icon: '🥇 ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/golda.mp3' },
-            { id: 'koch', name: 'Коч, братан!', icon: '😎 ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/koch-bratan.mp3' },
-            { id: 'a4', name: 'Влад А4!', icon: '🤡 ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/a4-vlad.mp3' },
-            { id: 'boss', name: 'Эй, Босс!', icon: '🕶️ ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/hey-boss.mp3' },
-            { id: 'sigma', name: 'Sigma Boy', icon: '🗿 ', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sigma-grindset-theme.mp3' },
-            { id: 'barhatnye', name: 'Бархатные тяги', icon: '👞 ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/barhatnye-tiagi.mp3' },
-            { id: 'saliut', name: 'Салют, братва!', icon: '🎆 ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/privet-ot-mopsa.mp3' },
-            { id: 'boyas', name: 'Сядешь в тюрьму', icon: '👮 ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/tiurma.mp3' },
-            { id: 'mne_pohuy', name: 'Мне похуй', icon: '🤷‍♂️ ', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/mne-pokhui.mp3' },
+            { id: 'chinazes', name: 'Чиназес', icon: '🤙', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/chinazes.mp3' },
+         { id: 'golda', name: 'ГОЛДА!', icon: '🥇', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/golda.mp3' },
+            { id: 'koch', name: 'Коч, братан!', icon: '😎', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/koch-bratan.mp3' },
+            { id: 'a4', name: 'Влад А4!', icon: '🤡', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/a4-vlad.mp3' },
+            { id: 'boss', name: 'Эй, Босс!', icon: '🕶️', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/hey-boss.mp3' },
+            { id: 'sigma', name: 'Sigma Boy', icon: '🗿', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sigma-grindset-theme.mp3' },
+            { id: 'barhatnye', name: 'Бархатные тяги', icon: '👞', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/barhatnye-tiagi.mp3' },
+            { id: 'saliut', name: 'Салют, братва!', icon: '🎆', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/privet-ot-mopsa.mp3' },
+            { id: 'boyas', name: 'Сядешь в тюрьму', icon: '👮', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/tiurma.mp3' },
+            { id: 'mne_pohuy', name: 'Мне похуй', icon: '🤷‍♂️', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/mne-pokhui.mp3' },
 
             // --- REACTION & SCREAMS ---
-            { id: 'bruh', name: 'BRUH', icon: '🗿 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bruh-sound-effect-sound-button.mp3' },
-            { id: 'emotional', name: 'Emotional Damage', icon: '💔 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/emotional-damage-meme.mp3' },
-            { id: 'fart', name: 'Пердеж Reverb', icon: '💨 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fart-with-reverb.mp3' },
-            { id: 'scream_loud', name: 'Крик из ада', icon: '😱 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/loud-scream.mp3' },
-            { id: 'vine_boom', name: 'Vine Boom', icon: '💥 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/vine-boom.mp3' },
+            { id: 'bruh', name: 'BRUH', icon: '🗿', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bruh-sound-effect-sound-button.mp3' },
+            { id: 'emotional', name: 'Emotional Damage', icon: '💔', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/emotional-damage-meme.mp3' },
+            { id: 'fart', name: 'Пердеж Reverb', icon: '💨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fart-with-reverb.mp3' },
+            { id: 'scream_loud', name: 'Крик из ада', icon: '😱', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/loud-scream.mp3' },
+            { id: 'vine_boom', name: 'Vine Boom', icon: '💥', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/vine-boom.mp3' },
             { id: 'anime_wow', name: 'Anime WOW', icon: '✨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/anime-wow.mp3' },
-            { id: 'coffin', name: 'Coffin Dance', icon: '⚰️ ', cat: 'music', url: 'https://www.myinstants.com/media/sounds/coffin-dance-official-audio.mp3' },
-            { id: 'spongebob_fail', name: 'Spongebob Fail', icon: '🎺 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/spongebob-fail.mp3' },
-            { id: 'punch', name: 'Удар по голове', icon: '🥊 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bonk-sound-effect.mp3' },
+            { id: 'coffin', name: 'Coffin Dance', icon: '⚰️', cat: 'music', url: 'https://www.myinstants.com/media/sounds/coffin-dance-official-audio.mp3' },
+            { id: 'spongebob_fail', name: 'Spongebob Fail', icon: '🎺', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/spongebob-fail.mp3' },
+            { id: 'punch', name: 'Удар по голове', icon: '🥊', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bonk-sound-effect.mp3' },
 
             // --- GAMES & POPULAR ---
-            { id: 'oof', name: 'Roblox OOF', icon: '🧱 ', cat: 'games', url: 'https://www.myinstants.com/media/sounds/roblox-off.mp3' },
-            { id: 'minecraft_oof', name: 'Minecraft Урон', icon: '⛏️ ', cat: 'games', url: 'https://www.myinstants.com/media/sounds/classic_hurt.mp3' },
+            { id: 'oof', name: 'Roblox OOF', icon: '🧱', cat: 'games', url: 'https://www.myinstants.com/media/sounds/roblox-off.mp3' },
+            { id: 'minecraft_oof', name: 'Minecraft Урон', icon: '⛏️', cat: 'games', url: 'https://www.myinstants.com/media/sounds/classic_hurt.mp3' },
             { id: 'cs_go_bomb', name: 'Bomb Has Been Planted', icon: '💣', cat: 'games', url: 'https://www.myinstants.com/media/sounds/bomb-has-been-planted-sound-effect.mp3' },
-            { id: 'gta_sa', name: 'Ah Shit, Here We Go', icon: '🚗 ', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-san-andreas-ah-shit-here-we-go-again.mp3' },
+            { id: 'gta_sa', name: 'Ah Shit, Here We Go', icon: '🚗', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-san-andreas-ah-shit-here-we-go-again.mp3' },
             { id: 'gta_mission', name: 'Mission Passed', icon: '⭐', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-san-andreas-mission-passed.mp3' },
-            { id: 'metal_pipe', name: 'Металлическая труба', icon: '🔩 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/falling-metal-pipe-sound-effect.mp3' },
-            { id: 'fbi', name: 'FBI Open Up', icon: '🚨 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fbi-open-up-sfx.mp3' },
-            { id: 'tada', name: 'Та-даам!', icon: '🎉 ', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/ta-da_1.mp3' },
+            { id: 'metal_pipe', name: 'Металлическая труба', icon: '🔩', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/falling-metal-pipe-sound-effect.mp3' },
+            { id: 'fbi', name: 'FBI Open Up', icon: '🚨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fbi-open-up-sfx.mp3' },
+            { id: 'tada', name: 'Та-даам!', icon: '🎉', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/ta-da_1.mp3' },
 
             // --- MUSIC & MEME SONGS ---
-17:55
-{ id: 'phonk', name: 'DRIFT PHONK', icon: '🏎️ ', cat: 'music', url: 'https://www.myinstants.com/media/sounds/phonk-bass.mp3' },
-            { id: 'rickroll', name: 'Rickroll', icon: '🕺 ', cat: 'music', url: 'https://www.myinstants.com/media/sounds/rick-roll-different-link.mp3' },
-            { id: 'sax_guy', name: 'Epic Sax Guy', icon: '🎷 ', cat: 'music', url: 'https://www.myinstants.com/media/sounds/epic-sax-guy.mp3' },
-            { id: 'run', name: 'RUN (Awolnation)', icon: '🏃 ', cat: 'music', url: 'https://www.myinstants.com/media/sounds/run-awolnation.mp3' },
-            { id: 'gigachad', name: 'GigaChad Theme', icon: '🗿 ', cat: 'music', url: 'https://www.myinstants.com/media/sounds/gigachad-theme.mp3' }
+         { id: 'phonk', name: 'DRIFT PHONK', icon: '🏎️', cat: 'music', url: 'https://www.myinstants.com/media/sounds/phonk-bass.mp3' },
+            { id: 'rickroll', name: 'Rickroll', icon: '🕺', cat: 'music', url: 'https://www.myinstants.com/media/sounds/rick-roll-different-link.mp3' },
+            { id: 'sax_guy', name: 'Epic Sax Guy', icon: '🎷', cat: 'music', url: 'https://www.myinstants.com/media/sounds/epic-sax-guy.mp3' },
+            { id: 'run', name: 'RUN (Awolnation)', icon: '🏃', cat: 'music', url: 'https://www.myinstants.com/media/sounds/run-awolnation.mp3' },
+            { id: 'gigachad', name: 'GigaChad Theme', icon: '🗿', cat: 'music', url: 'https://www.myinstants.com/media/sounds/gigachad-theme.mp3' }
         ];
 
         const categories = [
-            { id: 'all', name: 'Все мемы', icon: '🔥 ' },
+            { id: 'all', name: 'Все мемы', icon: '🔥' },
             { id: 'fav', name: 'Избранное', icon: '⭐' },
-            { id: 'ru', name: 'Русские мемы', icon: '🇷🇺 ' },
-            { id: 'reaction', name: 'Реакции', icon: '💥 ' },
+            { id: 'ru', name: 'Русские мемы', icon: '🇷🇺' },
+            { id: 'reaction', name: 'Реакции', icon: '💥' },
             { id: 'games', name: 'Игры', icon: '🎮' },
-            { id: 'music', name: 'Музыка', icon: '🎵 ' }
+            { id: 'music', name: 'Музыка', icon: '🎵' }
         ];
 
         let activeAudios = [];
@@ -120,7 +258,7 @@
             if (filtered.length === 0) {
                 grid.innerHTML = `
                     <div class="col-span-full text-center py-12 text-gray-400 font-bold text-lg">
-                        Ничего не найдено 😿  Попробуй изменить запрос!
+                        Ничего не найдено 😿 Попробуй изменить запрос!
                     </div>
                 `;
                 return;
@@ -138,8 +276,7 @@
                     <button onclick="toggleFav(event, '${meme.id}')" class="absolute top-3 right-3 text-xl transition transform hover:scale-125 z-10 ${isFav ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(255,202,58,0.8)]' : 'text-white/20 hover:text-white/60'}">
                         ★
                     </button>
-17:55
-<div class="text-4xl md:text-5xl my-auto transform transition duration-300 hover:scale-110 drop-shadow-lg">
+                    <div class="text-4xl md:text-5xl my-auto transform transition duration-300 hover:scale-110 drop-shadow-lg">
                         ${meme.icon}
                     </div>
                     <div class="text-xs md:text-sm font-bold text-center text-white leading-tight mt-2 line-clamp-2">
