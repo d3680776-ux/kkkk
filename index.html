@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Мем-Дека 4.0 Pro</title>
+    <title>3D Мем-Дека 5.0 — С Картинками</title>
     <style>
         * {
             box-sizing: border-box;
@@ -89,7 +89,6 @@
             gap: 12px;
         }
 
-        /* Системные кнопки управления */
         .ctrl-btn {
             background: #2a2a40;
             color: #fff;
@@ -161,11 +160,11 @@
             padding-bottom: 80px;
         }
 
-        /* Настоящие 3D Кнопки Мемов */
+        /* 3D Кнопки Мемов */
         .meme-card {
             background: linear-gradient(180deg, #3a3a5a 0%, #25253e 100%);
             border-radius: 16px;
-            padding: 18px 12px;
+            padding: 15px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -173,7 +172,6 @@
             position: relative;
             user-select: none;
             
-            /* 3D Эффекты */
             box-shadow: 0 8px 0 #181828, 0 15px 20px rgba(0, 0, 0, 0.4);
             border-top: 2px solid rgba(255, 255, 255, 0.2);
             transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.2s;
@@ -190,7 +188,6 @@
             box-shadow: 0 2px 0 #181828, 0 5px 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* Анимация проигрывания */
         .meme-card.playing {
             background: linear-gradient(180deg, #ff007f 0%, #7928ca 100%) !important;
             box-shadow: 0 0 25px #ff007f, 0 4px 0 #4a0028 !important;
@@ -203,10 +200,16 @@
             to { box-shadow: 0 0 30px #00dfd8, 0 4px 0 #4a0028; }
         }
 
-        .meme-emoji {
-            font-size: 2.8rem;
+        /* Картинка мема */
+        .meme-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 12px;
             margin-bottom: 10px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            pointer-events: none;
         }
 
         .meme-title {
@@ -223,9 +226,10 @@
             top: 8px;
             right: 10px;
             font-size: 1.2rem;
-            color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.3);
             cursor: pointer;
             transition: color 0.2s;
+            z-index: 2;
         }
 
         .fav-star.active {
@@ -256,14 +260,14 @@
 
     <div class="container">
         <header>
-            <h1>🔊 3D МЕМ-ДЕКА 4.0</h1>
-            <p>Жми на объемные кнопки и врывайся в мемы!</p>
+            <h1>🖼️ 3D МЕМ-ДЕКА 5.0</h1>
+            <p>Жми на 3D кнопки с картинками и запускай мемы!</p>
         </header>
 
         <!-- Панель управления -->
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Найти мем (например: Голда, Коч...)" oninput="filterMemes()">
+                <input type="text" id="searchInput" placeholder="🔍 Найти мем..." oninput="filterMemes()">
             </div>
             
             <div class="volume-control">
@@ -275,6 +279,7 @@
                 <button class="ctrl-btn ctrl-btn-stop" onclick="stopAll()">🛑 СТОП</button>
             </div>
         </div>
+
         <!-- Категории -->
         <div class="categories" id="categoriesContainer">
             <button class="cat-btn active" onclick="selectCategory('all', this)">Все мемы</button>
@@ -293,58 +298,39 @@
     <div class="status-bar" id="statusBar">▶ Играет: <span id="currentMemeName"></span></div>
 
     <script>
-        // Расширенная коллекция мемов
+        // База данных мемов с ссылками на изображения
         const memes = [
-            // Спец затребованные мемы & RU тренды
-            { id: 'golda', name: 'ГОЛДА!', emoji: '🪙', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/golda.mp3' },
-            { id: 'koch', name: 'Коч, братан!', emoji: '🤝', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/koch-bratan.mp3' },
-            { id: 'chinazes', name: 'Чиназес!', emoji: '🤙', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/chinazes.mp3' },
-            { id: 'a4', name: 'Влад А4!', emoji: '📄', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/a4-vlad.mp3' },
-            { id: 'boss', name: 'Эй, Босс!', emoji: '🕶️', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/hey-boss.mp3' },
-            { id: 'sigma', name: 'Sigma Song', emoji: '🗿', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sigma-grindset.mp3' },
-            { id: 'mewing', name: 'Bye Bye (Mewing)', emoji: '🤫', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bye-bye-mewing.mp3' },
-
-            // Классические реакции
-            { id: 'bruh', name: 'BRUH', emoji: '🗿', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bruh-sound-effect-sound-button.mp3' },
-            { id: 'emotional', name: 'Emotional Damage', emoji: '💥', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/emotional-damage-meme.mp3' },
-            { id: 'pipe', name: 'Металл. Труба', emoji: '🏗️', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/metal-pipe-clang.mp3' },
-            { id: 'fbi', name: 'FBI Open Up!', emoji: '🚨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fbi-open-up_s1.mp3' },
-            { id: 'vine_boom', name: 'Vine Boom', emoji: '💣', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/vine-boom.mp3' },
-            { id: 'badumtss', name: 'Ba-Dum-Tss', emoji: '🥁', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/ba-dum-tss.mp3' },
-            { id: 'huh', name: 'Huh? Кот', emoji: '🐱', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/huh-cat.mp3' },
-            { id: 'quack', name: 'Кряк', emoji: '🦆', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/quack.mp3' },
-            { id: 'fart', name: 'Wet Fart', emoji: '💨', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/dry-fart.mp3' },
-            { id: 'goat', name: 'Орущая Коза', emoji: '🐐', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/screaming-goat.mp3' },
-            { id: 'side_eye', name: 'Bombastic Side Eye', emoji: '👀', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bombastic-side-eye.mp3' },
-            { id: 'run', name: 'RUN Meme', emoji: '🏃', cat: 'music', url: 'https://www.myinstants.com/media/sounds/run-meme.mp3' },
-
-            // Игры
-            { id: 'oof', name: 'Roblox Oof', emoji: '🩹', cat: 'games', url: 'https://www.myinstants.com/media/sounds/roblox-off.mp3' },
-            { id: 'win_error', name: 'Windows Error', emoji: '💻', cat: 'games', url: 'https://www.myinstants.com/media/sounds/windows-error.mp3' },
-            { id: 'amongus', name: 'Among Us Report', emoji: 'ඞ', cat: 'games', url: 'https://www.myinstants.com/media/sounds/emergency-meeting-among-us.mp3' },
-            { id: 'gta_wasted', name: 'GTA Wasted', emoji: '💀', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-v-wasted-sound-effect.mp3' },
-            { id: 'mario_jump', name: 'Mario Jump', emoji: '🍄', cat: 'games', url: 'https://www.myinstants.com/media/sounds/maro-jump.mp3' },
-            { id: 'minecraft_hit', name: 'Minecraft Ouch', emoji: '⛏️', cat: 'games', url: 'https://www.myinstants.com/media/sounds/classic_hurt.mp3' },
-            { id: 'victory', name: 'Victory Fanfare', emoji: '🏆', cat: 'games', url: 'https://www.myinstants.com/media/sounds/ff7-victory-fanfare.mp3' },
-
-            // Музыка и Тренды
-            { id: 'airhorn', name: 'MLG Airhorn', emoji: '📢', cat: 'music', url: 'https://www.myinstants.com/media/sounds/mlg-airhorn.mp3' },
-            { id: 'sad_violin', name: 'Sad Violin', emoji: '🎻', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sad-violin.mp3' },
-            { id: 'coffin', name: 'Coffin Dance', emoji: '⚰️', cat: 'music', url: 'https://www.myinstants.com/media/sounds/coffin-dance-official-music-video-hd.mp3' },
-            { id: 'spongebob', name: 'Spongebob Fail', emoji: '🧽', cat: 'music', url: 'https://www.myinstants.com/media/sounds/spongebob-fail.mp3' },
-            { id: 'sax', name: 'Epic Sax Guy', emoji: '🎷', cat: 'music', url: 'https://www.myinstants.com/media/sounds/epic-sax-guy.mp3' },
-            { id: 'troll', name: 'Trollface Song', emoji: '🤡', cat: 'music', url: 'https://www.myinstants.com/media/sounds/troll-face-song.mp3' }
+            { id: 'golda', name: 'ГОЛДА!', img: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=200&q=80', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/golda.mp3' },
+            { id: 'koch', name: 'Коч, братан!', img: 'https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?auto=format&fit=crop&w=200&q=80', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/koch-bratan.mp3' },
+            { id: 'chinazes', name: 'Чиназес!', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/chinazes.mp3' },
+            { id: 'a4', name: 'Влад А4!', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/a4-vlad.mp3' },
+            { id: 'boss', name: 'Эй, Босс!', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80', cat: 'ru', url: 'https://www.myinstants.com/media/sounds/hey-boss.mp3' },
+            { id: 'sigma', name: 'Sigma Song', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80', cat: 'music', url: 'https://www.myinstants.com/media/sounds/sigma-grindset.mp3' },
+            { id: 'mewing', name: 'Bye Bye (Mewing)', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bye-bye-mewing.mp3' },
+            { id: 'bruh', name: 'BRUH', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/bruh-sound-effect-sound-button.mp3' },
+            { id: 'emotional', name: 'Emotional Damage', img: 'https://images.unsplash.com/photo-1594322436404-5a0526db4d13?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/emotional-damage-meme.mp3' },
+            { id: 'pipe', name: 'Металл. Труба', img: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/metal-pipe-clang.mp3' },
+            { id: 'fbi', name: 'FBI Open Up!', img: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/fbi-open-up_s1.mp3' },
+            { id: 'vine_boom', name: 'Vine Boom', img: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/vine-boom.mp3' },
+            { id: 'badumtss', name: 'Ba-Dum-Tss', img: 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/ba-dum-tss.mp3' },
+            { id: 'huh', name: 'Huh? Кот', img: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/huh-cat.mp3' },
+            { id: 'quack', name: 'Кряк', img: 'https://images.unsplash.com/photo-1555852095-64e7428df0fa?auto=format&fit=crop&w=200&q=80', cat: 'reaction', url: 'https://www.myinstants.com/media/sounds/quack.mp3' },
+            { id: 'oof', name: 'Roblox Oof', img: 'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=200&q=80', cat: 'games', url: 'https://www.myinstants.com/media/sounds/roblox-off.mp3' },
+            { id: 'win_error', name: 'Windows Error', img: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&w=200&q=80', cat: 'games', url: 'https://www.myinstants.com/media/sounds/windows-error.mp3' },
+            { id: 'amongus', name: 'Among Us Report', img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=200&q=80', cat: 'games', url: 'https://www.myinstants.com/media/sounds/emergency-meeting-among-us.mp3' },
+            { id: 'gta_wasted', name: 'GTA Wasted', img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=200&q=80', cat: 'games', url: 'https://www.myinstants.com/media/sounds/gta-v-wasted-sound-effect.mp3' },
+            { id: 'airhorn', name: 'MLG Airhorn', img: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=200&q=80', cat: 'music', url: 'https://www.myinstants.com/media/sounds/mlg-airhorn.mp3' },
+            { id: 'coffin', name: 'Coffin Dance', img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=200&q=80', cat: 'music', url: 'https://www.myinstants.com/media/sounds/coffin-dance-official-music-video-hd.mp3' }
         ];
 
         let activeAudios = [];
         let currentCategory = 'all';
-        let favorites = JSON.parse(localStorage.getItem('meme_favs_v2')) || [];
+        let favorites = JSON.parse(localStorage.getItem('meme_favs_v3')) || [];
 
         function init() {
             renderMemes();
         }
 
-        // Отрисовка сетки 3D-кнопок
         function renderMemes() {
             const grid = document.getElementById('memeGrid');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
@@ -372,16 +358,15 @@
 
                 card.innerHTML = `
                     <span class="fav-star ${isFav ? 'active' : ''}" onclick="toggleFav(event, '${meme.id}')">★</span>
-                    <div class="meme-emoji">${meme.emoji}</div>
+                    <img class="meme-img" src="${meme.img}" alt="${meme.name}">
                     <div class="meme-title">${meme.name}</div>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        // Воспроизведение звука
         function playSound(meme) {
-            const vol = parseFloat(document.getElementById('volumeSlider').value);
+        const vol = parseFloat(document.getElementById('volumeSlider').value);
             const audio = new Audio(meme.url);
             audio.volume = vol;
 
@@ -390,7 +375,7 @@
                 if (card) card.classList.add('playing');
                 showStatus(meme.name);
             }).catch(e => {
-                console.warn('Ошибка проигрывания аудиофайла:', e);
+                console.warn('Ошибка аудио:', e);
             });
 
             activeAudios.push(audio);
@@ -403,7 +388,6 @@
             };
         }
 
-        // Остановка всех звуков
         function stopAll() {
             activeAudios.forEach(a => {
                 a.pause();
@@ -414,13 +398,11 @@
             hideStatus();
         }
 
-        // Воспроизведение случайного звука
         function playRandom() {
             const randomMeme = memes[Math.floor(Math.random() * memes.length)];
             playSound(randomMeme);
         }
 
-        // Избранное
         function toggleFav(e, id) {
             e.stopPropagation();
             if (favorites.includes(id)) {
@@ -428,11 +410,10 @@
             } else {
                 favorites.push(id);
             }
-            localStorage.setItem('meme_favs_v2', JSON.stringify(favorites));
+            localStorage.setItem('meme_favs_v3', JSON.stringify(favorites));
             renderMemes();
         }
 
-        // Выбор категории
         function selectCategory(cat, btn) {
             currentCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -440,18 +421,15 @@
             renderMemes();
         }
 
-        // Поиск
         function filterMemes() {
             renderMemes();
         }
 
-        // Управление громкостью
         function updateVolume() {
             const vol = parseFloat(document.getElementById('volumeSlider').value);
             activeAudios.forEach(a => a.volume = vol);
         }
 
-        // Индикатор воспроизведения
         function showStatus(name) {
             const bar = document.getElementById('statusBar');
             document.getElementById('currentMemeName').innerText = name;
