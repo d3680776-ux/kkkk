@@ -64,6 +64,7 @@
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0 25px 50px -12px var(--shadow-color);
+      position: relative;
     }
 
     .chat-header {
@@ -144,7 +145,6 @@
       border-bottom-color: var(--accent-color);
     }
 
-    /* Значок пропущенных сообщений */
     .badge {
       background: #ef4444;
       color: white;
@@ -162,7 +162,6 @@
       overflow: hidden;
       position: relative;
     }
-
     .chat-section {
       flex: 1;
       display: flex;
@@ -381,6 +380,51 @@
       color: white;
     }
 
+    /* Окно встроенного видеозвонка */
+    .video-call-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+    }
+
+    .video-call-header {
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .video-call-header span {
+      font-size: 14px;
+      font-weight: 700;
+      color: #4ade80;
+    }
+
+    .close-call-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .video-frame {
+      width: 100%;
+      flex: 1;
+      border: none;
+    }
+
     .picker-panel {
       background: var(--header-bg);
       padding: 6px 12px;
@@ -468,6 +512,7 @@
 <body data-theme="dark">
 
   <div class="chat-card">
+    <!-- Шапка -->
     <div class="chat-header">
       <div class="header-info">
         <h1 id="chatTitle">💬 3D Мессенджер</h1>
@@ -476,23 +521,24 @@
       <div class="header-actions">
         <button class="action-btn" onclick="toggleTheme()" id="themeBtn">🌙 Тёмная</button>
         <button class="action-btn" onclick="toggleSidebar()">👥 Игроки</button>
-        <a href="https://meet.jit.si/3d-messenger-room-shushenskoe" target="_blank" class="action-btn call-btn">
+        <button class="action-btn call-btn" onclick="openVideoCall()">
           📹 Видео
-        </a>
+        </button>
       </div>
     </div>
 
-    <!-- Вкладки со счетчиками пропущенных -->
+    <!-- Вкладки -->
     <div class="nav-tabs">
       <button class="tab-btn active" id="tabMain" onclick="switchTab('main')">
         💬 Общий чат <span class="badge" id="unreadMainBadge" style="display:none;">0</span>
       </button>
       <button class="tab-btn" id="tabPrivate" onclick="switchTab('private')" style="display:none;">
         🔒 Личные (ЛС) <span class="badge" id="unreadPrivateBadge" style="display:none;">0</span>
-      </button>
+        </button>
       <button class="tab-btn" id="tabVoice" onclick="switchTab('voice')">🎙 Голос. Рулетка</button>
     </div>
 
+    <!-- Основной блок -->
     <div class="main-body">
       <div class="chat-section" id="chatSection">
         <div class="messages-box" id="msgContainer">
@@ -517,6 +563,7 @@
         </div>
       </div>
 
+      <!-- Голосовая рулетка -->
       <div class="voice-roulette-container" id="voiceSection">
         <div class="roulette-status" id="voiceStatus">Нажмите кнопку для поиска собеседника по голосу</div>
         <div class="roulette-desc">Общайтесь со случайными игроками голосом в реальном времени через микрофон.</div>
@@ -535,6 +582,16 @@
         </div>
       </div>
 
+      <!-- Встроенное видеоокно звонков -->
+      <div class="video-call-overlay" id="videoOverlay">
+        <div class="video-call-header">
+          <span>📹 Встроенный видеозвонок</span>
+          <button class="close-call-btn" onclick="closeVideoCall()">Закрыть ✖</button>
+        </div>
+        <iframe class="video-frame" id="videoFrame" allow="camera; microphone; display-capture; autoplay"></iframe>
+      </div>
+
+      <!-- Боковая панель игроков -->
       <div class="sidebar-users" id="sidebarUsers">
         <div class="sidebar-title">Игроки в сети</div>
         <div class="users-list" id="usersList"></div>
@@ -566,7 +623,6 @@
 
     document.getElementById("usernameInput").value = "Игрок_" + Math.floor(100 + Math.random() * 900);
 
-    // Запрос разрешения на Push-уведомления
     if ("Notification" in window && Notification.permission !== "granted") {
       Notification.requestPermission();
     }
@@ -595,6 +651,21 @@
       input.focus();
     }
 
+    // Встроенные видеозвонки
+    function openVideoCall() {
+      const overlay = document.getElementById("videoOverlay");
+      const frame = document.getElementById("videoFrame");
+      frame.src = "https://meet.jit.si/3d-messenger-room-shushenskoe";
+      overlay.style.display = "flex";
+    }
+
+    function closeVideoCall() {
+      const overlay = document.getElementById("videoOverlay");
+      const frame = document.getElementById("videoFrame");
+      frame.src = "";
+      overlay.style.display = "none";
+    }
+
     function switchTab(tab) {
       activeTab = tab;
       document.getElementById("tabMain").classList.toggle("active", tab === 'main');
@@ -603,6 +674,7 @@
 
       const chatSection = document.getElementById("chatSection");
       const voiceSection = document.getElementById("voiceSection");
+
       if (tab === 'voice') {
         chatSection.style.display = 'none';
         voiceSection.style.display = 'flex';
@@ -666,7 +738,7 @@
           nextBtn.style.display = "inline-block";
           muteBtn.style.display = "inline-block";
           visualizer.style.display = "flex";
-        } catch (err) {
+          } catch (err) {
           statusEl.innerText = "Ошибка доступа к микрофону. Разрешите его в браузере.";
           console.error(err);
         }
@@ -709,19 +781,16 @@
         const newMsgs = data.messages || [];
         visitorsList = data.visitors || [];
 
-        // Проверка новых сообщений для уведомлений и бейджей
         if (newMsgs.length > allMessages.length) {
           const addedCount = newMsgs.length - allMessages.length;
           const latestMsg = newMsgs[newMsgs.length - 1];
 
           if (latestMsg.userId !== myUserId) {
-            // Если сообщение пришло в общий чат, а ты в ЛС или голосовой рулетке
             if (!latestMsg.targetId && activeTab !== 'main') {
               unreadMainCount += addedCount;
               updateBadges();
               sendPushNotification("Сообщение в Общем чате", `${latestMsg.author}: ${latestMsg.text}`);
             } 
-            // Если сообщение пришло в ЛС
             else if (latestMsg.targetId === myUserId && activeTab !== 'private') {
               unreadPrivateCount += addedCount;
               updateBadges();
@@ -780,7 +849,6 @@
         userEl.onclick = () => startPrivateChat(user.id, user.name);
         usersListEl.appendChild(userEl);
       });
-
       const container = document.getElementById("msgContainer");
       container.innerHTML = "";
 
@@ -818,7 +886,7 @@
 
           msgEl.innerHTML = `
             <div class="msg-header">
-            <span class="msg-author">${escapeHTML(msg.author)}</span>
+              <span class="msg-author">${escapeHTML(msg.author)}</span>
               <div style="display: flex; align-items: center; gap: 4px;">
                 <span class="msg-time">${msg.time}</span>
                 ${deleteBtnHTML}
@@ -899,7 +967,7 @@
     }
 
     function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;'> '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
     loadData();
