@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeuroShow - 3D Галерея Нейрокартинок</title>
+  <title>Memes 3D Hub - Дека со звуками</title>
   <style>
     * {
       box-sizing: border-box;
@@ -28,11 +28,12 @@
     }
 
     header h1 {
-      font-size: 2.8rem;
-      background: linear-gradient(90deg, #00f2fe, #4facfe, #ff007f);
+      font-size: 3rem;
+      background: linear-gradient(90deg, #ff007f, #7928ca, #00f2fe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 10px;
+      font-weight: 900;
     }
 
     header p {
@@ -40,322 +41,267 @@
       font-size: 1.1rem;
     }
 
-    /* Панель фильтров / категорий */
-    .filter-container {
+    /* 3D Поисковая панель */
+    .search-wrapper {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 0 20px;
+      perspective: 1000px;
+    }
+
+    .search-box-3d {
+      background: rgba(20, 24, 39, 0.9);
+      border-radius: 20px;
+      padding: 6px;
+      border: 2px solid rgba(0, 242, 254, 0.3);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.15);
+      transform-style: preserve-3d;
+      transition: transform 0.2s, box-shadow 0.3s;
       display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding: 25px 20px;
-      max-width: 900px;
-      margin: 0 auto;
+      align-items: center;
     }
 
-    .filter-btn {
-      background: rgba(25, 30, 48, 0.8);
-      color: #94a3b8;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
+    .search-box-3d:hover {
+      box-shadow: 0 20px 45px rgba(0, 242, 254, 0.3), 0 0 30px rgba(255, 0, 127, 0.2);
     }
 
-    .filter-btn:hover, .filter-btn.active {
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 1.1rem;
+      padding: 12px 20px;
+    }
+
+    .search-input::placeholder {
+      color: #64748b;
+    }
+
+    .search-btn-3d {
       background: linear-gradient(135deg, #00f2fe, #4facfe);
       color: #090a0f;
-      border-color: transparent;
-      box-shadow: 0 5px 20px rgba(0, 242, 254, 0.4);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+      transition: transform 0.1s;
     }
 
-    /* Сетка 3D карточек */
-    .gallery-grid {
+    .search-btn-3d:active {
+      transform: scale(0.95);
+    }
+
+    /* Сетка 3D кнопок мемов */
+    .meme-grid {
       max-width: 1200px;
-      margin: 20px auto;
+      margin: 30px auto;
       padding: 0 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 35px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
       perspective: 1200px;
     }
 
-    .card {
-      background: rgba(20, 24, 39, 0.85);
-      border-radius: 24px;
-      overflow: hidden;
+    .meme-button-card {
+      background: linear-gradient(145deg, #171b2e, #101322);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-      transition: transform 0.15s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       transform-style: preserve-3d;
+      transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s;
       cursor: pointer;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card:hover {
-      box-shadow: 0 20px 45px rgba(0, 242, 254, 0.25);
-      border-color: rgba(0, 242, 254, 0.4);
-    }
-
-    .card-img-wrap {
-      width: 100%;
-      height: 220px;
       position: relative;
       overflow: hidden;
-      transform: translateZ(40px);
     }
 
-    .card-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s ease;
+    .meme-button-card:hover {
+      box-shadow: 0 20px 40px rgba(255, 0, 127, 0.3);
+      border-color: rgba(255, 0, 127, 0.5);
     }
 
-    .card:hover .card-img-wrap img {
-      transform: scale(1.08);
-    }
-
-    .card-badge {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      color: #00f2fe;
-      border: 1px solid rgba(0, 242, 254, 0.3);
-    }
-
-    .card-content {
-      padding: 20px;
-      transform: translateZ(25px);
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-      justify-content: space-between;
-    }
-
-    .card-title {
-      font-size: 1.3rem;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .card-desc {
-      font-size: 0.9rem;
-      color: #94a3b8;
-      line-height: 1.4;
-      margin-bottom: 20px;
-    }
-
-    .card-btn {
-      background: linear-gradient(135deg, #ff007f, #7928ca);
-      color: white;
-      border: none;
-      padding: 10px 0;
-      border-radius: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: opacity 0.2s;
+    .meme-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
       transform: translateZ(30px);
     }
 
-    .card-btn:hover {
-      opacity: 0.9;
-    }
-    /* Модальное окно просмотра презентации */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(10px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal {
-      background: #141827;
-      width: 90%;
-      max-width: 650px;
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      overflow: hidden;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
-      position: relative;
-      transform: scale(0.9);
-      transition: transform 0.3s ease;
-    }
-
-    .modal-overlay.active .modal {
-      transform: scale(1);
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.5);
-      border: none;
+    .meme-name {
+      font-size: 1.15rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      transform: translateZ(20px);
       color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      font-size: 1.2rem;
+    }
+
+    .meme-tag {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-bottom: 15px;
+      transform: translateZ(15px);
+    }
+
+    .play-btn-3d {
+      background: linear-gradient(135deg, #ff007f, #7928ca);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.95rem;
       cursor: pointer;
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background 0.2s;
-    }
-
-    .close-btn:hover {
-      background: rgba(255, 0, 127, 0.8);
-    }
-
-    .modal-img {
       width: 100%;
-      height: 320px;
-      object-fit: cover;
+      box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4);
+      transform: translateZ(25px);
+      transition: transform 0.1s;
     }
 
-    .modal-body {
-      padding: 30px;
+    .play-btn-3d:active {
+      transform: translateZ(25px) scale(0.95);
     }
 
-    .modal-title {
-      font-size: 1.8rem;
-      margin-bottom: 12px;
-      background: linear-gradient(90deg, #00f2fe, #ff007f);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .tiktok-link-badge {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #00f2fe;
+      text-decoration: none;
+      transform: translateZ(20px);
     }
 
-    .modal-text {
-      color: #cbd5e1;
-      font-size: 1rem;
-      line-height: 1.6;
-      margin-bottom: 25px;
+    .tiktok-link-badge:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>✨ NeuroShow 3D</h1>
-    <p>Галерея и презентация футуристичных нейрокартинок нового поколения</p>
+    <h1>🔥 Memes 3D Hub</h1>
+    <p>Самая мощная коллекция 3D-кнопок с легендарными звуками мемов</p>
   </header>
 
-  <!-- Фильтры категорий -->
-  <div class="filter-container">
-    <button class="filter-btn active" onclick="filterCards('all', this)">Все темы</button>
-    <button class="filter-btn" onclick="filterCards('cyber', this)">Киберпанк</button>
-    <button class="filter-btn" onclick="filterCards('space', this)">Космос & ИИ</button>
-    <button class="filter-btn" onclick="filterCards('nature', this)">Природа будущего</button>
-    <button class="filter-btn" onclick="filterCards('auto', this)">Авто & Скорость</button>
+  <!-- 3D Поиск -->
+  <div class="search-wrapper">
+    <div class="search-box-3d" id="searchBox">
+      <input type="text" class="search-input" id="searchInput" placeholder="Поиск мема по названию..." oninput="filterMemos()">
+      <button class="search-btn-3d">Найти 🔍</button>
+    </div>
   </div>
 
-  <!-- Галерея карточек -->
-  <div class="gallery-grid" id="gallery">
+  <!-- Сетка мемов -->
+  <div class="meme-grid" id="memeGrid">
 
-    <!-- Карточка 1 -->
-    <div class="card" data-category="cyber" onclick="openModal('Киберпанк Мегаполис', 'Презентация цифрового мира будущего, где технологии сливаются с неоновыми улицами ночного Токио.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80')">
-      <div class="card-img-wrap">
-        <span class="card-badge">Киберпанк</span>
-        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="Киберпанк">
-      </div>
-      <div class="card-content">
-        <div>
-          <div class="card-title">Неоновый Мегаполис</div>
-          <div class="card-desc">Генерация городской среды в дождливом стиле киберпанка.</div>
-        </div>
-        <button class="card-btn">Смотреть презентацию</button>
+    <!-- Новый TikTok мем -->
+    <div class="meme-card-wrapper" data-name="tiktok новый мем хит">
+      <div class="meme-button-card">
+        <div class="meme-icon">🌟</div>
+        <div class="meme-name">TikTok Мем №2 🔥</div>
+        <div class="meme-tag">Новый вирусный тренд</div>
+        <button class="play-btn-3d" onclick="playMemeSound('tiktok2')">Воспроизвести 🎵</button>
+        <br>
+        <a href="https://vt.tiktok.com/ZSgGtCSBq/" target="_blank" class="tiktok-link-badge">🔗 Открыть TikTok оригинал</a>
       </div>
     </div>
 
-    <!-- Карточка 2 -->
-    <div class="card" data-category="space" onclick="openModal('Глубокий Космос', 'Исследование неизведанных галактик и квантовых туманностей, созданных с помощью нейросетей.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80')">
-      <div class="card-img-wrap">
-        <span class="card-badge">Космос & ИИ</span>
-        <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" alt="Космос">
-      </div>
-      <div class="card-content">
-        <div>
-        <div class="card-title">Квантовая Туманность</div>
-          <div class="card-desc">Погружение в безграничные просторы виртуального космоса.</div>
-        </div>
-        <button class="card-btn">Смотреть презентацию</button>
+    <!-- Предыдущий TikTok мем -->
+    <div class="meme-card-wrapper" data-name="tiktok эксклюзив тренд">
+      <div class="meme-button-card">
+        <div class="meme-icon">🎬</div>
+        <div class="meme-name">TikTok Тренд 1 🔥</div>
+        <div class="meme-tag">Эксклюзивный вирусный звук</div>
+        <button class="play-btn-3d" onclick="playMemeSound('tiktok')">Воспроизвести 🎵</button>
+        <br>
+        <a href="https://vt.tiktok.com/ZSgGGEssq/" target="_blank" class="tiktok-link-badge">🔗 Открыть TikTok оригинал</a>
       </div>
     </div>
 
-    <!-- Карточка 3 -->
-    <div class="card" data-category="nature" onclick="openModal('Биолюминесцентный Лес', 'Экосистема будущего, где каждое растение излучает мягкий неоновый свет для освещения троп.', 'https://images.unsplash.com/photo-1511497584788-876761142212?auto=format&fit=crop&w=800&q=80')">
-      <div class="card-img-wrap">
-        <span class="card-badge">Природа будущего</span>
-        <img src="https://images.unsplash.com/photo-1511497584788-876761142212?auto=format&fit=crop&w=600&q=80" alt="Природа">
-      </div>
-      <div class="card-content">
-        <div>
-          <div class="card-title">Светящийся Лес</div>
-          <div class="card-desc">Фантастическая флора в гармонии с новыми цифровыми технологиями.</div>
-        </div>
-        <button class="card-btn">Смотреть презентацию</button>
+    <!-- Рикардо -->
+    <div class="meme-card-wrapper" data-name="рикардо танец">
+      <div class="meme-button-card">
+        <div class="meme-icon">🕺</div>
+        <div class="meme-name">Танец Рикардо</div>
+        <div class="meme-tag">Легендарный ритм</div>
+        <button class="play-btn-3d" onclick="playMemeSound('ricardo')">Воспроизвести 🎵</button>
       </div>
     </div>
 
-    <!-- Карточка 4 -->
-    <div class="card" data-category="auto" onclick="openModal('Гиперкар Револьвер', 'Концепт футуристичного спортивного автомобиля с аэродинамическим корпусом и реактивным приводом.', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80')">
-      <div class="card-img-wrap">
-        <span class="card-badge">Авто & Скорость</span>
-        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80" alt="Авто">
-      </div>
-      <div class="card-content">
-        <div>
-          <div class="card-title">Концепт Сверхзвукового Кара</div>
-          <div class="card-desc">Динамика и скорость нового поколения в каждой линии кузова.</div>
-        </div>
-        <button class="card-btn">Смотреть презентацию</button>
+    <!-- Поп-Кэт -->
+    <div class="meme-card-wrapper" data-name="поп кэт кот">
+      <div class="meme-button-card">
+        <div class="meme-icon">🐱</div>
+        <div class="meme-name">Поп-Кэт</div>
+        <div class="meme-tag">Популярный кликер</div>
+        <button class="play-btn-3d" onclick="playMemeSound('popcat')">Воспроизвести 🎵</button>
       </div>
     </div>
 
-  </div>
-
-  <!-- Модальное окно -->
-  <div class="modal-overlay" id="presentationModal" onclick="closeModal()">
-    <div class="modal" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeModal()">&times;</button>
-      <img id="modalImg" class="modal-img" src="" alt="Презентация">
-      <div class="modal-body">
-        <h2 id="modalTitle" class="modal-title">Название</h2>
-        <p id="modalDesc" class="modal-text">Описание презентации...</p>
-        <button class="filter-btn active" style="width:100%; text-align:center;" onclick="closeModal()">Закрыть презентацию</button>
+    <!-- Эпический Басс -->
+    <div class="meme-card-wrapper" data-name="басс буст взрыв">
+      <div class="meme-button-card">
+        <div class="meme-icon">💥</div>
+        <div class="meme-name">Эпичный Басс</div>
+        <div class="meme-tag">Взрывной бас-буст</div>
+        <button class="play-btn-3d" onclick="playMemeSound('bass')">Воспроизвести 🎵</button>
       </div>
     </div>
+
+    <!-- Скибиди -->
+    <div class="meme-card-wrapper" data-name="скибиди туалет">
+      <div class="meme-button-card">
+        <div class="meme-icon">🚽</div>
+        <div class="meme-name">Скибиди Трек</div>
+        <div class="meme-tag">Мемный хит</div>
+        <button class="play-btn-3d" onclick="playMemeSound('skibidi')">Воспроизвести 🎵</button>
+      </div>
+    </div>
+
+    <!-- Эх классика -->
+    <div class="meme-card-wrapper" data-name="классика вау">
+      <div class="meme-button-card">
+        <div class="meme-icon">👑</div>
+        <div class="meme-name">Эх, классика</div>
+        <div class="meme-tag">Цитата веков</div>
+        <button class="play-btn-3d" onclick="playMemeSound('classic')">Воспроизвести 🎵</button>
+      </div>
+    </div>
+
+    <!-- Oh Hell Nah -->
+    <div class="meme-card-wrapper" data-name="oh hell nah мем">
+      <div class="meme-button-card">
+        <div class="meme-icon">💀</div>
+        <div class="meme-name">Oh Hell Nah</div>
+        <div class="meme-tag">Мемная озвучка</div>
+        <button class="play-btn-3d" onclick="playMemeSound('hellnah')">Воспроизвести 🎵</button>
+      </div>
+    </div>
+
+    <!-- Epic Fail -->
+    <div class="meme-card-wrapper" data-name="фейл грусть скрипка">
+      <div class="meme-button-card">
+        <div class="meme-icon">🎻</div>
+        <div class="meme-name">Epic Fail</div>
+        <div class="meme-tag">Грустная нота</div>
+        <button class="play-btn-3d" onclick="playMemeSound('fail')">Воспроизвести 🎵</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    // 3D Наклон карточек за курсором
-    document.querySelectorAll('.card').forEach(card => {
+    // 3D Tilt эффект для карточек и поиска
+    document.querySelectorAll('.meme-button-card, .search-box-3d').forEach(card => {
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left - rect.width / 2;
         const y = e.clientY - rect.top - rect.height / 2;
-        card.style.transform = `rotateX(${-y / 10}deg) rotateY(${x / 10}deg) scale(1.02)`;
+        card.style.transform = `rotateX(${-y / 8}deg) rotateY(${x / 8}deg) scale(1.02)`;
       });
 
       card.addEventListener('mouseleave', () => {
@@ -363,30 +309,109 @@
       });
     });
 
-    // Фильтрация категорий
-    function filterCards(category, btn) {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    // Живой поиск мемов
+    function filterMemos() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const items = document.querySelectorAll('.meme-card-wrapper');
 
-      document.querySelectorAll('.card').forEach(card => {
-        if (category === 'all' || card.getAttribute('data-category') === category) {
-          card.style.display = 'flex';
+      items.forEach(item => {
+        const name = item.getAttribute('data-name');
+        if (name.includes(query)) {
+          item.style.display = 'block';
         } else {
-          card.style.display = 'none';
+          item.style.display = 'none';
         }
       });
     }
 
-    // Управление модальным окном
-    function openModal(title, desc, imgSrc) {
-      document.getElementById('modalTitle').innerText = title;
-      document.getElementById('modalDesc').innerText = desc;
-      document.getElementById('modalImg').src = imgSrc;
-      document.getElementById('presentationModal').classList.add('active');
-    }
+    // Аудиосинтезатор для звуков мемов
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    function closeModal() {
-    document.getElementById('presentationModal').classList.remove('active');
+    function playMemeSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'tiktok2') {
+        // Звуковая волна для нового трека
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(500, now);
+        osc.frequency.exponentialRampToValueAtTime(250, now + 0.25);
+        osc.frequency.exponentialRampToValueAtTime(700, now + 0.45);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      } else if (type === 'tiktok') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.4);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } else if (type === 'ricardo') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'popcat') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'bass') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(80, now);
+        osc.frequency.linearRampToValueAtTime(30, now + 0.5);
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } else if (type === 'skibidi') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.linearRampToValueAtTime(250, now + 0.2);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'classic') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(440, now + 0.3);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'hellnah') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(90, now + 0.4);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } else if (type === 'fail') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(350, now);
+        osc.frequency.linearRampToValueAtTime(150, now + 0.6);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
+        osc.start(now);
+        osc.stop(now + 0.65);
+      }
     }
   </script>
 </body>
