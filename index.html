@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Memes 3D Hub - Дека со звуками</title>
+  <title>Memes 3D Hub & Гонки с Разрушениями</title>
   <style>
     * {
       box-sizing: border-box;
@@ -96,7 +96,7 @@
       transform: scale(0.95);
     }
 
-    /* Сетка 3D кнопок мемов */
+    /* Сетка 3D кнопок */
     .meme-grid {
       max-width: 1200px;
       margin: 30px auto;
@@ -160,6 +160,12 @@
       box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4);
       transform: translateZ(25px);
       transition: transform 0.1s;
+      }
+
+    .play-btn-3d.game-btn {
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      color: #090a0f;
+      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
     }
 
     .play-btn-3d:active {
@@ -175,30 +181,116 @@
       transform: translateZ(20px);
     }
 
-    .tiktok-link-badge:hover {
-      text-decoration: underline;
+    /* Модальное окно гонок */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: #141827;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 24px;
+      padding: 25px;
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      position: relative;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: #a0aec0;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Игровая зона гонок */
+    .race-game-box {
+      background: #0d0f18;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 15px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+    }
+
+    .car-visual {
+      font-size: 4rem;
+      margin: 15px 0;
+      transition: transform 0.1s, filter 0.2s;
+      display: inline-block;
+    }
+
+    .damage-bar-wrap {
+      width: 100%;
+      height: 12px;
+      background: #222;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .damage-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff9900, #ff0055);
+      transition: width 0.2s;
+    }
+
+    .race-actions {
+      display: flex;
+      gap: 10px;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🔥 Memes 3D Hub</h1>
-    <p>Самая мощная коллекция 3D-кнопок с легендарными звуками мемов</p>
+    <h1>🔥 Memes 3D Hub & Гонки</h1>
+    <p>3D-звуки мемов и Гонки с реалистичной физикой разрушений!</p>
   </header>
 
   <!-- 3D Поиск -->
   <div class="search-wrapper">
     <div class="search-box-3d" id="searchBox">
-      <input type="text" class="search-input" id="searchInput" placeholder="Поиск мема по названию..." oninput="filterMemos()">
+      <input type="text" class="search-input" id="searchInput" placeholder="Поиск мема или игры..." oninput="filterMemos()">
       <button class="search-btn-3d">Найти 🔍</button>
     </div>
   </div>
 
-  <!-- Сетка мемов -->
+  <!-- Сетка мемов и игр -->
   <div class="meme-grid" id="memeGrid">
 
-    <!-- Новый TikTok мем -->
+    <!-- КАРТОЧКА ГОНОКС РАЗРУШЕНИЕМ -->
+    <div class="meme-card-wrapper" data-name="гонки машины разрушения дерби авария">
+      <div class="meme-button-card">
+        <div class="meme-icon">🏎️💥</div>
+        <div class="meme-name">Разрушаемые Гонки 3D</div>
+        <div class="meme-tag">Дерби & Симулятор аварий</div>
+        <button class="play-btn-3d game-btn" onclick="openRaceGame()">Играть в Гонки 🎮</button>
+      </div>
+    </div>
+
+    <!-- TikTok Мем №2 -->
     <div class="meme-card-wrapper" data-name="tiktok новый мем хит">
       <div class="meme-button-card">
         <div class="meme-icon">🌟</div>
@@ -210,12 +302,12 @@
       </div>
     </div>
 
-    <!-- Предыдущий TikTok мем -->
+    <!-- TikTok Мем №1 -->
     <div class="meme-card-wrapper" data-name="tiktok эксклюзив тренд">
       <div class="meme-button-card">
         <div class="meme-icon">🎬</div>
         <div class="meme-name">TikTok Тренд 1 🔥</div>
-        <div class="meme-tag">Эксклюзивный вирусный звук</div>
+        <div class="meme-tag">Эксклюзивный звук</div>
         <button class="play-btn-3d" onclick="playMemeSound('tiktok')">Воспроизвести 🎵</button>
         <br>
         <a href="https://vt.tiktok.com/ZSgGGEssq/" target="_blank" class="tiktok-link-badge">🔗 Открыть TikTok оригинал</a>
@@ -252,167 +344,24 @@
       </div>
     </div>
 
-    <!-- Скибиди -->
-    <div class="meme-card-wrapper" data-name="скибиди туалет">
-      <div class="meme-button-card">
-        <div class="meme-icon">🚽</div>
-        <div class="meme-name">Скибиди Трек</div>
-        <div class="meme-tag">Мемный хит</div>
-        <button class="play-btn-3d" onclick="playMemeSound('skibidi')">Воспроизвести 🎵</button>
-      </div>
-    </div>
-
-    <!-- Эх классика -->
-    <div class="meme-card-wrapper" data-name="классика вау">
-      <div class="meme-button-card">
-        <div class="meme-icon">👑</div>
-        <div class="meme-name">Эх, классика</div>
-        <div class="meme-tag">Цитата веков</div>
-        <button class="play-btn-3d" onclick="playMemeSound('classic')">Воспроизвести 🎵</button>
-      </div>
-    </div>
-
-    <!-- Oh Hell Nah -->
-    <div class="meme-card-wrapper" data-name="oh hell nah мем">
-      <div class="meme-button-card">
-        <div class="meme-icon">💀</div>
-        <div class="meme-name">Oh Hell Nah</div>
-        <div class="meme-tag">Мемная озвучка</div>
-        <button class="play-btn-3d" onclick="playMemeSound('hellnah')">Воспроизвести 🎵</button>
-      </div>
-    </div>
-
-    <!-- Epic Fail -->
-    <div class="meme-card-wrapper" data-name="фейл грусть скрипка">
-      <div class="meme-button-card">
-        <div class="meme-icon">🎻</div>
-        <div class="meme-name">Epic Fail</div>
-        <div class="meme-tag">Грустная нота</div>
-        <button class="play-btn-3d" onclick="playMemeSound('fail')">Воспроизвести 🎵</button>
-      </div>
-    </div>
-
   </div>
 
-  <script>
-    // 3D Tilt эффект для карточек и поиска
-    document.querySelectorAll('.meme-button-card, .search-box-3d').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        card.style.transform = `rotateX(${-y / 8}deg) rotateY(${x / 8}deg) scale(1.02)`;
-      });
+  <!-- Модалка Разрушаемых Гонок -->
+  <div class="modal-overlay" id="raceModal" onclick="closeRaceGame()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeRaceGame()">&times;</button>
+      <h2>🏎️ Дерби & Симулятор Аварий</h2>
+      <p style="color:#94a3b8; font-size:0.9rem; margin-top:5px;">Жми «Газ / Таран», чтобы врезаться в стены и разрушать машину!</p>
 
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
-      });
-    });
+      <div class="race-game-box">
+        <div id="carVisual" class="car-visual">🏎️</div>
+        <div style="font-weight:bold;" id="carStatus">Состояние: Идеальное (0% урона)</div>
+        
+        <div class="damage-bar-wrap">
+          <div class="damage-bar" id="damageBar"></div>
+        </div>
 
-    // Живой поиск мемов
-    function filterMemos() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const items = document.querySelectorAll('.meme-card-wrapper');
-
-      items.forEach(item => {
-        const name = item.getAttribute('data-name');
-        if (name.includes(query)) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-    }
-
-    // Аудиосинтезатор для звуков мемов
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function playMemeSound(type) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
-
-      if (type === 'tiktok2') {
-        // Звуковая волна для нового трека
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(500, now);
-        osc.frequency.exponentialRampToValueAtTime(250, now + 0.25);
-        osc.frequency.exponentialRampToValueAtTime(700, now + 0.45);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-        osc.start(now);
-        osc.stop(now + 0.6);
-      } else if (type === 'tiktok') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
-        osc.frequency.exponentialRampToValueAtTime(200, now + 0.4);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-        osc.start(now);
-        osc.stop(now + 0.5);
-      } else if (type === 'ricardo') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-        osc.start(now);
-        osc.stop(now + 0.35);
-      } else if (type === 'popcat') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.start(now);
-        osc.stop(now + 0.1);
-      } else if (type === 'bass') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(80, now);
-        osc.frequency.linearRampToValueAtTime(30, now + 0.5);
-        gain.gain.setValueAtTime(0.5, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-        osc.start(now);
-        osc.stop(now + 0.5);
-      } else if (type === 'skibidi') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(400, now);
-        osc.frequency.linearRampToValueAtTime(250, now + 0.2);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-        osc.start(now);
-        osc.stop(now + 0.25);
-      } else if (type === 'classic') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(220, now);
-        osc.frequency.linearRampToValueAtTime(440, now + 0.3);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-        osc.start(now);
-        osc.stop(now + 0.35);
-      } else if (type === 'hellnah') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.linearRampToValueAtTime(90, now + 0.4);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
-        osc.start(now);
-        osc.stop(now + 0.45);
-      } else if (type === 'fail') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(350, now);
-        osc.frequency.linearRampToValueAtTime(150, now + 0.6);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
-        osc.start(now);
-        osc.stop(now + 0.65);
-      }
-    }
-  </script>
-</body>
-</html>
+        <div class="race-actions">
+          <button class="play-btn-3d" onclick="crashCar()">💥 Таран / Авария!</button>
+          <button class="play-btn-3d game-btn" onclick="repair
+            
