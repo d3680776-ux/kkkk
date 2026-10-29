@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>МемЗвук - 3D Мемы и Мини-Игры</title>
+  <title>МемЗвук 3D & Пианино</title>
   <style>
     * {
       box-sizing: border-box;
@@ -22,7 +22,7 @@
 
     header {
       text-align: center;
-      padding: 30px 20px;
+      padding: 30px 20px 15px 20px;
       background: linear-gradient(135deg, #1a1c29 0%, #0d0f18 100%);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
@@ -40,6 +40,99 @@
       font-size: 1rem;
     }
 
+    /* Блок Пианино DJ Zubrail */
+    .piano-section {
+      max-width: 800px;
+      margin: 25px auto;
+      padding: 20px;
+      background: rgba(25, 28, 43, 0.9);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 242, 254, 0.15);
+      text-align: center;
+    }
+
+    .piano-section h2 {
+      font-size: 1.5rem;
+      color: #00f2fe;
+      margin-bottom: 10px;
+    }
+
+    .tutorial-box {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+    }
+
+    .tutorial-notes {
+      color: #ff007f;
+      font-weight: bold;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      margin-top: 5px;
+    }
+
+    .piano-keyboard {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      user-select: none;
+      height: 160px;
+      margin: 0 auto;
+      max-width: 450px;
+      background: #111;
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .key {
+      position: relative;
+      cursor: pointer;
+      border-radius: 0 0 5px 5px;
+      transition: background 0.1s, transform 0.1s;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 10px;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    .key.white {
+      width: 50px;
+      height: 140px;
+      background: #ffffff;
+      color: #111;
+      border: 1px solid #ccc;
+      z-index: 1;
+    }
+
+    .key.white:active, .key.white.active {
+      background: #e2e2e2;
+      transform: translateY(2px);
+    }
+
+    .key.black {
+      width: 32px;
+      height: 90px;
+      background: #111;
+      color: #fff;
+      margin-left: -16px;
+      margin-right: -16px;
+      z-index: 2;
+      border-radius: 0 0 3px 3px;
+      border: 1px solid #333;
+    }
+
+    .key.black:active, .key.black.active {
+      background: #333;
+      transform: translateY(2px);
+    }
+
+    /* Карточки Меме */
     .container {
       max-width: 1200px;
       margin: 30px auto;
@@ -50,7 +143,6 @@
       perspective: 1000px;
     }
 
-    /* 3D Карточка */
     .meme-card {
       background: rgba(25, 28, 43, 0.8);
       border-radius: 20px;
@@ -60,7 +152,6 @@
       transition: transform 0.1s ease, box-shadow 0.3s ease;
       transform-style: preserve-3d;
       cursor: pointer;
-      position: relative;
     }
 
     .meme-card:hover {
@@ -78,10 +169,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
       transform: translateZ(30px);
     }
-
     .meme-img-container img {
       width: 100%;
       height: 100%;
@@ -129,20 +218,12 @@
       color: white;
     }
 
-    .btn-sound:hover {
-      background: #e11d43;
-    }
-
     .btn-game {
       background: #00f2fe;
       color: #0d0f18;
     }
 
-    .btn-game:hover {
-      background: #00c7d4;
-    }
-
-    /* Модальное окно мини-игры */
+    /* Модалка игры */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -185,16 +266,6 @@
       cursor: pointer;
     }
 
-    .close-btn:hover {
-      color: #fff;
-    }
-
-    .modal h2 {
-      margin-bottom: 15px;
-      font-size: 1.5rem;
-    }
-
-    /* Игровые зоны */
     .game-box {
       background: #111322;
       border-radius: 12px;
@@ -205,16 +276,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      position: relative;
-      overflow: hidden;
       border: 1px dashed rgba(255,255,255,0.2);
-    }
-
-    .score-board {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #00f2fe;
-      margin-bottom: 10px;
     }
 
     .target-btn {
@@ -226,12 +288,6 @@
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 5px 15px rgba(255,0,127,0.4);
-      transition: transform 0.1s;
-    }
-
-    .target-btn:active {
-      transform: scale(0.92);
     }
   </style>
 </head>
@@ -239,111 +295,120 @@
 
   <header>
     <h1>🔊 МемЗвук 3D</h1>
-    <p>Кликай на карточки, слушай легендарные звуки мемов и играй в мини-игры!</p>
+    <p>Кликай на карточки, слушай звуки и играй на пианино!</p>
   </header>
 
-  <div class="container" id="cards-container">
-    
-    <!-- Мем 1: Рикардо -->
-    <div class="meme-card" data-sound="ricardo">
+  <!-- Секция пианино -->
+  <div class="piano-section">
+    <h2>🎹 Пианино: Сыграй «Револьвер» (DJ Zubrail)</h2>
+    <div class="tutorial-box">
+      <div>Порядок клавиш для мелодии «Револьвер»:</div>
+      <div class="tutorial-notes">Ля (A) ➔ До (C) ➔ Ре (D) ➔ Ре# (D#) ➔ Ре (D) ➔ До (C)</div>
+    </div>
+
+    <div class="piano-keyboard">
+      <div class="key white" data-note="220" onclick="playNote(220)">A</div>
+      <div class="key black" data-note="233" onclick="playNote(233)">A#</div>
+      <div class="key white" data-note="246" onclick="playNote(246)">B</div>
+      <div class="key white" data-note="261" onclick="playNote(261)">C</div>
+      <div class="key black" data-note="277" onclick="playNote(277)">C#</div>
+      <div class="key white" data-note="293" onclick="playNote(293)">D</div>
+      <div class="key black" data-note="311" onclick="playNote(311)">D#</div>
+      <div class="key white" data-note="329" onclick="playNote(329)">E</div>
+      <div class="key white" data-note="349" onclick="playNote(349)">F</div>
+    </div>
+  </div>
+
+  <!-- Карточки Мемов -->
+  <div class="container">
+    <div class="meme-card">
       <div class="meme-img-container">
         <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=500&q=80" alt="Рикардо">
       </div>
       <div class="meme-title">Танец Рикардо</div>
-      <div class="meme-desc">Легендарный ритм и фирменный танец.</div>
+      <div class="meme-desc">Легендарный ритм и танец.</div>
       <div class="card-actions">
-        <button class="btn btn-sound" onclick="event.stopPropagation(); playMemeSound('ricardo')">Звук 🎵</button>
-        <button class="btn btn-game" onclick="event.stopPropagation(); openGame('ricardo')">Игра 🎮</button>
+      <button class="btn btn-sound" onclick="playMemeSound('ricardo')">Звук 🎵</button>
+        <button class="btn btn-game" onclick="openGame('ricardo')">Игра 🎮</button>
       </div>
     </div>
 
-    <!-- Мем 2: Котэ / Поп-Кэт -->
-    <div class="meme-card" data-sound="popcat">
+    <div class="meme-card">
       <div class="meme-img-container">
         <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=500&q=80" alt="Pop Cat">
       </div>
-      <div class="meme-title">Поп-Кэт кликер</div>
-      <div class="meme-desc">Широко открывающий рот мемный котик.</div>
+      <div class="meme-title">Поп-Кэт Кликер</div>
+      <div class="meme-desc">Кликай поп-кэта для звука.</div>
       <div class="card-actions">
-        <button class="btn btn-sound" onclick="event.stopPropagation(); playMemeSound('popcat')">Звук 🎵</button>
-        <button class="btn btn-game" onclick="event.stopPropagation(); openGame('popcat')">Игра 🎮</button>
+        <button class="btn btn-sound" onclick="playMemeSound('popcat')">Звук 🎵</button>
+        <button class="btn btn-game" onclick="openGame('popcat')">Игра 🎮</button>
       </div>
     </div>
 
-    <!-- Мem 3: Скибиди / Басс -->
-    <div class="meme-card" data-sound="bass">
+    <div class="meme-card">
       <div class="meme-img-container">
-        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80" alt="Bass Boost">
+        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80" alt="Bass">
       </div>
-      <div class="meme-title">Эпичный Басс Буст</div>
-      <div class="meme-desc">Взрывной бас для самых громких моментов.</div>
+      <div class="meme-title">Эпичный Басс</div>
+      <div class="meme-desc">Взрывной бас.</div>
       <div class="card-actions">
-        <button class="btn btn-sound" onclick="event.stopPropagation(); playMemeSound('bass')">Звук 🎵</button>
-        <button class="btn btn-game" onclick="event.stopPropagation(); openGame('bass')">Игра 🎮</button>
+        <button class="btn btn-sound" onclick="playMemeSound('bass')">Звук 🎵</button>
+        <button class="btn btn-game" onclick="openGame('bass')">Игра 🎮</button>
       </div>
     </div>
-
   </div>
 
-  <!-- Модальное окно игры -->
+  <!-- Модалка мини-игры -->
   <div class="modal-overlay" id="gameModal" onclick="closeGame()">
     <div class="modal" onclick="event.stopPropagation()">
       <button class="close-btn" onclick="closeGame()">&times;</button>
       <h2 id="modalTitle">Мини-игра</h2>
-      <div class="game-box" id="gameArea">
-        <!-- Содержимое игры подставляется через JS -->
-      </div>
+      <div class="game-box" id="gameArea"></div>
     </div>
   </div>
 
   <script>
-    // 3D Tilt эффект для карточек
-    document.querySelectorAll('.meme-card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = ((y - centerY) / centerY) * -12;
-        const rotateY = ((x - centerX) / centerX) * 12;
-        
-        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
-      });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
-      });
-    });
-
-    // Синтезатор звуков мемов через Web Audio API (чтобы не нужны были внешние аудиофайлы)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+    // Функция проигрывания ноты пианино
+    function playNote(freq) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.8);
+    }
+
+    // Звуки мемов
     function playMemeSound(type) {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
       
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-
       const now = audioCtx.currentTime;
 
       if (type === 'ricardo') {
-        // Ритмичный басовый мотив
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, now);
         osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
-        osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
         gain.gain.setValueAtTime(0.3, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
         osc.start(now);
         osc.stop(now + 0.35);
       } else if (type === 'popcat') {
-        // Звук "ПОП!"
         osc.type = 'sine';
         osc.frequency.setValueAtTime(600, now);
         osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
@@ -352,7 +417,6 @@
         osc.start(now);
         osc.stop(now + 0.1);
       } else if (type === 'bass') {
-        // Эпичный низкий удар
         osc.type = 'square';
         osc.frequency.setValueAtTime(80, now);
         osc.frequency.linearRampToValueAtTime(30, now + 0.5);
@@ -363,50 +427,44 @@
       }
     }
 
-    // Управление мини-играми
-    let currentGameTimer = null;
+    // 3D Tilt
+    document.querySelectorAll('.meme-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        card.style.transform = `rotateX(${-y / 10}deg) rotateY(${x / 10}deg) scale(1.02)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
+      });
+    });
 
-    function openGame(memeType) {
+    // Игры
+    window.popCount = 0;
+    function openGame(type) {
       const modal = document.getElementById('gameModal');
       const title = document.getElementById('modalTitle');
       const area = document.getElementById('gameArea');
       modal.classList.add('active');
-      area.innerHTML = '';
 
-      if (memeType === 'ricardo') {
-        title.innerText = 'Ритм-кликер Рикардо';
-        let score = 0;
+      if (type === 'ricardo') {
+        title.innerText = 'Ритм-кликер';
+        area.innerHTML = `<button class="target-btn" onclick="playMemeSound('ricardo')">Танцевать! 🔥</button>`;
+      } else if (type === 'popcat') {
+        title.innerText = 'Поп-Кэт Кликер';
         area.innerHTML = `
-          <div class="score-board">Счет: <span id="rScore">0</span></div>
-          <button class="target-btn" onclick="let s=document.getElementById('rScore'); s.innerText=++${score}; playMemeSound('ricardo')">Танцевать! 🔥</button>
+          <div style="font-size:1.2rem; margin-bottom:10px;">Клики: <span id="pScore">${window.popCount}</span></div>
+          <button class="target-btn" onclick="document.getElementById('pScore').innerText = ++window.popCount; playMemeSound('popcat')">Открыть рот 🐱</button>
         `;
-      } else if (memeType === 'popcat') {
-        title.innerText = 'Поп-Кэт Мастер';
-        let pops = 0;
-        area.innerHTML = `
-          <div class="score-board">Клики: <span id="pScore">0</span></div>
-          <button class="target-btn" onclick="let s=document.getElementById('pScore'); s.innerText=++${pops}; playMenseSound('popcat')">Открыть рот 🐱</button>
-        `;
-        // Исправление вызова звука для попката в кнопке
-        area.querySelector('button').setAttribute('onclick', "let s=document.getElementById('pScore'); s.innerText=++window.popCount; playMemeSound('popcat');");
-        window.popCount = 0;
-      } else if (memeType === 'bass') {
-        title.innerText = 'Взрыв Баса (Успей нажать)';
-        area.innerHTML = `
-          <div class="score-board" id="bassTimer">Нажми, пока горит бас!</div>
-          <button class="target-btn" id="bassBtn" onclick="winBassGame()">💥 БАХ!</button>
-        `;
+      } else if (type === 'bass') {
+        title.innerText = 'Взрыв баса';
+        area.innerHTML = `<button class="target-btn" onclick="playMemeSound('bass')">💥 БАХ!</button>`;
       }
     }
 
     function closeGame() {
       document.getElementById('gameModal').classList.remove('active');
-      if (currentGameTimer) clearTimeout(currentGameTimer);
-    }
-
-    function winBassGame() {
-    playMemeSound('bass');
-      document.getElementById('bassTimer').innerText = 'Победа! Эпичный бас сработал! 😎';
     }
   </script>
 </body>
