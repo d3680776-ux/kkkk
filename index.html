@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>МемЗвук 3D & DJ Zubrail</title>
+  <title>NeuroShow - 3D Галерея Нейрокартинок</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,255 +13,174 @@
     }
 
     body {
-      background: #0d0f18;
+      background: #090a0f;
       color: #fff;
       min-height: 100vh;
       overflow-x: hidden;
-      padding-bottom: 50px;
+      padding-bottom: 60px;
     }
 
     header {
       text-align: center;
-      padding: 30px 20px 15px 20px;
-      background: linear-gradient(135deg, #1a1c29 0%, #0d0f18 100%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px 20px 20px 20px;
+      background: linear-gradient(135deg, #131728 0%, #090a0f 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     header h1 {
-      font-size: 2.5rem;
-      background: linear-gradient(90deg, #ff007f, #7928ca, #00f2fe);
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, #00f2fe, #4facfe, #ff007f);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     header p {
-      color: #a0aec0;
-      font-size: 1rem;
+      color: #94a3b8;
+      font-size: 1.1rem;
     }
 
-    /* Блок Пианино DJ Zubrail */
-    .piano-section {
-      max-width: 800px;
-      margin: 25px auto;
-      padding: 25px;
-      background: rgba(25, 28, 43, 0.9);
-      border-radius: 20px;
-      border: 1px solid rgba(0, 242, 254, 0.3);
-      box-shadow: 0 10px 30px rgba(0, 242, 254, 0.15);
-      text-align: center;
-    }
-
-    .piano-section h2 {
-      font-size: 1.6rem;
-      color: #00f2fe;
-      margin-bottom: 15px;
-    }
-
-    .track-controls {
-      margin-bottom: 20px;
+    /* Панель фильтров / категорий */
+    .filter-container {
       display: flex;
       justify-content: center;
       gap: 12px;
-      align-items: center;
-    }
-
-    .btn-main-play {
-      background: linear-gradient(135deg, #ff007f, #7928ca);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 25px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
-      transition: transform 0.1s, background 0.2s;
-    }
-
-    .btn-main-play:active {
-      transform: scale(0.95);
-    }
-
-    .tutorial-box {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 12px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-size: 0.95rem;
-      color: #e2e8f0;
-    }
-
-    .tutorial-notes {
-      color: #ff007f;
-      font-weight: bold;
-      font-size: 1.1rem;
-      letter-spacing: 2px;
-      margin-top: 6px;
-    }
-
-    .piano-keyboard {
-      display: flex;
-      justify-content: center;
-      position: relative;
-      user-select: none;
-      height: 160px;
+      flex-wrap: wrap;
+      padding: 25px 20px;
+      max-width: 900px;
       margin: 0 auto;
-      max-width: 450px;
-      background: #111;
-      padding: 10px;
-      border-radius: 12px;
     }
 
-    .key {
-      position: relative;
+    .filter-btn {
+      background: rgba(25, 30, 48, 0.8);
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: 600;
       cursor: pointer;
-      border-radius: 0 0 5px 5px;
-      transition: background 0.1s, transform 0.1s;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding-bottom: 10px;
-      font-weight: bold;
-      font-size: 0.85rem;
+      transition: all 0.3s ease;
     }
 
-    .key.white {
-      width: 50px;
-      height: 140px;
-      background: #ffffff;
-      color: #111;
-      border: 1px solid #ccc;
-      z-index: 1;
+    .filter-btn:hover, .filter-btn.active {
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      color: #090a0f;
+      border-color: transparent;
+      box-shadow: 0 5px 20px rgba(0, 242, 254, 0.4);
     }
 
-    .key.white:active, .key.white.active {
-      background: #00f2fe;
-      transform: translateY(2px);
-    }
-
-    .key.black {
-      width: 32px;
-      height: 90px;
-      background: #111;
-      color: #fff;
-      margin-left: -16px;
-      margin-right: -16px;
-      z-index: 2;
-      border-radius: 0 0 3px 3px;
-      border: 1px solid #333;
-    }
-
-    .key.black:active, .key.black.active {
-      background: #ff007f;
-      transform: translateY(2px);
-    }
-
-    /* Карточки Мемов */
-    .container {
+    /* Сетка 3D карточек */
+    .gallery-grid {
       max-width: 1200px;
-      margin: 30px auto;
+      margin: 20px auto;
       padding: 0 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px;
-      perspective: 1000px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 35px;
+      perspective: 1200px;
     }
 
-    .meme-card {
-      background: rgba(25, 28, 43, 0.8);
-      border-radius: 20px;
-      padding: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      transition: transform 0.1s ease, box-shadow 0.3s ease;
+    .card {
+      background: rgba(20, 24, 39, 0.85);
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      transition: transform 0.15s ease, box-shadow 0.3s ease, border-color 0.3s ease;
       transform-style: preserve-3d;
       cursor: pointer;
-    }
-
-    .meme-card:hover {
-      box-shadow: 0 15px 40px rgba(121, 40, 202, 0.4);
-      border-color: rgba(121, 40, 202, 0.5);
-    }
-
-    .meme-img-container {
-      width: 100%;
-      height: 180px;
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 15px;
-      background: #111;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      transform: translateZ(30px);
+      flex-direction: column;
     }
 
-    .meme-img-container img {
+    .card:hover {
+      box-shadow: 0 20px 45px rgba(0, 242, 254, 0.25);
+      border-color: rgba(0, 242, 254, 0.4);
+    }
+
+    .card-img-wrap {
+      width: 100%;
+      height: 220px;
+      position: relative;
+      overflow: hidden;
+      transform: translateZ(40px);
+    }
+
+    .card-img-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s;
+      transition: transform 0.5s ease;
     }
 
-    .meme-card:hover .meme-img-container img {
-      transform: scale(1.05);
+    .card:hover .card-img-wrap img {
+      transform: scale(1.08);
     }
 
-    .meme-title {
-      font-size: 1.25rem;
+    .card-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
       font-weight: bold;
-      margin-bottom: 6px;
-      transform: translateZ(20px);
+      color: #00f2fe;
+      border: 1px solid rgba(0, 242, 254, 0.3);
     }
 
-    .meme-desc {
-      font-size: 0.85rem;
-      color: #a0aec0;
-      margin-bottom: 15px;
-      transform: translateZ(15px);
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 10px;
+    .card-content {
+      padding: 20px;
       transform: translateZ(25px);
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
     }
 
-    .btn {
-      flex: 1;
-      padding: 10px 0;
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .card-btn {
+      background: linear-gradient(135deg, #ff007f, #7928ca);
+      color: white;
       border: none;
-      border-radius: 10px;
+      padding: 10px 0;
+      border-radius: 12px;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-      font-size: 0.9rem;
+      transition: opacity 0.2s;
+      transform: translateZ(30px);
     }
 
-    .btn-sound {
-      background: #fe2c55;
-      color: white;
+    .card-btn:hover {
+      opacity: 0.9;
     }
-
-    .btn-game {
-      background: #00f2fe;
-      color: #0d0f18;
-    }
-
-    /* Модалка игры */
+    /* Модальное окно просмотра презентации */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 100;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s;
+      transition: opacity 0.3s ease;
     }
 
     .modal-overlay.active {
@@ -270,242 +189,204 @@
     }
 
     .modal {
-      background: #181b2e;
+      background: #141827;
       width: 90%;
-      max-width: 450px;
-      border-radius: 20px;
-      padding: 25px;
+      max-width: 650px;
+      border-radius: 24px;
       border: 1px solid rgba(255, 255, 255, 0.15);
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
       position: relative;
-      text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
     }
 
     .close-btn {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      background: none;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.5);
       border: none;
-      color: #a0aec0;
-      font-size: 1.5rem;
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.2rem;
       cursor: pointer;
-    }
-
-    .game-box {
-      background: #111322;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 15px;
-      min-height: 180px;
+      z-index: 10;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      border: 1px dashed rgba(255,255,255,0.2);
+      transition: background 0.2s;
     }
 
-    .target-btn {
-      background: linear-gradient(135deg, #ff007f, #7928ca);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 30px;
+    .close-btn:hover {
+      background: rgba(255, 0, 127, 0.8);
+    }
+
+    .modal-img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    .modal-title {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, #00f2fe, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .modal-text {
+      color: #cbd5e1;
       font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
+      line-height: 1.6;
+      margin-bottom: 25px;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🔊 МемЗвук 3D</h1>
-    <p>Кликай на карточки, слушай треки и играй на пианино!</p>
+    <h1>✨ NeuroShow 3D</h1>
+    <p>Галерея и презентация футуристичных нейрокартинок нового поколения</p>
   </header>
 
-  <!-- Секция пианино и трека DJ Zubrail -->
-  <div class="piano-section">
-    <h2>🔫 DJ Zubrail — Револьвер</h2>
-    
-    <div class="track-controls">
-      <button class="btn-main-play" onclick="toggleMainTrack()">▶ Воспроизвести трек</button>
-      <audio id="mainAudio" src="DJ_ZUP_RAIii_-_revolver_82169023.mp3"></audio>
-    </div>
-
-    <div class="tutorial-box">
-      <div>Сыграй главный мотив трека на пианино:</div>
-      <div class="tutorial-notes">A ➔ C ➔ D ➔ D# ➔ D ➔ C</div>
-    </div>
-
-    <div class="piano-keyboard">
-      <div class="key white" onclick="playNote(220)">A</div>
-      <div class="key black" onclick="playNote(233)">A#</div>
-      <div class="key white" onclick="playNote(246)">B</div>
-      <div class="key white" onclick="playNote(261)">C</div>
-      <div class="key black" onclick="playNote(277)">C#</div>
-      <div class="key white" onclick="playNote(293)">D</div>
-      <div class="key black" onclick="playNote(311)">D#</div>
-      <div class="key white" onclick="playNote(329)">E</div>
-      <div class="key white" onclick="playNote(349)">F</div>
-    </div>
+  <!-- Фильтры категорий -->
+  <div class="filter-container">
+    <button class="filter-btn active" onclick="filterCards('all', this)">Все темы</button>
+    <button class="filter-btn" onclick="filterCards('cyber', this)">Киберпанк</button>
+    <button class="filter-btn" onclick="filterCards('space', this)">Космос & ИИ</button>
+    <button class="filter-btn" onclick="filterCards('nature', this)">Природа будущего</button>
+    <button class="filter-btn" onclick="filterCards('auto', this)">Авто & Скорость</button>
   </div>
 
-  <!-- Карточки Мемов -->
-  <div class="container">
+  <!-- Галерея карточек -->
+  <div class="gallery-grid" id="gallery">
 
-    <!-- Новая карточка DJ Zubrail -->
-    <div class="meme-card">
-      <div class="meme-img-container">
-        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80" alt="DJ Zubrail">
+    <!-- Карточка 1 -->
+    <div class="card" data-category="cyber" onclick="openModal('Киберпанк Мегаполис', 'Презентация цифрового мира будущего, где технологии сливаются с неоновыми улицами ночного Токио.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80')">
+      <div class="card-img-wrap">
+        <span class="card-badge">Киберпанк</span>
+        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="Киберпанк">
       </div>
-      <div class="meme-title">DJ Zubrail — Револьвер</div>
-      <div class="meme-desc">Буква Ю! «У меня в кармане револьвер» 🔫</div>
-      <div class="card-actions">
-        <button class="btn btn-sound" onclick="toggleMainTrack()">Трек 🎵</button>
-        <button class="btn btn-game" onclick="openGame('revolver')">Игра 🎮</button>
+      <div class="card-content">
+        <div>
+          <div class="card-title">Неоновый Мегаполис</div>
+          <div class="card-desc">Генерация городской среды в дождливом стиле киберпанка.</div>
+        </div>
+        <button class="card-btn">Смотреть презентацию</button>
       </div>
     </div>
 
-    <!-- Карточка 2: Танец Рикардо -->
-    <div class="meme-card">
-      <div class="meme-img-container">
-        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=500&q=80" alt="Рикардо">
+    <!-- Карточка 2 -->
+    <div class="card" data-category="space" onclick="openModal('Глубокий Космос', 'Исследование неизведанных галактик и квантовых туманностей, созданных с помощью нейросетей.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80')">
+      <div class="card-img-wrap">
+        <span class="card-badge">Космос & ИИ</span>
+        <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" alt="Космос">
       </div>
-      <div class="meme-title">Танец Рикардо</div>
-      <div class="meme-desc">Легендарный ритм и танец.</div>
-      <div class="card-actions">
-        <button class="btn btn-sound" onclick="playMemeSound('ricardo')">Звук 🎵</button>
-        <button class="btn btn-game" onclick="openGame('ricardo')">Игра 🎮</button>
+      <div class="card-content">
+        <div>
+        <div class="card-title">Квантовая Туманность</div>
+          <div class="card-desc">Погружение в безграничные просторы виртуального космоса.</div>
+        </div>
+        <button class="card-btn">Смотреть презентацию</button>
       </div>
     </div>
 
-    <!-- Карточка 3: Поп-Кэт -->
-    <div class="meme-card">
-      <div class="meme-img-container">
-        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=500&q=80" alt="Pop Cat">
+    <!-- Карточка 3 -->
+    <div class="card" data-category="nature" onclick="openModal('Биолюминесцентный Лес', 'Экосистема будущего, где каждое растение излучает мягкий неоновый свет для освещения троп.', 'https://images.unsplash.com/photo-1511497584788-876761142212?auto=format&fit=crop&w=800&q=80')">
+      <div class="card-img-wrap">
+        <span class="card-badge">Природа будущего</span>
+        <img src="https://images.unsplash.com/photo-1511497584788-876761142212?auto=format&fit=crop&w=600&q=80" alt="Природа">
       </div>
-      <div class="meme-title">Поп-Кэт Кликер</div>
-      <div class="meme-desc">Кликай поп-кэта для звука.</div>
-      <div class="card-actions">
-        <button class="btn btn-sound" onclick="playMemeSound('popcat')">Звук 🎵</button>
-        <button class="btn btn-game" onclick="openGame('popcat')">Игра 🎮</button>
+      <div class="card-content">
+        <div>
+          <div class="card-title">Светящийся Лес</div>
+          <div class="card-desc">Фантастическая флора в гармонии с новыми цифровыми технологиями.</div>
+        </div>
+        <button class="card-btn">Смотреть презентацию</button>
+      </div>
+    </div>
+
+    <!-- Карточка 4 -->
+    <div class="card" data-category="auto" onclick="openModal('Гиперкар Револьвер', 'Концепт футуристичного спортивного автомобиля с аэродинамическим корпусом и реактивным приводом.', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80')">
+      <div class="card-img-wrap">
+        <span class="card-badge">Авто & Скорость</span>
+        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80" alt="Авто">
+      </div>
+      <div class="card-content">
+        <div>
+          <div class="card-title">Концепт Сверхзвукового Кара</div>
+          <div class="card-desc">Динамика и скорость нового поколения в каждой линии кузова.</div>
+        </div>
+        <button class="card-btn">Смотреть презентацию</button>
       </div>
     </div>
 
   </div>
 
-  <!-- Модалка мини-игры -->
-  <div class="modal-overlay" id="gameModal" onclick="closeGame()">
+  <!-- Модальное окно -->
+  <div class="modal-overlay" id="presentationModal" onclick="closeModal()">
     <div class="modal" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeGame()">&times;</button>
-      <h2 id="modalTitle">Мини-игра</h2>
-      <div class="game-box" id="gameArea"></div>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <img id="modalImg" class="modal-img" src="" alt="Презентация">
+      <div class="modal-body">
+        <h2 id="modalTitle" class="modal-title">Название</h2>
+        <p id="modalDesc" class="modal-text">Описание презентации...</p>
+        <button class="filter-btn active" style="width:100%; text-align:center;" onclick="closeModal()">Закрыть презентацию</button>
+      </div>
     </div>
   </div>
 
   <script>
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const mainAudio = document.getElementById('mainAudio');
-
-    function toggleMainTrack() {
-      if (mainAudio.paused) {
-        mainAudio.play();
-      } else {
-        mainAudio.pause();
-      }
-    }
-
-    // Воспроизведение ноты пианино
-    function playNote(freq) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.8);
-    }
-
-    // Звуки мемов
-    function playMemeSound(type) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
-
-      if (type === 'ricardo') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-        osc.start(now);
-        osc.stop(now + 0.35);
-        } else if (type === 'popcat') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.start(now);
-        osc.stop(now + 0.1);
-      }
-    }
-
-    // 3D Tilt
-    document.querySelectorAll('.meme-card').forEach(card => {
+    // 3D Наклон карточек за курсором
+    document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left - rect.width / 2;
         const y = e.clientY - rect.top - rect.height / 2;
         card.style.transform = `rotateX(${-y / 10}deg) rotateY(${x / 10}deg) scale(1.02)`;
       });
+
       card.addEventListener('mouseleave', () => {
         card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
       });
     });
 
-    // Игры
-    window.popCount = 0;
-    function openGame(type) {
-      const modal = document.getElementById('gameModal');
-      const title = document.getElementById('modalTitle');
-      const area = document.getElementById('gameArea');
-      modal.classList.add('active');
+    // Фильтрация категорий
+    function filterCards(category, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-      if (type === 'revolver') {
-        title.innerText = 'Револьвер Шутер';
-        area.innerHTML = `
-          <p style="margin-bottom:15px; color:#a0aec0;">Жми кнопку под басы!</p>
-          <button class="target-btn" onclick="toggleMainTrack()">💥 Играть / Включить Револьвер</button>
-        `;
-      } else if (type === 'ricardo') {
-        title.innerText = 'Ритм-кликер';
-        area.innerHTML = `<button class="target-btn" onclick="playMemeSound('ricardo')">Танцевать! 🔥</button>`;
-      } else if (type === 'popcat') {
-        title.innerText = 'Поп-Кэт Кликер';
-        area.innerHTML = `
-          <div style="font-size:1.2rem; margin-bottom:10px;">Клики: <span id="pScore">${window.popCount}</span></div>
-          <button class="target-btn" onclick="document.getElementById('pScore').innerText = ++window.popCount; playMemeSound('popcat')">Открыть рот 🐱</button>
-        `;
-      }
+      document.querySelectorAll('.card').forEach(card => {
+        if (category === 'all' || card.getAttribute('data-category') === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
     }
 
-    function closeGame() {
-      document.getElementById('gameModal').classList.remove('active');
+    // Управление модальным окном
+    function openModal(title, desc, imgSrc) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalDesc').innerText = desc;
+      document.getElementById('modalImg').src = imgSrc;
+      document.getElementById('presentationModal').classList.add('active');
+    }
+
+    function closeModal() {
+    document.getElementById('presentationModal').classList.remove('active');
     }
   </script>
 </body>
