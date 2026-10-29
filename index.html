@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>МемЗвук 3D & Пианино</title>
+  <title>МемЗвук 3D & DJ Zubrail</title>
   <style>
     * {
       box-sizing: border-box;
@@ -44,7 +44,7 @@
     .piano-section {
       max-width: 800px;
       margin: 25px auto;
-      padding: 20px;
+      padding: 25px;
       background: rgba(25, 28, 43, 0.9);
       border-radius: 20px;
       border: 1px solid rgba(0, 242, 254, 0.3);
@@ -53,15 +53,40 @@
     }
 
     .piano-section h2 {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       color: #00f2fe;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+    }
+
+    .track-controls {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-main-play {
+      background: linear-gradient(135deg, #ff007f, #7928ca);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
+      transition: transform 0.1s, background 0.2s;
+    }
+
+    .btn-main-play:active {
+      transform: scale(0.95);
     }
 
     .tutorial-box {
       background: rgba(0, 0, 0, 0.4);
-      padding: 10px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 12px;
       margin-bottom: 20px;
       font-size: 0.95rem;
       color: #e2e8f0;
@@ -72,7 +97,7 @@
       font-weight: bold;
       font-size: 1.1rem;
       letter-spacing: 2px;
-      margin-top: 5px;
+      margin-top: 6px;
     }
 
     .piano-keyboard {
@@ -111,7 +136,7 @@
     }
 
     .key.white:active, .key.white.active {
-      background: #e2e2e2;
+      background: #00f2fe;
       transform: translateY(2px);
     }
 
@@ -128,11 +153,11 @@
     }
 
     .key.black:active, .key.black.active {
-      background: #333;
+      background: #ff007f;
       transform: translateY(2px);
     }
 
-    /* Карточки Меме */
+    /* Карточки Мемов */
     .container {
       max-width: 1200px;
       margin: 30px auto;
@@ -171,6 +196,7 @@
       align-items: center;
       transform: translateZ(30px);
     }
+
     .meme-img-container img {
       width: 100%;
       height: 100%;
@@ -295,32 +321,53 @@
 
   <header>
     <h1>🔊 МемЗвук 3D</h1>
-    <p>Кликай на карточки, слушай звуки и играй на пианино!</p>
+    <p>Кликай на карточки, слушай треки и играй на пианино!</p>
   </header>
 
-  <!-- Секция пианино -->
+  <!-- Секция пианино и трека DJ Zubrail -->
   <div class="piano-section">
-    <h2>🎹 Пианино: Сыграй «Револьвер» (DJ Zubrail)</h2>
+    <h2>🔫 DJ Zubrail — Револьвер</h2>
+    
+    <div class="track-controls">
+      <button class="btn-main-play" onclick="toggleMainTrack()">▶ Воспроизвести трек</button>
+      <audio id="mainAudio" src="DJ_ZUP_RAIii_-_revolver_82169023.mp3"></audio>
+    </div>
+
     <div class="tutorial-box">
-      <div>Порядок клавиш для мелодии «Револьвер»:</div>
-      <div class="tutorial-notes">Ля (A) ➔ До (C) ➔ Ре (D) ➔ Ре# (D#) ➔ Ре (D) ➔ До (C)</div>
+      <div>Сыграй главный мотив трека на пианино:</div>
+      <div class="tutorial-notes">A ➔ C ➔ D ➔ D# ➔ D ➔ C</div>
     </div>
 
     <div class="piano-keyboard">
-      <div class="key white" data-note="220" onclick="playNote(220)">A</div>
-      <div class="key black" data-note="233" onclick="playNote(233)">A#</div>
-      <div class="key white" data-note="246" onclick="playNote(246)">B</div>
-      <div class="key white" data-note="261" onclick="playNote(261)">C</div>
-      <div class="key black" data-note="277" onclick="playNote(277)">C#</div>
-      <div class="key white" data-note="293" onclick="playNote(293)">D</div>
-      <div class="key black" data-note="311" onclick="playNote(311)">D#</div>
-      <div class="key white" data-note="329" onclick="playNote(329)">E</div>
-      <div class="key white" data-note="349" onclick="playNote(349)">F</div>
+      <div class="key white" onclick="playNote(220)">A</div>
+      <div class="key black" onclick="playNote(233)">A#</div>
+      <div class="key white" onclick="playNote(246)">B</div>
+      <div class="key white" onclick="playNote(261)">C</div>
+      <div class="key black" onclick="playNote(277)">C#</div>
+      <div class="key white" onclick="playNote(293)">D</div>
+      <div class="key black" onclick="playNote(311)">D#</div>
+      <div class="key white" onclick="playNote(329)">E</div>
+      <div class="key white" onclick="playNote(349)">F</div>
     </div>
   </div>
 
   <!-- Карточки Мемов -->
   <div class="container">
+
+    <!-- Новая карточка DJ Zubrail -->
+    <div class="meme-card">
+      <div class="meme-img-container">
+        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80" alt="DJ Zubrail">
+      </div>
+      <div class="meme-title">DJ Zubrail — Револьвер</div>
+      <div class="meme-desc">Буква Ю! «У меня в кармане револьвер» 🔫</div>
+      <div class="card-actions">
+        <button class="btn btn-sound" onclick="toggleMainTrack()">Трек 🎵</button>
+        <button class="btn btn-game" onclick="openGame('revolver')">Игра 🎮</button>
+      </div>
+    </div>
+
+    <!-- Карточка 2: Танец Рикардо -->
     <div class="meme-card">
       <div class="meme-img-container">
         <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=500&q=80" alt="Рикардо">
@@ -328,11 +375,12 @@
       <div class="meme-title">Танец Рикардо</div>
       <div class="meme-desc">Легендарный ритм и танец.</div>
       <div class="card-actions">
-      <button class="btn btn-sound" onclick="playMemeSound('ricardo')">Звук 🎵</button>
+        <button class="btn btn-sound" onclick="playMemeSound('ricardo')">Звук 🎵</button>
         <button class="btn btn-game" onclick="openGame('ricardo')">Игра 🎮</button>
       </div>
     </div>
 
+    <!-- Карточка 3: Поп-Кэт -->
     <div class="meme-card">
       <div class="meme-img-container">
         <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=500&q=80" alt="Pop Cat">
@@ -345,17 +393,6 @@
       </div>
     </div>
 
-    <div class="meme-card">
-      <div class="meme-img-container">
-        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80" alt="Bass">
-      </div>
-      <div class="meme-title">Эпичный Басс</div>
-      <div class="meme-desc">Взрывной бас.</div>
-      <div class="card-actions">
-        <button class="btn btn-sound" onclick="playMemeSound('bass')">Звук 🎵</button>
-        <button class="btn btn-game" onclick="openGame('bass')">Игра 🎮</button>
-      </div>
-    </div>
   </div>
 
   <!-- Модалка мини-игры -->
@@ -369,8 +406,17 @@
 
   <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const mainAudio = document.getElementById('mainAudio');
 
-    // Функция проигрывания ноты пианино
+    function toggleMainTrack() {
+      if (mainAudio.paused) {
+        mainAudio.play();
+      } else {
+        mainAudio.pause();
+      }
+    }
+
+    // Воспроизведение ноты пианино
     function playNote(freq) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
 
@@ -408,7 +454,7 @@
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
         osc.start(now);
         osc.stop(now + 0.35);
-      } else if (type === 'popcat') {
+        } else if (type === 'popcat') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(600, now);
         osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
@@ -416,14 +462,6 @@
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
         osc.start(now);
         osc.stop(now + 0.1);
-      } else if (type === 'bass') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(80, now);
-        osc.frequency.linearRampToValueAtTime(30, now + 0.5);
-        gain.gain.setValueAtTime(0.5, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-        osc.start(now);
-        osc.stop(now + 0.5);
       }
     }
 
@@ -448,7 +486,13 @@
       const area = document.getElementById('gameArea');
       modal.classList.add('active');
 
-      if (type === 'ricardo') {
+      if (type === 'revolver') {
+        title.innerText = 'Револьвер Шутер';
+        area.innerHTML = `
+          <p style="margin-bottom:15px; color:#a0aec0;">Жми кнопку под басы!</p>
+          <button class="target-btn" onclick="toggleMainTrack()">💥 Играть / Включить Револьвер</button>
+        `;
+      } else if (type === 'ricardo') {
         title.innerText = 'Ритм-кликер';
         area.innerHTML = `<button class="target-btn" onclick="playMemeSound('ricardo')">Танцевать! 🔥</button>`;
       } else if (type === 'popcat') {
@@ -457,9 +501,6 @@
           <div style="font-size:1.2rem; margin-bottom:10px;">Клики: <span id="pScore">${window.popCount}</span></div>
           <button class="target-btn" onclick="document.getElementById('pScore').innerText = ++window.popCount; playMemeSound('popcat')">Открыть рот 🐱</button>
         `;
-      } else if (type === 'bass') {
-        title.innerText = 'Взрыв баса';
-        area.innerHTML = `<button class="target-btn" onclick="playMemeSound('bass')">💥 БАХ!</button>`;
       }
     }
 
