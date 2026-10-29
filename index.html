@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Memes 3D Hub & Гонки с Разрушениями</title>
+  <title>3D Game Hub - Гонки, Хоррор, Стрелялка</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
     }
 
     body {
@@ -17,351 +19,473 @@
       color: #fff;
       min-height: 100vh;
       overflow-x: hidden;
-      padding-bottom: 60px;
     }
 
     header {
       text-align: center;
-      padding: 40px 20px 20px 20px;
+      padding: 30px 20px;
       background: linear-gradient(135deg, #131728 0%, #090a0f 100%);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     header h1 {
-      font-size: 3rem;
-      background: linear-gradient(90deg, #ff007f, #7928ca, #00f2fe);
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, #ff007f, #00f2fe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-weight: 900;
     }
 
     header p {
       color: #94a3b8;
-      font-size: 1.1rem;
     }
 
-    /* 3D Поисковая панель */
-    .search-wrapper {
-      max-width: 600px;
-      margin: 30px auto;
+    /* Меню выбора игр */
+    .games-grid {
+      max-width: 1200px;
+      margin: 40px auto;
       padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
       perspective: 1000px;
     }
 
-    .search-box-3d {
-      background: rgba(20, 24, 39, 0.9);
-      border-radius: 20px;
-      padding: 6px;
-      border: 2px solid rgba(0, 242, 254, 0.3);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.15);
+    .game-card {
+      background: linear-gradient(145deg, #171b2e, #101322);
+      border-radius: 24px;
+      padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
       transform-style: preserve-3d;
-      transition: transform 0.2s, box-shadow 0.3s;
-      display: flex;
-      align-items: center;
+      transition: transform 0.15s ease, box-shadow 0.3s ease, border-color 0.3s;
+      cursor: pointer;
+      text-align: center;
     }
 
-    .search-box-3d:hover {
-      box-shadow: 0 20px 45px rgba(0, 242, 254, 0.3), 0 0 30px rgba(255, 0, 127, 0.2);
+    .game-card:hover {
+      box-shadow: 0 20px 45px rgba(0, 242, 254, 0.3);
+      border-color: rgba(0, 242, 254, 0.5);
     }
 
-    .search-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 1.1rem;
-      padding: 12px 20px;
+    .game-icon {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+      transform: translateZ(30px);
     }
 
-    .search-input::placeholder {
-      color: #64748b;
+    .game-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      transform: translateZ(20px);
     }
 
-    .search-btn-3d {
+    .game-desc {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      transform: translateZ(15px);
+    }
+
+    .play-btn {
       background: linear-gradient(135deg, #00f2fe, #4facfe);
       color: #090a0f;
       border: none;
       padding: 12px 24px;
       border-radius: 14px;
       font-weight: bold;
-      cursor: pointer;
       font-size: 1rem;
-      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
-      transition: transform 0.1s;
-    }
-
-    .search-btn-3d:active {
-      transform: scale(0.95);
-    }
-
-    /* Сетка 3D кнопок */
-    .meme-grid {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 0 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 25px;
-      perspective: 1200px;
-    }
-
-    .meme-button-card {
-      background: linear-gradient(145deg, #171b2e, #101322);
-      border-radius: 20px;
-      padding: 20px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      transform-style: preserve-3d;
-      transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .meme-button-card:hover {
-      box-shadow: 0 20px 40px rgba(255, 0, 127, 0.3);
-      border-color: rgba(255, 0, 127, 0.5);
-    }
-
-    .meme-icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
-      transform: translateZ(30px);
-    }
-
-    .meme-name {
-      font-size: 1.15rem;
-      font-weight: bold;
-      margin-bottom: 6px;
-      transform: translateZ(20px);
-      color: #fff;
-    }
-
-    .meme-tag {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      margin-bottom: 15px;
-      transform: translateZ(15px);
-    }
-
-    .play-btn-3d {
-      background: linear-gradient(135deg, #ff007f, #7928ca);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 0.95rem;
       cursor: pointer;
       width: 100%;
-      box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4);
       transform: translateZ(25px);
-      transition: transform 0.1s;
-      }
-
-    .play-btn-3d.game-btn {
-      background: linear-gradient(135deg, #00f2fe, #4facfe);
-      color: #090a0f;
       box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
     }
 
-    .play-btn-3d:active {
-      transform: translateZ(25px) scale(0.95);
-    }
-
-    .tiktok-link-badge {
-      display: inline-block;
-      margin-top: 8px;
-      font-size: 0.75rem;
-      color: #00f2fe;
-      text-decoration: none;
-      transform: translateZ(20px);
-    }
-
-    /* Модальное окно гонок */
-    .modal-overlay {
+    /* Модальное окно с 3D игровым холстом */
+    .game-modal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(10px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: #000;
       z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
+      display: none;
+      flex-direction: column;
     }
 
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
+    .game-modal.active {
+      display: flex;
     }
 
-    .modal {
-      background: #141827;
-      width: 90%;
-      max-width: 500px;
-      border-radius: 24px;
-      padding: 25px;
-      border: 1px solid rgba(0, 242, 254, 0.3);
-      position: relative;
-      text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    .game-header {
+      height: 50px;
+      background: #111;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid #222;
     }
 
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: none;
+    .game-controls-info {
+      color: #00f2fe;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .close-game-btn {
+      background: #ff007f;
+      color: #fff;
       border: none;
-      color: #a0aec0;
-      font-size: 1.5rem;
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-weight: bold;
       cursor: pointer;
     }
 
-    /* Игровая зона гонок */
-    .race-game-box {
-      background: #0d0f18;
-      border-radius: 16px;
-      padding: 20px;
-      margin-top: 15px;
-      border: 1px dashed rgba(255, 255, 255, 0.2);
-    }
-
-    .car-visual {
-      font-size: 4rem;
-      margin: 15px 0;
-      transition: transform 0.1s, filter 0.2s;
-      display: inline-block;
-    }
-
-    .damage-bar-wrap {
+    #canvas-container {
+      flex: 1;
       width: 100%;
-      height: 12px;
-      background: #222;
-      border-radius: 6px;
-      overflow: hidden;
-      margin: 15px 0;
+      height: calc(100vh - 50px);
+      position: relative;
     }
 
-    .damage-bar {
+    canvas {
+      width: 100%;
       height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #ff9900, #ff0055);
-      transition: width 0.2s;
+      display: block;
     }
 
-    .race-actions {
-      display: flex;
-      gap: 10px;
+    /* Прицел для хоррора и шутера */
+    .crosshair {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      display: none;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🔥 Memes 3D Hub & Гонки</h1>
-    <p>3D-звуки мемов и Гонки с реалистичной физикой разрушений!</p>
+    <h1>🎮 3D Game Hub</h1>
+    <p>Выбирай 3D-игру и играй прямо в браузере!</p>
   </header>
 
-  <!-- 3D Поиск -->
-  <div class="search-wrapper">
-    <div class="search-box-3d" id="searchBox">
-      <input type="text" class="search-input" id="searchInput" placeholder="Поиск мема или игры..." oninput="filterMemos()">
-      <button class="search-btn-3d">Найти 🔍</button>
-    </div>
-  </div>
-
-  <!-- Сетка мемов и игр -->
-  <div class="meme-grid" id="memeGrid">
-
-    <!-- КАРТОЧКА ГОНОКС РАЗРУШЕНИЕМ -->
-    <div class="meme-card-wrapper" data-name="гонки машины разрушения дерби авария">
-      <div class="meme-button-card">
-        <div class="meme-icon">🏎️💥</div>
-        <div class="meme-name">Разрушаемые Гонки 3D</div>
-        <div class="meme-tag">Дерби & Симулятор аварий</div>
-        <button class="play-btn-3d game-btn" onclick="openRaceGame()">Играть в Гонки 🎮</button>
-      </div>
+  <div class="games-grid">
+    
+    <!-- Игра 1: Гонки -->
+    <div class="game-card" onclick="start3DGame('racing')">
+      <div class="game-icon">🏎️</div>
+      <div class="game-title">Разрушаемые Гонки</div>
+      <div class="game-desc">Управляй машиной, врезайся в блоки и разрушай детали тачки на 3D-трассе!</div>
+      <button class="play-btn">Играть 🎮</button>
     </div>
 
-    <!-- TikTok Мем №2 -->
-    <div class="meme-card-wrapper" data-name="tiktok новый мем хит">
-      <div class="meme-button-card">
-        <div class="meme-icon">🌟</div>
-        <div class="meme-name">TikTok Мем №2 🔥</div>
-        <div class="meme-tag">Новый вирусный тренд</div>
-        <button class="play-btn-3d" onclick="playMemeSound('tiktok2')">Воспроизвести 🎵</button>
-        <br>
-        <a href="https://vt.tiktok.com/ZSgGtCSBq/" target="_blank" class="tiktok-link-badge">🔗 Открыть TikTok оригинал</a>
-      </div>
+    <!-- Игра 2: Хоррор -->
+    <div class="game-card" onclick="start3DGame('horror')">
+      <div class="game-icon">👻</div>
+      <div class="game-title">3D Хоррор</div>
+      <div class="game-desc">Тёмный коридор, фонарик и пугающая атмосфера. Исследуй локацию!</div>
+      <button class="play-btn">Играть 🎮</button>
     </div>
 
-    <!-- TikTok Мем №1 -->
-    <div class="meme-card-wrapper" data-name="tiktok эксклюзив тренд">
-      <div class="meme-button-card">
-        <div class="meme-icon">🎬</div>
-        <div class="meme-name">TikTok Тренд 1 🔥</div>
-        <div class="meme-tag">Эксклюзивный звук</div>
-        <button class="play-btn-3d" onclick="playMemeSound('tiktok')">Воспроизвести 🎵</button>
-        <br>
-        <a href="https://vt.tiktok.com/ZSgGGEssq/" target="_blank" class="tiktok-link-badge">🔗 Открыть TikTok оригинал</a>
-      </div>
-    </div>
-
-    <!-- Рикардо -->
-    <div class="meme-card-wrapper" data-name="рикардо танец">
-      <div class="meme-button-card">
-        <div class="meme-icon">🕺</div>
-        <div class="meme-name">Танец Рикардо</div>
-        <div class="meme-tag">Легендарный ритм</div>
-        <button class="play-btn-3d" onclick="playMemeSound('ricardo')">Воспроизвести 🎵</button>
-      </div>
-    </div>
-
-    <!-- Поп-Кэт -->
-    <div class="meme-card-wrapper" data-name="поп кэт кот">
-      <div class="meme-button-card">
-        <div class="meme-icon">🐱</div>
-        <div class="meme-name">Поп-Кэт</div>
-        <div class="meme-tag">Популярный кликер</div>
-        <button class="play-btn-3d" onclick="playMemeSound('popcat')">Воспроизвести 🎵</button>
-      </div>
-    </div>
-
-    <!-- Эпический Басс -->
-    <div class="meme-card-wrapper" data-name="басс буст взрыв">
-      <div class="meme-button-card">
-        <div class="meme-icon">💥</div>
-        <div class="meme-name">Эпичный Басс</div>
-        <div class="meme-tag">Взрывной бас-буст</div>
-        <button class="play-btn-3d" onclick="playMemeSound('bass')">Воспроизвести 🎵</button>
-      </div>
+    <!-- Игра 3: Стрелялка -->
+    <div class="game-card" onclick="start3DGame('shooter')">
+      <div class="game-icon">🎯</div>
+      <div class="game-title">3D Стрелялка (FPS)</div>
+      <div class="game-desc">Арена от первого лица! Прицеливайся и уничтожай 3D-мишени выстрелами.</div>
+      <button class="play-btn">Играть 🎮</button>
     </div>
 
   </div>
 
-  <!-- Модалка Разрушаемых Гонок -->
-  <div class="modal-overlay" id="raceModal" onclick="closeRaceGame()">
-    <div class="modal" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeRaceGame()">&times;</button>
-      <h2>🏎️ Дерби & Симулятор Аварий</h2>
-      <p style="color:#94a3b8; font-size:0.9rem; margin-top:5px;">Жми «Газ / Таран», чтобы врезаться в стены и разрушать машину!</p>
+  <!-- Экран Игры -->
+  <div class="game-modal" id="gameModal">
+    <div class="game-header">
+      <div class="game-controls-info" id="controlsInfo">Управление: WASD / Стрелочки</div>
+      <button class="close-game-btn" onclick="exitGame()">Выйти в меню ✖</button>
+    </div>
+    <div id="canvas-container">
+      <div class="crosshair" id="crosshair"></div>
+    </div>
+  </div>
 
-      <div class="race-game-box">
-        <div id="carVisual" class="car-visual">🏎️</div>
-        <div style="font-weight:bold;" id="carStatus">Состояние: Идеальное (0% урона)</div>
-        
-        <div class="damage-bar-wrap">
-          <div class="damage-bar" id="damageBar"></div>
-        </div>
+  <script>
+    // 3D Карточки Tilt
+    document.querySelectorAll('.game-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        card.style.transform = `rotateX(${-y / 10}deg) rotateY(${x / 10}deg) scale(1.02)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
+      });
+    });
 
-        <div class="race-actions">
-          <button class="play-btn-3d" onclick="crashCar()">💥 Таран / Авария!</button>
-          <button class="play-btn-3d game-btn" onclick="repair
-            
+    // Аудиосинтезатор Web Audio API для звуков двигателей, выстрелов и хоррора
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'crash') { // Звук удара машины
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(100, now);
+        osc.frequency.linearRampToValueAtTime(30, now + 0.3);
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now); osc.stop(now + 0.3);
+      } else if (type === 'shot') { // Звук выстрела
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now); osc.stop(now + 0.15);
+      } else if (type === 'scare') { // Звук хоррора
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(80, now);
+        osc.frequency.linearRampToValueAtTime(220, now + 0.5);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now); osc.stop(now + 0.5);
+      }
+    }
+
+    // Движок Three.js и управление играми
+    let scene, camera, renderer, animationFrameId;
+    let activeGame = null;
+    let keys = {};
+
+    window.addEventListener('keydown', e => keys[e.code] = true);
+    window.addEventListener('keyup', e => keys[e.code] = false);
+
+    function start3DGame(gameType) {
+      document.getElementById('gameModal').classList.add('active');
+      const container = document.getElementById('canvas-container');
+      const crosshair = document.getElementById('crosshair');
+      const controlsInfo = document.getElementById('controlsInfo');
+
+      // Инициализация Three.js
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      activeGame = gameType;
+
+      if (gameType === 'racing') {
+        crosshair.style.display = 'none';
+        controlsInfo.innerText = 'Гонки: WASD / Стрелочки — Управление машиной. Врезайся в блоки для разрушения!';
+        initRacingGame();
+      } else if (gameType === 'horror') {
+        crosshair.style.display = 'block';
+        controlsInfo.innerText = 'Хоррор: WASD — Ходьба, Мышь — Обзор, F — Фонарик';
+        initHorrorGame();
+      } else if (gameType === 'shooter') {
+        crosshair.style.display = 'block';
+        controlsInfo.innerText = 'Стрелялка: WASD — Движение, Клик мыши — Выстрел по мишеням!';
+        initShooterGame();
+      }
+    }
+
+    function exitGame() {
+      document.getElementById('gameModal').classList.remove('active');
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      const container = document.getElementById('canvas-container');
+      if (renderer && renderer.domElement) {
+        container.removeChild(renderer.domElement);
+      }
+      activeGame = null;
+      keys = {};
+    }
+
+    /* ---------------- 1. ГОНКИ С РАЗРУШЕНИЯМИ ---------------- */
+    let car, carParts = [], obstacles = [];
+
+    function initRacingGame() {
+      scene.background = new THREE.Color(0x1a202c);
+
+      // Свет
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(10, 20, 10);
+      scene.add(light);
+      scene.add(new THREE.AmbientLight(0x404040));
+
+      // Дорога
+      const roadGeo = new THREE.PlaneGeometry(20, 400);
+      const roadMat = new THREE.MeshBasicMaterial({ color: 0x2d3748 });
+      const road = new THREE.Mesh(roadGeo, roadMat);
+      road.rotation.x = -Math.PI / 2;
+      scene.add(road);
+
+      // Кузов машины
+      car = new THREE.Group();
+      const bodyGeo = new THREE.BoxGeometry(2, 1, 4);
+      const bodyMat = new THREE.MeshLambertMaterial({ color: 0xff0055 });
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.position.y = 0.5;
+      car.add(body);
+
+      // Отделяемые детали (бампер, спойлер)
+      const spoilerGeo = new THREE.BoxGeometry(1.8, 0.2, 0.6);
+      const spoilerMat = new THREE.MeshLambertMaterial({ color: 0x111 });
+      const spoiler = new THREE.Mesh(spoilerGeo, spoilerMat);
+      spoiler.position.set(0, 1.2, -1.8);
+      car.add(spoiler);
+      carParts.push(spoiler);
+
+      scene.add(car);
+      car.position.set(0, 0, 180);
+
+      // Препятствия
+      for (let i = 0; i < 15; i++) {
+        const obsGeo = new THREE.BoxGeometry(2, 2, 2);
+        const obsMat = new THREE.MeshLambertMaterial({ color: 0x00f2fe });
+        const obs = new THREE.Mesh(obsGeo, obsMat);
+        obs.position.set((Math.random() - 0.5) * 14, 1, (Math.random() - 0.5) * 300);
+        scene.add(obs);
+        obstacles.push(obs);
+      }
+
+      camera.position.set(0, 5, 190);
+
+      function animateRacing() {
+        if (activeGame !== 'racing') return;
+        animationFrameId = requestAnimationFrame(animateRacing);
+
+        // Движение машины
+        if (keys['KeyW'] || keys['ArrowUp']) car.position.z -= 0.8;
+        if (keys['KeyS'] || keys['ArrowDown']) car.position.z += 0.4;
+        if (keys['KeyA'] || keys['ArrowLeft']) car.position.x -= 0.2;
+        if (keys['KeyD'] || keys['ArrowRight']) car.position.x += 0.2;
+
+        camera.position.z = car.position.z + 10;
+        camera.position.x = car.position.x;
+        camera.lookAt(car.position);
+
+        // Столкновения и разрушение
+        obstacles.forEach(obs => {
+          if (car.position.distanceTo(obs.position) < 2) {
+            playSound('crash');
+            obs.position.y = -10; // Убрать блок
+            if (carParts.length > 0) {
+              const part = carParts.pop();
+              car.remove(part); // Отваливается деталь машины!
+            }
+          }
+        });
+
+        renderer.render(scene, camera);
+      }
+      animateRacing();
+    }
+
+    /* ---------------- 2. ХОРРОР С ФОНАРИКОМ ---------------- */
+    function initHorrorGame() {
+      scene.background = new THREE.Color(0x020204);
+      scene.fog = new THREE.FogExp2(0x020204, 0.15);
+
+      // Фонарик игрока
+      const flashlight = new THREE.SpotLight(0xffffff, 2, 20, Math.PI / 6, 0.5);
+      camera.add(flashlight);
+      flashlight.position.set(0, 0, 1);
+      flashlight.target = camera;
+      scene.add(camera);
+
+      // Стеновые блоки коридора
+      for (let z = 0; z > -100; z -= 10) {
+        const wallMat = new THREE.MeshLambertMaterial({ color: 0x1a1a24 });
+        const leftWall = new THREE.Mesh(new THREE.BoxGeometry(1, 4, 10), wallMat);
+        leftWall.position.set(-4, 2, z);
+        scene.add(leftWall);
+
+        const rightWall = new THREE.Mesh(new THREE.BoxGeometry(1, 4, 10), wallMat);
+        rightWall.position.set(4, 2, z);
+        scene.add(rightWall);
+      }
+
+      camera.position.set(0, 1.6, 0);
+
+      function animateHorror() {
+        if (activeGame !== 'horror') return;
+        animationFrameId = requestAnimationFrame(animateHorror);
+
+        if (keys['KeyW']) camera.position.z -= 0.1;
+        if (keys['KeyS']) camera.position.z += 0.1;
+
+        // Случайный испуг
+        if (Math.random() < 0.003) playSound('scare');
+
+        renderer.render(scene, camera);
+      }
+      animateHorror();
+    }
+
+    /* ---------------- 3. СТРЕЛЯЛКА (FPS) ---------------- */
+    let targets = [];
+
+    function initShooterGame() {
+      scene.background = new THREE.Color(0x0d0f18);
+      const light = new THREE.PointLight(0xffffff, 1, 100);
+      light.position.set(0, 10, 0);
+      scene.add(light);
+
+      // Арена
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshBasicMaterial({ color: 0x1f2937 }));
+      floor.rotation.x = -Math.PI / 2;
+      scene.add(floor);
+
+      // Мишени
+      for (let i = 0; i < 8; i++) {
+        const tGeo = new THREE.SphereGeometry(1.2, 16, 16);
+        const tMat = new THREE.MeshBasicMaterial({ color: 0xff007f });
+        const target = new THREE.Mesh(tGeo, tMat);
+        target.position.set((Math.random() - 0.5) * 40, 2, -10 - Math.random() * 20);
+        scene.add(target);
+        targets.push(target);
+      }
+
+      camera.position.set(0, 1.6, 15);
+
+      // Выстрел по клику
+      window.onclick = () => {
+        if (activeGame !== 'shooter') return;
+        playSound('shot');
+        targets.forEach(target => {
+          if (target.position.z < 0) {
+            target.position.y = -10; // Уничтожение мишени
+          }
+        });
+      };
+
+      function animateShooter() {
+        if (activeGame !== 'shooter') return;
+        animationFrameId = requestAnimationFrame(animateShooter);
+
+        if (keys['KeyA']) camera.position.x -= 0.15;
+        if (keys['KeyD']) camera.position.x += 0.15;
+
+        renderer.render(scene, camera);
+      }
+      animateShooter();
+    }
+  </script>
+</body>
+</html>
