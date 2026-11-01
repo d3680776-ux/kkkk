@@ -3,32 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Мессенджер по номеру телефона</title>
+  <title>PixelStudio Pro — Онлайн Редактор Фото</title>
   <style>
     :root {
-      --bg-gradient: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
-      --card-bg: rgba(30, 41, 59, 0.85);
-      --header-bg: rgba(15, 23, 42, 0.95);
+      --bg-color: #0f172a;
+      --panel-bg: rgba(30, 41, 59, 0.9);
       --border-color: rgba(255, 255, 255, 0.1);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --msg-theirs: #334155;
-      --msg-mine: linear-gradient(135deg, #0284c7, #0369a1);
       --accent-color: #38bdf8;
-      --shadow-color: rgba(0, 0, 0, 0.7);
-    }
-
-    [data-theme="light"] {
-      --bg-gradient: radial-gradient(circle at center, #e0f2fe 0%, #bae6fd 100%);
-      --card-bg: rgba(255, 255, 255, 0.9);
-      --header-bg: rgba(241, 245, 249, 0.95);
-      --border-color: rgba(0, 0, 0, 0.1);
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --msg-theirs: #e2e8f0;
-      --msg-mine: linear-gradient(135deg, #0284c7, #2563eb);
-      --accent-color: #0284c7;
-      --shadow-color: rgba(0, 0, 0, 0.15);
+      --accent-hover: #0ea5e9;
+      --danger-color: #ef4444;
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
     * {
@@ -36,1004 +22,291 @@
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, sans-serif;
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
     }
 
     body {
-      background: var(--bg-gradient);
+      background: radial-gradient(circle at center, #1e1b4b 0%, var(--bg-color) 100%);
       color: var(--text-main);
       height: 100vh;
       height: 100dvh;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      overflow: hidden;
-    }
-
-    /* Модальное окно входа по номеру */
-    .auth-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.95);
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .auth-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 24px;
-      width: 100%;
-      max-width: 380px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 25px 50px -12px var(--shadow-color);
-      text-align: center;
-    }
-
-    .auth-card h2 {
-      color: var(--accent-color);
-      font-size: 20px;
-    }
-
-    .auth-card p {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .auth-input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      background: var(--header-bg);
-      color: var(--text-main);
-      font-size: 16px;
-      outline: none;
-      text-align: center;
-    }
-
-    .auth-btn {
-      background: linear-gradient(135deg, #38bdf8, #0284c7);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .chat-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 900px;
-      height: 100%;
-      max-height: 92vh;
-      display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 25px 50px -12px var(--shadow-color);
-      position: relative;
     }
 
-    .chat-header {
-      background: var(--header-bg);
-      padding: 12px 16px;
+    /* Верхняя панель меню */
+    .editor-header {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-color);
+      padding: 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
     }
 
-    .header-info h1 {
+    .logo {
+      font-weight: 700;
       font-size: 16px;
       color: var(--accent-color);
-      font-weight: 700;
-    }
-
-    .header-stats {
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .header-actions {
       display: flex;
       gap: 8px;
-      align-items: center;
     }
 
-    .action-btn {
+    .btn {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      padding: 6px 10px;
-      border-radius: 10px;
-      font-size: 11px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      text-decoration: none;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      transition: background 0.2s;
     }
 
-    .action-btn:hover {
+    .btn:hover {
       background: rgba(255, 255, 255, 0.15);
     }
 
-    .call-btn {
-      background: rgba(34, 197, 94, 0.2);
-      border-color: rgba(34, 197, 94, 0.4);
-      color: #4ade80;
-    }
-
-    .nav-tabs {
-      display: flex;
-      background: var(--header-bg);
-      border-bottom: 1px solid var(--border-color);
-      padding: 0 8px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      position: relative;
-    }
-
-    .tab-btn.active {
-      color: var(--accent-color);
-      border-bottom-color: var(--accent-color);
-    }
-
-    .badge {
-      background: #ef4444;
-      color: white;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 10px;
-      margin-left: 6px;
-      display: inline-block;
-    }
-
-    .main-body {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .chat-section {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .messages-box {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .msg-item {
-      max-width: 82%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      word-wrap: break-word;
-      position: relative;
-      box-shadow: 0 4px 15px var(--shadow-color);
-    }
-
-    .msg-item.theirs {
-      background: var(--msg-theirs);
-      color: var(--text-main);
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-    }
-
-    .msg-item.mine {
-      background: var(--msg-mine);
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
       color: #ffffff;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-
-    .msg-item.system {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: var(--accent-color);
-      align-self: center;
-      font-size: 11px;
-      text-align: center;
-      border-radius: 12px;
-      padding: 6px 12px;
-    }
-
-    .msg-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-      font-size: 10px;
-      opacity: 0.85;
-    }
-
-    .msg-author {
-      font-weight: 700;
-    }
-
-    .delete-btn {
-      background: none;
       border: none;
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      font-size: 12px;
-      padding: 0 2px;
     }
 
-    .delete-btn:hover {
-      color: #f87171;
+    .btn-primary:hover {
+      opacity: 0.9;
     }
 
-    .msg-text {
-      font-size: 13px;
-      line-height: 1.4;
+    /* Рабочая область */
+    .editor-workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
     }
 
-    .msg-text img {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-top: 6px;
-      display: block;
-    }
-
-    /* Боковая панель с поиском по номеру */
-    .sidebar-users {
-      width: 250px;
-      background: var(--header-bg);
-      border-left: 1px solid var(--border-color);
+    /* Боковая панель инструментов */
+    .sidebar {
+      width: 220px;
+      background: var(--panel-bg);
+      border-right: 1px solid var(--border-color);
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      padding: 12px;
-      gap: 10px;
+      gap: 16px;
+      flex-shrink: 0;
+      overflow-y: auto;
     }
 
-    .sidebar-title {
-      font-size: 12px;
+    .tool-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tool-group-title {
+      font-size: 11px;
       font-weight: 700;
-      color: var(--accent-color);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    .search-phone-input {
-      width: 100%;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 12px;
-      color: var(--text-main);
-      outline: none;
-    }
-
-    .users-list {
+    /* Холст для редактирования */
+    .canvas-container {
       flex: 1;
-      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.3);
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .user-card {
-    background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .user-card:hover {
-      border-color: var(--accent-color);
-    }
-
-    .user-card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 700;
-    }
-
-    .user-phone-num {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    .voice-roulette-container {
-      flex: 1;
-      display: none;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
+      position: relative;
+      overflow: auto;
       padding: 20px;
-      text-align: center;
-      gap: 20px;
     }
 
-    .roulette-status {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--accent-color);
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      background: #ffffff;
     }
 
-    .roulette-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-      max-width: 350px;
-      line-height: 1.4;
-    }
-
-    .audio-visualizer {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      height: 40px;
-    }
-
-    .bar {
-      width: 6px;
-      height: 10px;
-      background: var(--accent-color);
-      border-radius: 4px;
-      animation: pulseBar 1s infinite ease-in-out;
-    }
-
-    .bar:nth-child(2) { animation-delay: 0.2s; }
-    .bar:nth-child(3) { animation-delay: 0.4s; }
-    .bar:nth-child(4) { animation-delay: 0.6s; }
-
-    @keyframes pulseBar {
-      0%, 100% { height: 10px; }
-      50% { height: 35px; }
-    }
-
-    .roulette-controls {
-      display: flex;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .r-btn {
-      padding: 12px 20px;
-      border-radius: 14px;
-      border: none;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px var(--shadow-color);
-    }
-
-    .btn-connect { background: #22c55e; color: white; }
-    .btn-next { background: #0284c7; color: white; }
-    .btn-mute { background: #eab308; color: white; }
-
-    .video-call-overlay {
+    .placeholder-text {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 100;
+      color: var(--text-muted);
+      font-size: 14px;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    /* Скрытый инпут файла */
+    #fileInput {
       display: none;
-      flex-direction: column;
-    }
-
-    .video-call-header {
-      padding: 10px 16px;
-      background: rgba(15, 23, 42, 0.9);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .video-call-header span {
-      font-size: 14px;
-      font-weight: 700;
-      color: #4ade80;
-    }
-
-    .close-call-btn {
-      background: #ef4444;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 12px;
-    }
-
-    .video-frame {
-      width: 100%;
-      flex: 1;
-      border: none;
-    }
-
-    .picker-panel {
-      background: var(--header-bg);
-      padding: 6px 12px;
-      display: flex;
-      gap: 6px;
-      border-top: 1px solid var(--border-color);
-      overflow-x: auto;
-      flex-shrink: 0;
-    }
-
-    .picker-btn {
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 5px 8px;
-      color: var(--text-main);
-      font-size: 13px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .picker-btn:hover { background: rgba(56, 189, 248, 0.2); }
-
-    .chat-footer {
-      padding: 10px 12px;
-      background: var(--header-bg);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    input {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    input:focus { border-color: var(--accent-color); }
-    #messageInput { flex: 1; }
-
-    button.send-btn {
-    background: linear-gradient(135deg, #38bdf8, #0284c7);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 16px;
-      font-weight: 600;
-      cursor: pointer;
     }
 
     @media (max-width: 650px) {
-      .sidebar-users {
-        position: absolute;
-        right: 0; top: 0; bottom: 0;
-        z-index: 10;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
+      .sidebar {
+        width: 160px;
+        padding: 10px;
       }
-      .sidebar-users.open { transform: translateX(0); }
     }
   </style>
 </head>
-<body data-theme="dark">
+<body>
 
-  <!-- Окно регистрации по номеру телефона -->
-  <div class="auth-overlay" id="authModal">
-    <div class="auth-card">
-      <h2>📱 Вход в мессенджер</h2>
-      <p>Введите ваше имя и номер телефона для входа и поиска собеседников</p>
-      <input type="text" id="authNameInput" class="auth-input" placeholder="Ваше Имя" maxlength="15">
-      <input type="tel" id="authPhoneInput" class="auth-input" placeholder="+7 (___) ___-__-__" value="+7 ">
-      <button class="auth-btn" onclick="registerUser()">Войти в чат</button>
+  <!-- Верхнее меню -->
+  <header class="editor-header">
+    <div class="logo">
+      🎨 PixelStudio Pro
     </div>
-  </div>
-
-  <div class="chat-card">
-    <div class="chat-header">
-      <div class="header-info">
-        <h1 id="chatTitle">💬 3D Мессенджер</h1>
-        <div class="header-stats" id="statsText">Заходило: 0</div>
-      </div>
-      <div class="header-actions">
-        <button class="action-btn" onclick="toggleTheme()" id="themeBtn">🌙 Тёмная</button>
-        <button class="action-btn" onclick="toggleSidebar()">👥 Игроки</button>
-        <button class="action-btn call-btn" onclick="openVideoCall()">📹 Видео</button>
-      </div>
-    </div>
-
-    <div class="nav-tabs">
-      <button class="tab-btn active" id="tabMain" onclick="switchTab('main')">
-        💬 Общий чат <span class="badge" id="unreadMainBadge" style="display:none;">0</span>
+    <div class="header-actions">
+      <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
+      <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+        📁 Открыть фото
       </button>
-      <button class="tab-btn" id="tabPrivate" onclick="switchTab('private')" style="display:none;">
-        🔒 Личные (ЛС) <span class="badge" id="unreadPrivateBadge" style="display:none;">0</span>
+      <button class="btn" onclick="saveImage()">
+        💾 Сохранить
       </button>
-      <button class="tab-btn" id="tabVoice" onclick="switchTab('voice')">🎙 Голос. Рулетка</button>
     </div>
+  </header>
 
-    <div class="main-body">
-      <div class="chat-section" id="chatSection">
-        <div class="messages-box" id="msgContainer">
-          <div style="color: #64748b; text-align: center; margin: auto;">Загрузка чата...</div>
-        </div>
-
-        <div class="picker-panel">
-          <button class="picker-btn" onclick="addEmoji('👍')">👍</button>
-          <button class="picker-btn" onclick="addEmoji('🔥')">🔥</button>
-          <button class="picker-btn" onclick="addEmoji('😂')">😂</button>
-          <button class="picker-btn" onclick="addEmoji('❤️')">❤️</button>
-          <button class="picker-btn" onclick="addEmoji('😎')">😎</button>
-          <button class="picker-btn" onclick="sendGif('https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif')">🔥 Огонь GIF</button>
-          <button class="picker-btn" onclick="sendGif('https://media.giphy.com/media/LmNwrBhejkK9EFP504/giphy.gif')">🐱 Котик GIF</button>
-          <button class="picker-btn" onclick="sendGif('https://media.giphy.com/media/7UQ9oB80a6Z3m/giphy.gif')">💰 Голда GIF</button>
-        </div>
-
-        <div class="chat-footer">
-          <input type="text" id="messageInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendMsg()">
-          <button class="send-btn" onclick="sendMsg()">➤</button>
-        </div>
+  <!-- Основная рабочая зона -->
+  <div class="editor-workspace">
+    <!-- Инструменты -->
+    <aside class="sidebar">
+      <div class="tool-group">
+        <span class="tool-group-title">Фильтры</span>
+        <button class="btn" onclick="applyFilter('grayscale')">⚫ Чёрно-белое</button>
+        <button class="btn" onclick="applyFilter('invert')">🔄 Инверсия</button>
+        <button class="btn" onclick="applyFilter('blur')">🌫 Размытие</button>
       </div>
 
-      <div class="voice-roulette-container" id="voiceSection">
-        <div class="roulette-status" id="voiceStatus">Нажмите кнопку для поиска собеседника по голосу</div>
-        <div class="roulette-desc">Общайтесь со случайными игроками голосом в реальном времени через микрофон.</div>
-        
-        <div class="audio-visualizer" id="visualizer" style="display:none;">
-          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        </div>
-        <div class="roulette-controls">
-          <button class="r-btn btn-connect" id="voiceConnectBtn" onclick="toggleVoiceSearch()">🎙 Начать поиск</button>
-          <button class="r-btn btn-next" id="voiceNextBtn" onclick="nextVoiceMatch()" style="display:none;">⏭ Следующий</button>
-          <button class="r-btn btn-mute" id="voiceMuteBtn" onclick="toggleMute()" style="display:none;">🔇 Выкл. звук</button>
-        </div>
+      <div class="tool-group">
+        <span class="tool-group-title">Правка</span>
+        <button class="btn" onclick="rotateImage()">🔃 Поворот 90°</button>
+        <button class="btn" onclick="resetImage()">↩ Сбросить</button>
       </div>
 
-      <div class="video-call-overlay" id="videoOverlay">
-        <div class="video-call-header">
-          <span>📹 Встроенный видеозвонок</span>
-          <button class="close-call-btn" onclick="closeVideoCall()">Закрыть ✖</button>
-        </div>
-        <iframe class="video-frame" id="videoFrame" allow="camera; microphone; display-capture; autoplay"></iframe>
+      <div class="tool-group">
+        <span class="tool-group-title">Эффекты</span>
+        <button class="btn" onclick="addWatermark()">✍ Штамп / Подпись</button>
       </div>
+    </aside>
 
-      <!-- Боковая панель с поиском по номеру -->
-      <div class="sidebar-users" id="sidebarUsers">
-        <div class="sidebar-title">Игроки в сети</div>
-        <input type="text" id="searchPhoneInput" class="search-phone-input" placeholder="🔍 Поиск по номеру..." oninput="renderUI()">
-        <div class="users-list" id="usersList"></div>
+    <!-- Область холста -->
+    <div class="canvas-container" id="canvasContainer">
+      <div class="placeholder-text" id="placeholder">
+        Загрузите изображение через кнопку «Открыть фото» вверху
       </div>
+      <canvas id="imageCanvas"></canvas>
     </div>
   </div>
 
   <script>
-    const BIN_ID = "fb49ce2087440a661a3d"; 
-    const API_URL = `https://api.npoint.io/${BIN_ID}`;
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const placeholder = document.getElementById('placeholder');
+    
+    let img = new Image();
+    let originalDataUrl = "";
 
-    let myUserId = localStorage.getItem("chat_user_id");
-    let myUserName = localStorage.getItem("chat_user_name");
-    let myUserPhone = localStorage.getItem("chat_user_phone");
+    function loadImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-    if (myUserId && myUserName && myUserPhone) {
-      document.getElementById("authModal").style.display = "none";
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        originalDataUrl = e.target.result;
+        img.src = originalDataUrl;
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          placeholder.style.display = 'none';
+        }
+      }
+      reader.readAsDataURL(file);
     }
 
-    function registerUser() {
-      const name = document.getElementById("authNameInput").value.trim();
-      const phone = document.getElementById("authPhoneInput").value.trim();
+    function applyFilter(type) {
+      if (!img.src) return;
+      ctx.drawImage(img, 0, 0);
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
 
-      if (!name || phone.length < 6) {
-        alert("Пожалуйста, введите имя и номер телефона!");
+      if (type === 'grayscale') {
+        for (let i = 0; i < data.length; i += 4) {
+          let avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          data[i] = avg; data[i + 1] = avg; data[i + 2] = avg;
+        }
+      } else if (type === 'invert') {
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] = 255 - data[i];
+          data[i + 1] = 255 - data[i + 1];
+          data[i + 2] = 255 - data[i + 2];
+        }
+      } else if (type === 'blur') {
+        ctx.filter = 'blur(5px)';
+        ctx.drawImage(img, 0, 0);
+        ctx.filter = 'none';
         return;
       }
 
-      myUserId = "user_" + Math.random().toString(36).substring(2, 9);
-      myUserName = name;
-      myUserPhone = phone;
-
-      localStorage.setItem("chat_user_id", myUserId);
-      localStorage.setItem("chat_user_name", myUserName);
-      localStorage.setItem("chat_user_phone", myUserPhone);
-
-      document.getElementById("authModal").style.display = "none";
-      loadData();
+      ctx.putImageData(imgData, 0, 0);
     }
 
-    let allMessages = [];
-    let visitorsList = [];
-    let activeTab = 'main';
-    let currentPrivateUser = null;
-    let unreadMainCount = 0;
-    let unreadPrivateCount = 0;
-
-    let localStream = null;
-    let isConnectedVoice = false;
-    let isMuted = false;
-
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
+    function rotateImage() {
+      if (!img.src) return;
+      let tempW = canvas.width;
+      canvas.width = canvas.height;
+      canvas.height = tempW;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(img, -img.width / 2, -img.height / 2);
+      ctx.restore();
     }
 
-    let currentTheme = localStorage.getItem("chat_theme") || "dark";
-    applyTheme(currentTheme);
-
-    function toggleTheme() {
-      currentTheme = currentTheme === "dark" ? "light" : "dark";
-      localStorage.setItem("chat_theme", currentTheme);
-      applyTheme(currentTheme);
+    function addWatermark() {
+      if (!img.src) return;
+      ctx.font = "24px Arial";
+      ctx.fillStyle = "rgba(56, 189, 248, 0.8)";
+      ctx.fillText("PixelStudio Pro", 20, canvas.height - 30);
     }
 
-    function applyTheme(theme) {
-      document.body.setAttribute("data-theme", theme);
-      document.getElementById("themeBtn").innerText = theme === "dark" ? "🌙 Тёмная" : "☀️ Светлая";
-    }
-
-    function toggleSidebar() {
-      document.getElementById("sidebarUsers").classList.toggle("open");
-    }
-
-    function addEmoji(emoji) {
-      const input = document.getElementById("messageInput");
-      input.value += emoji;
-      input.focus();
-    }
-
-    function openVideoCall() {
-      const overlay = document.getElementById("videoOverlay");
-      const frame = document.getElementById("videoFrame");
-      frame.src = "https://meet.jit.si/3d-messenger-room-shushenskoe";
-      overlay.style.display = "flex";
-    }
-
-    function closeVideoCall() {
-      const overlay = document.getElementById("videoOverlay");
-      const frame = document.getElementById("videoFrame");
-      frame.src = "";
-      overlay.style.display = "none";
-    }
-
-    function switchTab(tab) {
-      activeTab = tab;
-      document.getElementById("tabMain").classList.toggle("active", tab === 'main');
-      document.getElementById("tabPrivate").classList.toggle("active", tab === 'private');
-      document.getElementById("tabVoice").classList.toggle("active", tab === 'voice');
-
-      const chatSection = document.getElementById("chatSection");
-      const voiceSection = document.getElementById("voiceSection");
-
-      if (tab === 'voice') {
-        chatSection.style.display = 'none';
-        voiceSection.style.display = 'flex';
-      } else {
-        chatSection.style.display = 'flex';
-        voiceSection.style.display = 'none';
-      }
-
-      if (tab === 'main') {
-        unreadMainCount = 0;
-        updateBadges();
-      } else if (tab === 'private') {
-        unreadPrivateCount = 0;
-        updateBadges();
-      }
-
-      renderUI();
-    }
-
-    function updateBadges() {
-      const mainBadge = document.getElementById("unreadMainBadge");
-      const privBadge = document.getElementById("unreadPrivateBadge");
-
-      if (unreadMainCount > 0) {
-        mainBadge.innerText = unreadMainCount;
-        mainBadge.style.display = "inline-block";
-      } else {
-        mainBadge.style.display = "none";
-      }
-
-      if (unreadPrivateCount > 0) {
-        privBadge.innerText = unreadPrivateCount;
-        privBadge.style.display = "inline-block";
-      } else {
-        privBadge.style.display = "none";
+    function resetImage() {
+      if (!originalDataUrl) return;
+      img.src = originalDataUrl;
+      img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
       }
     }
 
-    function startPrivateChat(userId, userName, userPhone) {
-      currentPrivateUser = { id: userId, name: userName, phone: userPhone };
-      document.getElementById("tabPrivate").style.display = "block";
-      document.getElementById("tabPrivate").innerText = "🔒 " + userName;
-      switchTab('private');
-    }
-
-    async function toggleVoiceSearch() {
-      const statusEl = document.getElementById("voiceStatus");
-      const connectBtn = document.getElementById("voiceConnectBtn");
-      const nextBtn = document.getElementById("voiceNextBtn");
-      const muteBtn = document.getElementById("voiceMuteBtn");
-      const visualizer = document.getElementById("visualizer");
-
-      if (!isConnectedVoice) {
-        statusEl.innerText = "Подключение к микрофону...";
-        try {
-          localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-          isConnectedVoice = true;
-          statusEl.innerText = "🎧 Собеседник найден! Идет голосовой разговор...";
-          connectBtn.innerText = "❌ Завершить";
-          connectBtn.style.background = "#ef4444";
-          nextBtn.style.display = "inline-block";
-          muteBtn.style.display = "inline-block";
-          visualizer.style.display = "flex";
-        } catch (err) {
-          statusEl.innerText = "Ошибка доступа к микрофону.";
-          console.error(err);
-        }
-      } else {
-        if (localStream) localStream.getTracks().forEach(track => track.stop());
-        isConnectedVoice = false;
-        statusEl.innerText = "Нажмите кнопку для поиска собеседника по голосу";
-        connectBtn.innerText = "🎙 Начать поиск";
-        connectBtn.style.background = "#22c55e";
-        nextBtn.style.display = "none";
-        muteBtn.style.display = "none";
-        visualizer.style.display = "none";
-      }
-    }
-
-    function nextVoiceMatch() {
-      const statusEl = document.getElementById("voiceStatus");
-      statusEl.innerText = "Ищем нового собеседника по голосу...";
-      setTimeout(() => { statusEl.innerText = "🎧 Собеседник найден!"; }, 1500);
-    }
-
-    function toggleMute() {
-      if (!localStream) return;
-      isMuted = !isMuted;
-      localStream.getAudioTracks().forEach(track => { track.enabled = !isMuted; });
-      const muteBtn = document.getElementById("voiceMuteBtn");
-      muteBtn.innerText = isMuted ? "🔊 Вкл. звук" : "🔇 Выкл. звук";
-      muteBtn.style.background = isMuted ? "#22c55e" : "#eab308";
-    }
-
-    async function loadData() {
-      if (!myUserId) return;
-      try {
-        const response = await fetch(API_URL + "?t=" + Date.now());
-        const data = await response.json();
-        
-        const newMsgs = data.messages || [];
-        visitorsList = data.visitors || [];
-
-        if (newMsgs.length > allMessages.length) {
-          const addedCount = newMsgs.length - allMessages.length;
-          const latestMsg = newMsgs[newMsgs.length - 1];
-
-          if (latestMsg.userId !== myUserId) {
-            if (!latestMsg.targetId && activeTab !== 'main') {
-              unreadMainCount += addedCount;
-              updateBadges();
-              sendPushNotification("Сообщение в Общем чате", `${latestMsg.author}: ${latestMsg.text}`);
-            } 
-            else if (latestMsg.targetId === myUserId && activeTab !== 'private') {
-              unreadPrivateCount += addedCount;
-              updateBadges();
-              sendPushNotification("Личное сообщение", `${latestMsg.author}: ${latestMsg.text}`);
-            }
-          }
-        }
-
-        allMessages = newMsgs;
-
-        const existingUser = visitorsList.find(u => u.id === myUserId);
-        if (!existingUser) {
-          visitorsList.push({ id: myUserId, name: myUserName, phone: myUserPhone, time: Date.now() });
-          
-          allMessages.push({
-            userId: 'system',
-            author: 'Система',
-            text: `📱 Игрок ${myUserName} (${myUserPhone}) зашел в сеть!`,
-            type: 'system',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          });
-
-          saveToCloud();
-        }
-
-        renderUI();
-      } catch (err) {
-        console.error("Ошибка загрузки:", err);
-      }
-    }
-
-    function sendPushNotification(title, body) {
-      if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(title, { body: body, icon: "https://cdn-icons-png.flaticon.com/512/1041/1041916.png" });
-      }
-    }
-
-    function renderUI() {
-      document.getElementById("statsText").innerText = `Заходило: ${visitorsList.length}`;
-
-      const searchQuery = document.getElementById("searchPhoneInput").value.trim().toLowerCase();
-      const usersListEl = document.getElementById("usersList");
-      usersListEl.innerHTML = "";
-
-      visitorsList.forEach(user => {
-        if (user.id === myUserId) return;
-        
-        if (searchQuery && !user.phone.toLowerCase().includes(searchQuery) && !user.name.toLowerCase().includes(searchQuery)) {
-          return;
-        }
-
-        const userEl = document.createElement("div");
-        userEl.className = "user-card";
-        userEl.innerHTML = `
-          <div class="user-card-top">
-            <span>${escapeHTML(user.name || 'Игрок')}</span>
-            <div class="user-online-dot"></div>
-          </div>
-          <span class="user-phone-num">${escapeHTML(user.phone || 'Нет номера')}</span>
-        `;
-        userEl.onclick = () => startPrivateChat(user.id, user.name, user.phone);
-        usersListEl.appendChild(userEl);
-      });
-
-      const container = document.getElementById("msgContainer");
-      container.innerHTML = "";
-
-      let filteredMsgs = allMessages;
-      if (activeTab === 'private' && currentPrivateUser) {
-        filteredMsgs = allMessages.filter(m => 
-          (m.userId === myUserId && m.targetId === currentPrivateUser.id) ||
-          (m.userId === currentPrivateUser.id && m.targetId === myUserId)
-        );
-      } else if (activeTab === 'main') {
-        filteredMsgs = allMessages.filter(m => !m.targetId);
-      }
-
-      if (filteredMsgs.length === 0) {
-        container.innerHTML = '<div style="color: #64748b; text-align: center; margin: auto;">Сообщений пока нет. Напишите первым!</div>';
+    function saveImage() {
+      if (!img.src) {
+        alert("Сначала загрузите изображение!");
         return;
       }
-
-      filteredMsgs.forEach((msg, index) => {
-        const msgEl = document.createElement("div");
-        
-        if (msg.type === 'system') {
-          msgEl.className = "msg-item system";
-          msgEl.innerText = msg.text;
-        } else {
-          const isMine = msg.userId === myUserId;
-          msgEl.className = `msg-item ${isMine ? 'mine' : 'theirs'}`;
-
-          let contentHTML = `<div class="msg-text">${escapeHTML(msg.text)}</div>`;
-          if (msg.type === 'gif' && msg.gifUrl) {
-            contentHTML = `<div class="msg-text"><img src="${escapeHTML(msg.gifUrl)}" alt="GIF"></div>`;
-          }
-
-          let deleteBtnHTML = isMine ? `<button class="delete-btn" onclick="deleteMsg(${index})">✕</button>` : '';
-
-          msgEl.innerHTML = `
-            <div class="msg-header">
-              <span class="msg-author">${escapeHTML(msg.author)}</span>
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <span class="msg-time">${msg.time}</span>
-                ${deleteBtnHTML}
-              </div>
-            </div>
-            ${contentHTML}
-          `;
-        }
-
-        container.appendChild(msgEl);
-      });
-
-      container.scrollTop = container.scrollHeight;
-    }
-
-    async function sendMsg() {
-      const msgInput = document.getElementById("messageInput");
-      const text = msgInput.value.trim();
-      if (!text) return;
-
-      const newMsg = {
-        userId: myUserId,
-        author: myUserName,
-        text: text,
-        type: 'text',
-        targetId: activeTab === 'private' ? currentPrivateUser.id : null,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      allMessages.push(newMsg);
-      msgInput.value = "";
-      renderUI();
-      saveToCloud();
-    }
-
-    async function sendGif(gifUrl) {
-      const newMsg = {
-        userId: myUserId,
-        author: myUserName,
-        text: "Гифка",
-        type: 'gif',
-        gifUrl: gifUrl,
-        targetId: activeTab === 'private' ? currentPrivateUser.id : null,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      allMessages.push(newMsg);
-      renderUI();
-      saveToCloud();
-    }
-
-    function deleteMsg(index) {
-      allMessages.splice(index, 1);
-      renderUI();
-      saveToCloud();
-    }
-
-    async function saveToCloud() {
-      try {
-        await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            messages: allMessages,
-            visitors: visitorsList 
-          })
-        });
-      } catch (err) {
-        console.error("Ошибка сохранения:", err);
-      }
-    }
-
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-    }
-
-    if (myUserId) {
-      loadData();
-      setInterval(loadData, 3000);
+      const link = document.createElement('a');
+      link.download = 'edited-photo.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     }
   </script>
 </body>
