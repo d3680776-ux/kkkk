@@ -1,1213 +1,675 @@
-
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PixelStudio Pro - Графический Редактор</title>
-  <!-- FontAwesome для профессиональных иконок инструментов -->
+  <title>GAZAN — Официальный сайт артиста | Концерты & Мерч</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Иконки -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg-dark: #12161f;
-      --panel-bg: rgba(26, 33, 48, 0.85);
-      --panel-border: rgba(255, 255, 255, 0.08);
-      --header-bg: #1a2130;
-      --accent: #0284c7;
-      --accent-light: #38bdf8;
-      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --btn-3d-bg: linear-gradient(180deg, #334155 0%, #1e293b 100%);
-      --btn-3d-shadow: 0 4px 0 #0f172a, 0 6px 10px rgba(0,0,0,0.4);
-      --btn-3d-active: 0 1px 0 #0f172a, 0 2px 4px rgba(0,0,0,0.4);
-      --canvas-pattern: #1e293b;
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              accent: '#f97316',
+              glow: '#ffedd5',
+              dark: '#0b0f19',
+              card: 'rgba(23, 31, 51, 0.75)',
+            }
+          }
+        }
+      }
     }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap');
 
     * {
+      font-family: 'Montserrat', sans-serif;
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      height: 100vh;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      background: radial-gradient(circle at 50% -20%, #1e293b 0%, #0b0f19 70%);
+      color: #f8fafc;
+      overflow-x: hidden;
     }
 
-    /* Верхняя панель меню */
-    header {
-      background: var(--header-bg);
-      border-bottom: 1px solid var(--panel-border);
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      z-index: 20;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    /* Glassmorphism эффекты */
+    .glass-card {
+      background: rgba(30, 41, 59, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      font-size: 16px;
-      color: var(--accent-light);
-      letter-spacing: 0.5px;
-    }
-
-    .brand i {
-      font-size: 20px;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .top-menu {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .glass-nav {
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     /* 3D Кнопки */
     .btn-3d {
-      background: var(--btn-3d-bg);
-      border: 1px solid var(--panel-border);
-      color: var(--text-main);
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: var(--btn-3d-shadow);
-      transition: all 0.1s ease;
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      box-shadow: 0 6px 0 #c2410c, 0 10px 20px rgba(249, 115, 22, 0.4);
+      transition: all 0.15s ease;
     }
-
     .btn-3d:hover {
-      filter: brightness(1.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #c2410c, 0 14px 24px rgba(249, 115, 22, 0.5);
     }
-
     .btn-3d:active {
-      transform: translateY(3px);
-      box-shadow: var(--btn-3d-active);
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #c2410c, 0 4px 10px rgba(249, 115, 22, 0.4);
     }
 
-    .btn-3d.primary {
-      background: var(--accent-gradient);
-      border-color: rgba(255,255,255,0.2);
-      box-shadow: 0 4px 0 #0369a1, 0 6px 12px rgba(0,0,0,0.4);
+    .btn-3d-secondary {
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 6px 0 #0f172a, 0 10px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.15s ease;
+    }
+    .btn-3d-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #0f172a, 0 14px 24px rgba(0, 0, 0, 0.5);
+    }
+    .btn-3d-secondary:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #0f172a, 0 4px 10px rgba(0, 0, 0, 0.4);
     }
 
-    .btn-3d.primary:active {
-      box-shadow: 0 1px 0 #0369a1, 0 2px 4px rgba(0,0,0,0.4);
+    /* Неоновое свечение */
+    .neon-text {
+      text-shadow: 0 0 20px rgba(249, 115, 22, 0.6), 0 0 40px rgba(249, 115, 22, 0.3);
     }
 
-    .btn-3d.danger {
-      background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
-      box-shadow: 0 4px 0 #7f1d1d, 0 6px 10px rgba(0,0,0,0.4);
+    /* Полоса прокрутки */
+    ::-webkit-scrollbar {
+      width: 8px;
     }
-
-    /* Верхняя панель параметров инструмента */
-    .options-bar {
-      background: rgba(22, 29, 43, 0.95);
-      border-bottom: 1px solid var(--panel-border);
-      height: 40px;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      gap: 16px;
-      font-size: 12px;
-      color: var(--text-muted);
-      z-index: 15;
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
     }
-
-    .option-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .option-group label {
-      color: var(--text-main);
-      font-weight: 600;
-    }
-
-    input[type="range"] {
-      appearance: none;
+    ::-webkit-scrollbar-thumb {
       background: #334155;
-      height: 6px;
-      border-radius: 3px;
-      outline: none;
-      width: 90px;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--accent-light);
-      cursor: pointer;
-    }
-
-    input[type="color"] {
-      border: 1px solid var(--panel-border);
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      background: none;
-      cursor: pointer;
-    }
-
-    select, input[type="number"], input[type="text"] {
-      background: #1e293b;
-      border: 1px solid var(--panel-border);
-      color: var(--text-main);
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      outline: none;
-    }
-
-    /* Основной макет приложения */
-    .app-body {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* Левая панель инструментов */
-    .toolbar {
-      width: 52px;
-      background: var(--panel-bg);
-      backdrop-filter: blur(12px);
-      border-right: 1px solid var(--panel-border);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 10px 0;
-      gap: 8px;
-      z-index: 10;
-    }
-
-    .tool-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s ease;
-      position: relative;
-    }
-
-    .tool-btn:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-main);
-    }
-
-    .tool-btn.active {
-      background: var(--accent-gradient);
-      color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
-    }
-
-    .tool-btn[title]:hover::after {
-      content: attr(title);
-      position: absolute;
-      left: 48px;
-      background: #0f172a;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      white-space: nowrap;
-      z-index: 100;
-      border: 1px solid var(--panel-border);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-
-    /* Центральная рабочая область холста */
-    .viewport {
-      flex: 1;
-      background: #090d16;
-      background-image: 
-        radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
-      background-size: 20px 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      position: relative;
-      cursor: default;
-    }
-
-    .canvas-wrapper {
-      position: absolute;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-      background-image: linear-gradient(45deg, var(--canvas-pattern) 25%, transparent 25%), 
-                        linear-gradient(-45deg, var(--canvas-pattern) 25%, transparent 25%), 
-                        linear-gradient(45deg, transparent 75%, var(--canvas-pattern) 75%), 
-                        linear-gradient(-45deg, transparent 75%, var(--canvas-pattern) 75%);
-      background-size: 16px 16px;
-      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
-      background-color: #0f172a;
-      transform-origin: center center;
-    }
-
-    #mainCanvas {
-      display: block;
-    }
-
-    /* Правая панель слоев и настроек */
-    .right-sidebar {
-      width: 280px;
-      background: var(--panel-bg);
-      backdrop-filter: blur(12px);
-      border-left: 1px solid var(--panel-border);
-      display: flex;
-      flex-direction: column;
-      z-index: 10;
-    }
-
-    .sidebar-section {
-      padding: 12px;
-      border-bottom: 1px solid var(--panel-border);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .section-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent-light);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* Список слоев */
-    .layers-container {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 12px;
-    }
-
-    .layer-item {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid var(--panel-border);
-      border-radius: 8px;
-      padding: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .layer-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .layer-item.active {
-      border-color: var(--accent-light);
-      background: rgba(2, 132, 199, 0.15);
-      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2);
-    }
-
-    .layer-preview {
-      width: 36px;
-      height: 36px;
       border-radius: 4px;
-      background: #fff;
-      border: 1px solid var(--panel-border);
-      object-fit: contain;
-      background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);
-      background-size: 8px 8px;
     }
-
-    .layer-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      overflow: hidden;
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f97316;
     }
-
-    .layer-name {
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .layer-vis-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 13px;
-      padding: 4px;
-    }
-
-    .layer-vis-btn.active {
-      color: var(--accent-light);
-    }
-
-    .layer-controls {
-      display: flex;
-      gap: 6px;
-    }
-
-    .layer-controls .btn-3d {
-      padding: 4px 8px;
-      font-size: 11px;
-    }
-
-    /* Модальные окна */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
-      z-index: 1000;
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-card {
-      background: var(--header-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 16px;
-      width: 360px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-    }
-
-    .modal-card h3 {
-      color: var(--accent-light);
-      font-size: 16px;
-    }
-
-    .modal-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    #fileInput { display: none; }
-
-    /* Помощник зума снизу */
-    .zoom-widget {
-      position: absolute;
-      bottom: 16px;
-      left: 68px;
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      backdrop-filter: blur(10px);
-      padding: 4px 10px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-
-    .zoom-widget i {
-      cursor: pointer;
-      color: var(--text-muted);
-    }
-    .zoom-widget i:hover { color: var(--text-main); }
   </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between">
 
-  <!-- Верхняя панель управления -->
-  <header>
-    <div class="brand">
-      <i class="fa-solid fa-palette"></i>
-      <span>PixelStudio Pro</span>
+  <!-- Шапка сайта -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass-nav px-4 py-3 transition-all duration-300">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <a href="#" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center font-black text-xl shadow-lg shadow-orange-500/30">
+          G
+        </div>
+        <span class="text-2xl font-black tracking-widest text-white">GAZAN</span>
+      </a>
+
+      <!-- Навигация для ПК -->
+      <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
+        <a href="#about" class="hover:text-orange-400 transition-colors">Об артисте</a>
+        <a href="#tours" class="hover:text-orange-400 transition-colors">Концертный тур</a>
+        <a href="#merch" class="hover:text-orange-400 transition-colors">Мерч</a>
+        <a href="#tracks" class="hover:text-orange-400 transition-colors">Треки</a>
+      </div>
+
+      <div class="hidden md:block">
+        <a href="#tours" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white inline-block">
+          <i class="fa-solid fa-ticket mr-2"></i>Купить билеты
+        </a>
+      </div>
+
+      <!-- Мобильная кнопка меню -->
+      <button class="md:hidden text-2xl text-slate-300 focus:outline-none" onclick="toggleMobileMenu()">
+        <i class="fa-solid fa-bars" id="menuIcon"></i>
+      </button>
     </div>
-    <div class="top-menu">
-      <button class="btn-3d" onclick="openNewCanvasModal()"><i class="fa-solid fa-file-circle-plus"></i> Создать</button>
-      <input type="file" id="fileInput" accept="image/*" onchange="handleFileOpen(event)">
-      <button class="btn-3d" onclick="document.getElementById('fileInput').click()"><i class="fa-solid fa-folder-open"></i> Открыть</button>
-      <button class="btn-3d" onclick="undo()"><i class="fa-solid fa-rotate-left"></i></button>
-      <button class="btn-3d" onclick="redo()"><i class="fa-solid fa-rotate-right"></i></button>
-      <button class="btn-3d primary" onclick="exportImage('png')"><i class="fa-solid fa-download"></i> PNG</button>
-      <button class="btn-3d primary" onclick="exportImage('jpeg')"><i class="fa-solid fa-file-export"></i> JPG</button>
+
+    <!-- Мобильное меню -->
+    <div id="mobileMenu" class="hidden md:hidden flex-col gap-4 pt-4 pb-2 border-t border-slate-800/80 mt-3 text-center">
+      <a href="#about" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-orange-400 font-semibold py-2">Об артисте</a>
+      <a href="#tours" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-orange-400 font-semibold py-2">Концертный тур</a>
+      <a href="#merch" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-orange-400 font-semibold py-2">Мерч</a>
+      <a href="#tracks" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-orange-400 font-semibold py-2">Треки</a>
+      <a href="#tours" onclick="toggleMobileMenu()" class="btn-3d py-3 rounded-xl font-bold text-sm text-white uppercase tracking-wider my-2">
+        Купить билеты
+      </a>
+    </div>
+  </nav>
+
+  <!-- Главный баннер (Hero Section) -->
+  <header id="about" class="pt-28 pb-16 px-4 relative overflow-hidden">
+    <!-- Декоративные фоновые элементы -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-orange-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Текстовый блок -->
+      <div class="lg:col-span-7 flex flex-col gap-6 text-center lg:text-left z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card w-max mx-auto lg:mx-0 border-orange-500/30">
+          <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping"></span>
+          <span class="text-xs font-bold uppercase tracking-wider text-orange-400">Большой тур по России 2026</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black leading-none tracking-tight">
+          ОФИЦИАЛЬНЫЙ САЙТ <br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-500 to-orange-600 neon-text">GAZAN</span>
+        </h1>
+
+        <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium">
+          Добро пожаловать на официальный ресурс хип-хоп и поп-артиста **GAZAN**. Здесь вы можете узнать актуальные даты концертов, купить билеты из первых рук и заказать оригинальный фирменный мерч!
+        </p>
+
+        <div class="flex flex-wrap gap-4 justify-center lg:justify-start pt-2">
+          <a href="#tours" class="btn-3d px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-white flex items-center gap-3">
+            <i class="fa-solid fa-fire text-lg"></i> Афиша Концертов
+          </a>
+          <a href="#merch" class="btn-3d-secondary px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-white flex items-center gap-3">
+            <i class="fa-solid fa-shirt text-lg"></i> Магазин Мерча
+          </a>
+        </div>
+
+        <!-- Статистика -->
+        <div class="grid grid-cols-3 gap-4 pt-6 max-w-md mx-auto lg:mx-0">
+          <div class="glass-card p-3 rounded-2xl text-center">
+            <div class="text-2xl font-black text-orange-400">20+</div>
+            <div class="text-[10px] uppercase font-bold text-slate-400">Городов в туре</div>
+          </div>
+          <div class="glass-card p-3 rounded-2xl text-center">
+          <div class="text-2xl font-black text-orange-400">100M+</div>
+            <div class="text-[10px] uppercase font-bold text-slate-400">Прослушиваний</div>
+          </div>
+          <div class="glass-card p-3 rounded-2xl text-center">
+            <div class="text-2xl font-black text-orange-400">100%</div>
+            <div class="text-[10px] uppercase font-bold text-slate-400">Живой звук</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Главная фотография баннера (ГАЗ-66) -->
+      <div class="lg:col-span-5 relative z-10">
+        <div class="glass-card p-3 rounded-3xl relative group overflow-hidden border-orange-500/20">
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-square">
+            <img 
+              src="image_e589afba-f414-4321-bb4f-8975ac4ee0dc.jpg" 
+              alt="ГАЗан 67 ГАЗ-66" 
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              onerror="this.onerror=null; this.src='https://placehold.co/800x800/1e293b/f97316?text=GAZAN+67';"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent"></div>
+            
+            <div class="absolute bottom-4 left-4 right-4 text-left">
+              <span class="inline-block px-3 py-1 bg-orange-500/90 text-white font-black text-xs uppercase tracking-wider rounded-lg mb-1">Легендарная тачка</span>
+              <h3 class="text-xl font-extrabold text-white">ГАЗ-66 «ГАЗан 67»</h3>
+              <p class="text-xs text-slate-300">Символ фирменного стиля артиста GAZAN</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </header>
 
-  <!-- Динамическая панель настроек инструмента -->
-  <div class="options-bar" id="optionsBar">
-    <div class="option-group">
-      <label>Инструмент:</label>
-      <span id="currentToolName" style="color: var(--accent-light); font-weight:700;">Кисть</span>
-    </div>
+  <!-- Раздел расписания концертов (Tour Schedule) -->
+  <section id="tours" class="py-16 px-4 relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div>
+          <span class="text-orange-500 font-bold uppercase text-xs tracking-widest">Афиша 2026</span>
+          <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white mt-1">
+            КОНЦЕРТНЫЙ ТУР ПО РОССИИ
+          </h2>
+        </div>
 
-    <!-- Настройки Кисти / Ластика -->
-    <div class="option-group tool-opt" id="brushOpts">
-      <label>Цвет:</label>
-      <input type="color" id="primaryColor" value="#38bdf8">
-      <label>Размер:</label>
-      <input type="range" id="brushSize" min="1" max="100" value="12" oninput="document.getElementById('brushSizeVal').innerText=this.value">
-      <span id="brushSizeVal">12</span>px
-    </div>
+        <!-- Поиск по городам -->
+        <div class="w-full md:w-72 relative">
+          <input 
+            type="text" 
+            id="searchCity" 
+            placeholder="Поиск города..." 
+            oninput="filterConcerts()"
+            class="w-full glass-card px-4 py-3 pl-11 rounded-2xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 transition-colors"
+          />
+          <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        </div>
+      </div>
 
-    <!-- Настройки Фигур -->
-    <div class="option-group tool-opt" id="shapeOpts" style="display: none;">
-      <label>Фигура:</label>
-      <select id="shapeType">
-        <option value="rect">Прямоугольник</option>
-        <option value="circle">Круг / Эллипс</option>
-        <option value="line">Линия</option>
-        <option value="arrow">Стрелка</option>
-      </select>
-    </div>
+      <!-- Карточки концертов -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="concertsGrid">
+        
+        <!-- Москва -->
+        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
+          <div class="flex justify-between items-start">
+            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
+              15 МАРТА 2026
+            </div>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
+          </div>
 
-    <!-- Настройки Текста -->
-    <div class="option-group tool-opt" id="textOpts" style="display: none;">
-      <label>Шрифт:</label>
-      <select id="fontFamily">
-        <option value="Arial">Arial</option>
-        <option value="Segoe UI">Segoe UI</option>
-        <option value="Times New Roman">Times New Roman</option>
-        <option value="Courier New">Courier New</option>
-        <option value="Impact">Impact</option>
-      </select>
-      <label>Размер:</label>
-      <input type="number" id="fontSize" value="32" min="8" max="200" style="width:55px;"> px
+          <div>
+            <h3 class="text-2xl font-black text-white mb-1">Москва</h3>
+            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>Adrenaline Stadium</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+            <div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
+              <div class="text-lg font-black text-white">1 800 ₽</div>
+            </div>
+            <button onclick="openTicketModal('Москва', 'Adrenaline Stadium', '15 Марта 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
+              Купить билет
+            </button>
+          </div>
+        </div>
+
+        <!-- Санкт-Петербург -->
+        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
+          <div class="flex justify-between items-start">
+            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
+              22 МАРТА 2026
+            </div>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-black text-white mb-1">Санкт-Петербург</h3>
+            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>A2 Green Concert</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+            <div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
+              <div class="text-lg font-black text-white">1 600 ₽</div>
+            </div>
+            <button onclick="openTicketModal('Санкт-Петербург', 'A2 Green Concert', '22 Марта 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
+              Купить билет
+            </button>
+          </div>
+        </div>
+
+        <!-- Красноярск -->
+        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
+          <div class="flex justify-between items-start">
+            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
+              05 АПРЕЛЯ 2026
+            </div>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-black text-white mb-1">Красноярск</h3>
+            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>Гранд Холл Сибирь</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+            <div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
+              <div class="text-lg font-black text-white">1 500 ₽</div>
+            </div>
+            <button onclick="openTicketModal('Красноярск', 'Гранд Холл Сибирь', '05 Апреля 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
+              Купить билет
+            </button>
+          </div>
+        </div>
+
+        <!-- Новосибирск -->
+        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
+          <div class="flex justify-between items-start">
+            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
+              12 АПРЕЛЯ 2026
+            </div>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-black text-white mb-1">Новосибирск</h3>
+            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>Экспоцентр</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+            <div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
+              <div class="text-lg font-black text-white">1 700 ₽</div>
+            </div>
+            <button onclick="openTicketModal('Новосибирск', 'Экспоцентр', '12 Апреля 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
+              Купить билет
+            </button>
+          </div>
+        </div>
+
+        <!-- Екатеринбург -->
+        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
+          <div class="flex justify-between items-start">
+            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
+              19 АПРЕЛЯ 2026
+            </div>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-black text-white mb-1">Екатеринбург</h3>
+            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>Теле-Клуб</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+            <div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
+              <div class="text-lg font-black text-white">1 600 ₽</div>
+            </div>
+            <button onclick="openTicketModal('Екатеринбург', 'Теле-Клуб', '19 Апреля 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
+              Купить билет
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Раздел мерча (Merchandise Store) -->
+  <section id="merch" class="py-16 px-4 bg-slate-950/40 border-y border-slate-800/50">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-orange-500 font-bold uppercase text-xs tracking-widest">Официальный Стор</span>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white mt-1">
+          МЕРЧ GAZAN
+        </h2>
+        <p class="text-slate-400 text-sm mt-3">Эксклюзивная коллекция одежды и аксессуаров из высшего качества</p>
+      </div>
+
+      <!-- Сетка товаров -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Товар 1 -->
+        <div class="glass-card rounded-3xl p-4 flex flex-col justify-between group hover:border-orange-500/40 transition-all">
+          <div class="relative overflow-hidden rounded-2xl bg-slate-800/50 aspect-square mb-4">
+            <img src="https://placehold.co/500x500/1e293b/f97316?text=Hoodie+Чеченец" alt="Худи Чеченец" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <span class="absolute top-3 left-3 bg-orange-500 text-white font-extrabold text-[10px] uppercase px-2.5 py-1 rounded-lg">Хит продаж</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Худи GAZAN «Чеченец»</h3>
+            <p class="text-xs text-slate-400 mt-1 mb-3">Оверсайз крой, 100% плотный хлопок</p>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
+              <span class="text-xl font-black text-white">4 990 ₽</span>
+              <button onclick="openMerchModal('Худи GAZAN «Чеченец»', '4 990 ₽')" class="btn-3d px-4 py-2 rounded-xl text-xs font-bold text-white">
+                Заказать
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Товар 2 -->
+        <div class="glass-card rounded-3xl p-4 flex flex-col justify-between group hover:border-orange-500/40 transition-all">
+          <div class="relative overflow-hidden rounded-2xl bg-slate-800/50 aspect-square mb-4">
+          <img src="https://placehold.co/500x500/1e293b/f97316?text=T-Shirt+ГАЗан+67" alt="Футболка ГАЗан 67" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Футболка «ГАЗан 67»</h3>
+            <p class="text-xs text-slate-400 mt-1 mb-3">Фирменный арт с легендарным ГАЗ-66</p>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
+              <span class="text-xl font-black text-white">2 490 ₽</span>
+              <button onclick="openMerchModal('Футболка «ГАЗан 67»', '2 490 ₽')" class="btn-3d px-4 py-2 rounded-xl text-xs font-bold text-white">
+                Заказать
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Товар 3 -->
+        <div class="glass-card rounded-3xl p-4 flex flex-col justify-between group hover:border-orange-500/40 transition-all">
+          <div class="relative overflow-hidden rounded-2xl bg-slate-800/50 aspect-square mb-4">
+            <img src="https://placehold.co/500x500/1e293b/f97316?text=Cap+GAZAN" alt="Кепка GAZAN" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Брендированная Кепка</h3>
+            <p class="text-xs text-slate-400 mt-1 mb-3">Стильный вышитый логотип 3D</p>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
+              <span class="text-xl font-black text-white">1 890 ₽</span>
+              <button onclick="openMerchModal('Брендированная Кепка GAZAN', '1 890 ₽')" class="btn-3d px-4 py-2 rounded-xl text-xs font-bold text-white">
+                Заказать
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Товар 4 -->
+        <div class="glass-card rounded-3xl p-4 flex flex-col justify-between group hover:border-orange-500/40 transition-all">
+          <div class="relative overflow-hidden rounded-2xl bg-slate-800/50 aspect-square mb-4">
+            <img src="https://placehold.co/500x500/1e293b/f97316?text=Accessory+Pack" alt="Набор Аксессуаров" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">VIP Набор Аксессуаров</h3>
+            <p class="text-xs text-slate-400 mt-1 mb-3">Браслет + стикерпак + брелок</p>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
+              <span class="text-xl font-black text-white">990 ₽</span>
+              <button onclick="openMerchModal('VIP Набор Аксессуаров', '990 ₽')" class="btn-3d px-4 py-2 rounded-xl text-xs font-bold text-white">
+                Заказать
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Аудиоплеер треков -->
+  <section id="tracks" class="py-16 px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-10">
+        <span class="text-orange-500 font-bold uppercase text-xs tracking-widest">Дискография</span>
+        <h2 class="text-3xl sm:text-4xl font-black text-white mt-1">ТОП ТРЕКИ GAZAN</h2>
+      </div>
+
+      <div class="glass-card p-6 rounded-3xl flex flex-col gap-4">
+        
+        <!-- Трек 1 -->
+        <div class="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-800/50 transition-colors">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 font-black">
+              <i class="fa-solid fa-play"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-white">Чеченец</h4>
+              <span class="text-xs text-slate-400">GAZAN</span>
+            </div>
+          </div>
+          <a href="https://music.yandex.ru" target="_blank" class="text-xs font-bold text-orange-400 hover:underline">Яндекс Музыка <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
+        </div>
+
+        <!-- Трек 2 -->
+        <div class="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-800/50 transition-colors">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 font-black">
+              <i class="fa-solid fa-play"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-white">Бархатный кросс</h4>
+              <span class="text-xs text-slate-400">GAZAN</span>
+            </div>
+          </div>
+          <a href="https://music.yandex.ru" target="_blank" class="text-xs font-bold text-orange-400 hover:underline">Яндекс Музыка <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
+        </div>
+
+        <!-- Трек 3 -->
+        <div class="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-800/50 transition-colors">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 font-black">
+              <i class="fa-solid fa-play"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-white">Ауф</h4>
+              <span class="text-xs text-slate-400">GAZAN</span>
+            </div>
+          </div>
+          <a href="https://music.yandex.ru" target="_blank" class="text-xs font-bold text-orange-400 hover:underline">Яндекс Музыка <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Подвал (Footer) -->
+  <footer class="bg-slate-950 border-t border-slate-800/80 pt-12 pb-8 px-4 mt-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+      <div>
+        <div class="flex items-center gap-3 justify-center md:justify-start mb-2">
+          <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center font-black text-white">G</div>
+          <span class="text-xl font-black tracking-widest text-white">GAZAN</span>
+        </div>
+        <p class="text-xs text-slate-400">Официальный сайт артиста. Все права защищены © 2026</p>
+      </div>
+
+      <!-- Соцсети -->
+      <div class="flex gap-4">
+        <a href="#" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-slate-300 hover:text-orange-400 hover:border-orange-500/40 transition-colors">
+          <i class="fa-brands fa-vk text-lg"></i>
+        </a>
+        <a href="#" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-slate-300 hover:text-orange-400 hover:border-orange-500/40 transition-colors">
+          <i class="fa-brands fa-telegram text-lg"></i>
+        </a>
+        <a href="#" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-slate-300 hover:text-orange-400 hover:border-orange-500/40 transition-colors">
+          <i class="fa-brands fa-youtube text-lg"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Модальное окно покупки билетов -->
+  <div id="ticketModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden justify-center items-center p-4">
+    <div class="glass-card max-w-md w-full rounded-3xl p-6 relative border-orange-500/30">
+      <button onclick="closeTicketModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+
+      <h3 class="text-2xl font-black text-white mb-1" id="modalCityName">Покупка билета</h3>
+      <p class="text-xs text-orange-400 font-bold mb-4" id="modalVenueName">Концертный зал</p>
+
+      <form onsubmit="handleOrderSubmit(event)" class="space-y-4">
+        <div>
+        <label class="block text-xs font-bold text-slate-400 mb-1">ФИО зрителя</label>
+          <input type="text" required placeholder="Иван Иванов" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Ваш Телефон</label>
+          <input type="tel" required placeholder="+7 (999) 000-00-00" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Email (для получения электронных билетов)</label>
+          <input type="email" required placeholder="user@example.com" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
+        </div>
+
+        <button type="submit" class="btn-3d w-full py-3.5 rounded-xl font-extrabold text-sm uppercase text-white mt-4">
+          Перейти к оплате билета
+        </button>
+      </form>
     </div>
   </div>
 
-  <!-- Главное тело приложения -->
-  <div class="app-body">
-    <!-- Левый панель инструментов -->
-    <div class="toolbar">
-      <button class="tool-btn active" onclick="selectTool('move')" title="Перемещение (M)"><i class="fa-solid fa-up-down-left-right"></i></button>
-      <button class="tool-btn" onclick="selectTool('brush')" title="Кисть (B)"><i class="fa-solid fa-paint-brush"></i></button>
-      <button class="tool-btn" onclick="selectTool('eraser')" title="Ластик (E)"><i class="fa-solid fa-eraser"></i></button>
-      <button class="tool-btn" onclick="selectTool('bucket')" title="Заливка (G)"><i class="fa-solid fa-fill-drip"></i></button>
-      <button class="tool-btn" onclick="selectTool('shape')" title="Фигуры (U)"><i class="fa-solid fa-shapes"></i></button>
-      <button class="tool-btn" onclick="selectTool('text')" title="Текст (T)"><i class="fa-solid fa-font"></i></button>
-      <button class="tool-btn" onclick="selectTool('picker')" title="Пипетка (I)"><i class="fa-solid fa-eye-dropper"></i></button>
-      <button class="tool-btn" onclick="selectTool('crop')" title="Обрезка (C)"><i class="fa-solid fa-crop-simple"></i></button>
-      <button class="tool-btn" onclick="selectTool('pan')" title="Панорамирование (H)"><i class="fa-solid fa-hand"></i></button>
-    </div>
+  <!-- Модальное окно заказа мерча -->
+  <div id="merchModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden justify-center items-center p-4">
+    <div class="glass-card max-w-md w-full rounded-3xl p-6 relative border-orange-500/30">
+      <button onclick="closeMerchModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
 
-    <!-- Холст просмотра -->
-    <div class="viewport" id="viewport">
-      <div class="canvas-wrapper" id="canvasWrapper">
-        <canvas id="mainCanvas" width="800" height="600"></canvas>
-      </div>
+      <h3 class="text-2xl font-black text-white mb-1" id="modalMerchTitle">Оформление заказа</h3>
+      <p class="text-xs text-orange-400 font-bold mb-4" id="modalMerchPrice">Цена товара</p>
 
-      <!-- Зум виджет -->
-      <div class="zoom-widget">
-        <i class="fa-solid fa-minus" onclick="adjustZoom(-0.1)"></i>
-        <span id="zoomLevel">100%</span>
-        <i class="fa-solid fa-plus" onclick="adjustZoom(0.1)"></i>
-        <i class="fa-solid fa-expand" onclick="resetZoom()" title="Сброс масштаба"></i>
-      </div>
-    </div>
+      <form onsubmit="handleOrderSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Размер</label>
+          <select class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
+            <option value="S" class="bg-slate-900">S</option>
+            <option value="M" class="bg-slate-900" selected>M</option>
+            <option value="L" class="bg-slate-900">L</option>
+            <option value="XL" class="bg-slate-900">XL</option>
+            <option value="XXL" class="bg-slate-900">XXL (Оверсайз)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Ваше Имя</label>
+          <input type="text" required placeholder="Имя" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Телефон для связи</label>
+          <input type="tel" required placeholder="+7 (999) 000-00-00" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
+        </div>
 
-    <!-- Правый сайдбар (Слои и Коррекция) -->
-    <div class="right-sidebar">
-      
-      <!-- Фильтры и коррекция -->
-      <div class="sidebar-section">
-        <div class="section-title">Коррекция слоя</div>
-        <div class="option-group" style="flex-direction:column; align-items:stretch; gap:6px;">
-          <div class="modal-row">
-          <span style="font-size:11px;">Яркость:</span>
-            <input type="range" id="filterBrightness" min="-100" max="100" value="0" oninput="applyLayerFilters()">
-          </div>
-          <div class="modal-row">
-            <span style="font-size:11px;">Контраст:</span>
-            <input type="range" id="filterContrast" min="-100" max="100" value="0" oninput="applyLayerFilters()">
-          </div>
-          <div class="modal-row">
-            <span style="font-size:11px;">Размытие:</span>
-            <input type="range" id="filterBlur" min="0" max="20" value="0" oninput="applyLayerFilters()">
-          </div>
-        </div>
-        <div style="display:flex; gap:6px; margin-top:4px;">
-          <button class="btn-3d" style="flex:1; justify-content:center;" onclick="applyQuickFilter('grayscale')">Ч/Б</button>
-          <button class="btn-3d" style="flex:1; justify-content:center;" onclick="applyQuickFilter('invert')">Инверсия</button>
-          <button class="btn-3d" style="flex:1; justify-content:center;" onclick="applyQuickFilter('sepia')">Сепия</button>
-        </div>
-        <div style="display:flex; gap:6px; margin-top:4px;">
-          <button class="btn-3d" style="flex:1; justify-content:center;" onclick="rotateActiveLayer(90)"><i class="fa-solid fa-rotate-right"></i> 90°</button>
-          <button class="btn-3d" style="flex:1; justify-content:center;" onclick="flipActiveLayer('h')">⇄ Отразить</button>
-        </div>
-      </div>
-
-      <!-- Управление Слоями -->
-      <div class="sidebar-section" style="padding-bottom: 4px;">
-        <div class="section-title">
-          <span>Слои</span>
-          <div class="layer-controls">
-            <button class="btn-3d" onclick="addNewLayer()"><i class="fa-solid fa-plus"></i></button>
-            <button class="btn-3d danger" onclick="deleteActiveLayer()"><i class="fa-solid fa-trash-can"></i></button>
-          </div>
-        </div>
-        <div class="modal-row" style="margin-top:6px;">
-          <span style="font-size:11px;">Прозрачность слоя:</span>
-          <input type="range" id="layerOpacity" min="0" max="100" value="100" oninput="changeLayerOpacity(this.value)">
-        </div>
-      </div>
-
-      <!-- Список слоев -->
-      <div class="layers-container" id="layersList">
-        <!-- Слои генерируются скриптом -->
-      </div>
+        <button type="submit" class="btn-3d w-full py-3.5 rounded-xl font-extrabold text-sm uppercase text-white mt-4">
+          Подтвердить заказ в 1 клик
+        </button>
+      </form>
     </div>
   </div>
 
-  <!-- Модалка нового холста -->
-  <div class="modal-overlay" id="newCanvasModal">
-    <div class="modal-card">
-      <h3>Новый документ</h3>
-      <div class="modal-row">
-        <label>Ширина (px):</label>
-        <input type="number" id="newWidth" value="800" min="100" max="4000">
-      </div>
-      <div class="modal-row">
-        <label>Высота (px):</label>
-        <input type="number" id="newHeight" value="600" min="100" max="4000">
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
-        <button class="btn-3d" onclick="closeModal('newCanvasModal')">Отмена</button>
-        <button class="btn-3d primary" onclick="createCustomCanvas()">Создать</button>
-      </div>
-    </div>
-  </div>
-
+  <!-- Скрипты взаимодействия -->
   <script>
-    // Инициализация графического движка
-    const mainCanvas = document.getElementById('mainCanvas');
-    const mainCtx = mainCanvas.getContext('2d');
-    const viewport = document.getElementById('viewport');
-    const wrapper = document.getElementById('canvasWrapper');
-
-    // Состояние приложения
-    let layers = [];
-    let activeLayerIndex = -1;
-    let currentTool = 'move';
-    let isDrawing = false;
-    let startX = 0, startY = 0;
-    let zoomLevel = 1;
-    let panX = 0, panY = 0;
-    let isPanning = false;
-
-    // История (Undo/Redo)
-    let history = [];
-    let historyStep = -1;
-
-    // Старт работы
-    window.onload = () => {
-      createNewCanvas(800, 600);
-      setupEventListeners();
-    };
-
-    // Создание чистого документа
-    function createNewCanvas(width, height) {
-      mainCanvas.width = width;
-      mainCanvas.height = height;
-      layers = [];
-      history = [];
-      historyStep = -1;
-      
-      // Добавляем фоновый белый слой
-      const bgLayer = createLayerState("Фон", width, height);
-      const bgCtx = bgLayer.canvas.getContext('2d');
-      bgCtx.fillStyle = "#ffffff";
-      bgCtx.fillRect(0, 0, width, height);
-      
-      layers.push(bgLayer);
-      activeLayerIndex = 0;
-      
-      saveHistory();
-      renderLayersList();
-      renderMainCanvas();
-      resetZoom();
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+      menu.classList.toggle('flex');
     }
 
-    function createLayerState(name, w, h) {
-      const c = document.createElement('canvas');
-      c.width = w;
-      c.height = h;
-      return {
-        id: 'layer_' + Date.now() + Math.random(),
-        name: name,
-        canvas: c,
-        visible: true,
-        opacity: 1,
-        x: 0,
-        y: 0,
-        filters: { brightness: 0, contrast: 0, blur: 0 }
-      };
-    }
+    function filterConcerts() {
+      const query = document.getElementById('searchCity').value.toLowerCase();
+      const cards = document.querySelectorAll('.concert-card');
 
-    // Рендеринг всех слоев на финальный холст
-    function renderMainCanvas() {
-      mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-      
-      layers.forEach(layer => {
-        if (!layer.visible) return;
-        
-        mainCtx.save();
-        mainCtx.globalAlpha = layer.opacity;
-
-        // Применение CSS-фильтров слоя
-        let filterStr = '';
-        if (layer.filters.brightness !== 0) filterStr += `brightness(${100 + Number(layer.filters.brightness)}%) `;
-        if (layer.filters.contrast !== 0) filterStr += `contrast(${100 + Number(layer.filters.contrast)}%) `;
-        if (layer.filters.blur > 0) filterStr += `blur(${layer.filters.blur}px) `;
-        
-        mainCtx.filter = filterStr.trim() || 'none';
-        mainCtx.drawImage(layer.canvas, layer.x, layer.y);
-        mainCtx.restore();
-      });
-
-      updateLayerPreviews();
-    }
-
-    // Рендер панели слоев
-    function renderLayersList() {
-      const container = document.getElementById('layersList');
-      container.innerHTML = '';
-
-      [...layers].reverse().forEach((layer, revIdx) => {
-        const actualIdx = layers.length - 1 - revIdx;
-        const item = document.createElement('div');
-        item.className = `layer-item ${actualIdx === activeLayerIndex ? 'active' : ''}`;
-        item.onclick = () => selectLayer(actualIdx);
-
-        item.innerHTML = `
-          <button class="layer-vis-btn ${layer.visible ? 'active' : ''}" onclick="toggleLayerVis(event, ${actualIdx})">
-            <i class="fa-solid ${layer.visible ? 'fa-eye' : 'fa-eye-slash'}"></i>
-          </button>
-          <img class="layer-preview" id="prev_${layer.id}">
-          <div class="layer-info">
-            <span class="layer-name">${escapeHTML(layer.name)}</span>
-          </div>
-        `;
-        container.appendChild(item);
-      });
-
-      if (layers[activeLayerIndex]) {
-        document.getElementById('layerOpacity').value = layers[activeLayerIndex].opacity * 100;
-        document.getElementById('filterBrightness').value = layers[activeLayerIndex].filters.brightness;
-        document.getElementById('filterContrast').value = layers[activeLayerIndex].filters.contrast;
-        document.getElementById('filterBlur').value = layers[activeLayerIndex].filters.blur;
-      }
-    }
-
-    function updateLayerPreviews() {
-      layers.forEach(l => {
-        const img = document.getElementById(`prev_${l.id}`);
-        if (img) img.src = l.canvas.toDataURL();
-      });
-    }
-
-    // Управление слоями
-    function addNewLayer() {
-      const newLayer = createLayerState(`Слой ${layers.length + 1}`, mainCanvas.width, mainCanvas.height);
-      layers.push(newLayer);
-      activeLayerIndex = layers.length - 1;
-      saveHistory();
-      renderLayersList();
-      renderMainCanvas();
-    }
-
-    function deleteActiveLayer() {
-      if (layers.length <= 1) return alert("Нельзя удалить единственный слой!");
-      layers.splice(activeLayerIndex, 1);
-      activeLayerIndex = Math.max(0, activeLayerIndex - 1);
-      saveHistory();
-      renderLayersList();
-      renderMainCanvas();
-    }
-
-    function selectLayer(idx) {
-      activeLayerIndex = idx;
-      renderLayersList();
-      }
-
-    function toggleLayerVis(e, idx) {
-      e.stopPropagation();
-      layers[idx].visible = !layers[idx].visible;
-      renderLayersList();
-      renderMainCanvas();
-    }
-
-    function changeLayerOpacity(val) {
-      if (!layers[activeLayerIndex]) return;
-      layers[activeLayerIndex].opacity = val / 100;
-      renderMainCanvas();
-    }
-
-    // Выбор инструментов
-    function selectTool(tool) {
-      currentTool = tool;
-      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-      event.currentTarget.classList.add('active');
-
-      document.getElementById('currentToolName').innerText = getToolName(tool);
-      
-      // Показ нужных настроек в верхней панели
-      document.querySelectorAll('.tool-opt').forEach(o => o.style.display = 'none');
-      if (tool === 'brush' || tool === 'eraser') document.getElementById('brushOpts').style.display = 'flex';
-      if (tool === 'shape') document.getElementById('shapeOpts').style.display = 'flex';
-      if (tool === 'text') {
-        document.getElementById('textOpts').style.display = 'flex';
-        document.getElementById('brushOpts').style.display = 'flex';
-      }
-    }
-
-    function getToolName(t) {
-      const names = { move:'Перемещение', brush:'Кисть', eraser:'Ластик', bucket:'Заливка', shape:'Фигуры', text:'Текст', picker:'Пипетка', crop:'Обрезка', pan:'Панорамирование' };
-      return names[t] || t;
-    }
-
-    // Обработка событий рисования на Canvas
-    function setupEventListeners() {
-      wrapper.addEventListener('mousedown', startDrawing);
-      window.addEventListener('mousemove', draw);
-      window.addEventListener('mouseup', stopDrawing);
-
-      // Масштабирование колесиком
-      viewport.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        adjustZoom(e.deltaY < 0 ? 0.1 : -0.1);
-      });
-
-      // Сочетания клавиш
-      window.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.code === 'KeyZ') { e.preventDefault(); undo(); }
-        if (e.ctrlKey && e.code === 'KeyY') { e.preventDefault(); redo(); }
-      });
-    }
-
-    function getCanvasCoords(e) {
-      const rect = mainCanvas.getBoundingClientRect();
-      const scaleX = mainCanvas.width / rect.width;
-      const scaleY = mainCanvas.height / rect.height;
-      return {
-        x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
-      };
-    }
-
-    function startDrawing(e) {
-      if (currentTool === 'pan' || e.button === 1) {
-        isPanning = true;
-        startX = e.clientX - panX;
-        startY = e.clientY - panY;
-        return;
-      }
-
-      if (!layers[activeLayerIndex] || !layers[activeLayerIndex].visible) return;
-      isDrawing = true;
-      const coords = getCanvasCoords(e);
-      startX = coords.x;
-      startY = coords.y;
-
-      const layer = layers[activeLayerIndex];
-      const ctx = layer.canvas.getContext('2d');
-
-      if (currentTool === 'brush' || currentTool === 'eraser') {
-        ctx.beginPath();
-        ctx.moveTo(coords.x - layer.x, coords.y - layer.y);
-      } else if (currentTool === 'bucket') {
-        floodFill(layer.canvas, Math.floor(coords.x - layer.x), Math.floor(coords.y - layer.y), document.getElementById('primaryColor').value);
-        saveHistory();
-        renderMainCanvas();
-      } else if (currentTool === 'picker') {
-        pickColor(coords.x, coords.y);
-      } else if (currentTool === 'text') {
-        const text = prompt("Введите текст:");
-        if (text) {
-          ctx.font = `${document.getElementById('fontSize').value}px ${document.getElementById('fontFamily').value}`;
-          ctx.fillStyle = document.getElementById('primaryColor').value;
-          ctx.fillText(text, coords.x - layer.x, coords.y - layer.y);
-          saveHistory();
-          renderMainCanvas();
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
         }
-      }
-    }
-
-    function draw(e) {
-      if (isPanning) {
-        panX = e.clientX - startX;
-        panY = e.clientY - startY;
-        updateTransform();
-        return;
-      }
-      if (!isDrawing) return;
-      const coords = getCanvasCoords(e);
-      const layer = layers[activeLayerIndex];
-      const ctx = layer.canvas.getContext('2d');
-
-      if (currentTool === 'brush') {
-        ctx.strokeStyle = document.getElementById('primaryColor').value;
-        ctx.lineWidth = document.getElementById('brushSize').value;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.lineTo(coords.x - layer.x, coords.y - layer.y);
-        ctx.stroke();
-        renderMainCanvas();
-      } else if (currentTool === 'eraser') {
-        ctx.lineWidth = document.getElementById('brushSize').value;
-        ctx.lineCap = 'round';
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineTo(coords.x - layer.x, coords.y - layer.y);
-        ctx.stroke();
-        renderMainCanvas();
-      } else if (currentTool === 'move') {
-        layer.x += (coords.x - startX);
-        layer.y += (coords.y - startY);
-        startX = coords.x;
-        startY = coords.y;
-        renderMainCanvas();
-      }
-    }
-
-    function stopDrawing(e) {
-      if (isPanning) {
-        isPanning = false;
-        return;
-      }
-
-      if (!isDrawing) return;
-      isDrawing = false;
-      const coords = getCanvasCoords(e);
-      const layer = layers[activeLayerIndex];
-      const ctx = layer.canvas.getContext('2d');
-
-      if (currentTool === 'shape') {
-        const shape = document.getElementById('shapeType').value;
-        ctx.strokeStyle = document.getElementById('primaryColor').value;
-        ctx.fillStyle = document.getElementById('primaryColor').value;
-        ctx.lineWidth = document.getElementById('brushSize').value;
-        ctx.beginPath();
-
-        let lx = coords.x - layer.x;
-        let ly = coords.y - layer.y;
-        let sx = startX - layer.x;
-        let sy = startY - layer.y;
-
-        if (shape === 'rect') {
-          ctx.strokeRect(sx, sy, lx - sx, ly - sy);
-        } else if (shape === 'circle') {
-          let radius = Math.hypot(lx - sx, ly - sy);
-          ctx.arc(sx, sy, radius, 0, Math.PI * 2);
-          ctx.stroke();
-        } else if (shape === 'line') {
-          ctx.moveTo(sx, sy);
-          ctx.lineTo(lx, ly);
-          ctx.stroke();
-        }
-        renderMainCanvas();
-      }
-
-      saveHistory();
-    }
-
-    // Заливка (Bucket Fill)
-    function floodFill(canvas, startX, startY, fillColorHex) {
-      const ctx = canvas.getContext('2d');
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imgData.data;
-
-      const targetColor = getPixelColor(data, startX, startY, canvas.width);
-      const fillColor = hexToRgba(fillColorHex);
-
-      if (colorsMatch(targetColor, fillColor)) return;
-
-      const queue = [[startX, startY]];
-      while (queue.length > 0) {
-        const [x, y] = queue.pop();
-        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
-
-        const idx = (y * canvas.width + x) * 4;
-        const currentColor = [data[idx], data[idx+1], data[idx+2], data[idx+3]];
-
-        if (colorsMatch(currentColor, targetColor)) {
-          data[idx] = fillColor[0];
-          data[idx+1] = fillColor[1];
-          data[idx+2] = fillColor[2];
-          data[idx+3] = 255;
-
-          queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
-        }
-      }
-
-      ctx.putImageData(imgData, 0, 0);
-    }
-
-    function getPixelColor(data, x, y, width) {
-      const idx = (y * width + x) * 4;
-      return [data[idx], data[idx+1], data[idx+2], data[idx+3]];
-    }
-
-    function colorsMatch(a, b) {
-      return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
-    }
-
-    function hexToRgba(hex) {
-      let c = hex.replace('#', '');
-      if (c.length === 3) c = c.split('').map(x => x + x).join('');
-      const num = parseInt(c, 16);
-      return [(num >> 16) & 255, (num >> 8) & 255, num & 255, 255];
-    }
-
-    // Пипетка
-    function pickColor(x, y) {
-    const pixel = mainCtx.getImageData(x, y, 1, 1).data;
-      const hex = "#" + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1);
-      document.getElementById('primaryColor').value = hex;
-    }
-
-    // Фильтры и Коррекция
-    function applyLayerFilters() {
-      if (!layers[activeLayerIndex]) return;
-      layers[activeLayerIndex].filters.brightness = document.getElementById('filterBrightness').value;
-      layers[activeLayerIndex].filters.contrast = document.getElementById('filterContrast').value;
-      layers[activeLayerIndex].filters.blur = document.getElementById('filterBlur').value;
-      renderMainCanvas();
-    }
-
-    function applyQuickFilter(type) {
-      if (!layers[activeLayerIndex]) return;
-      const ctx = layers[activeLayerIndex].canvas.getContext('2d');
-      const imgData = ctx.getImageData(0, 0, layers[activeLayerIndex].canvas.width, layers[activeLayerIndex].canvas.height);
-      const data = imgData.data;
-
-      for (let i = 0; i < data.length; i += 4) {
-        if (type === 'grayscale') {
-          let avg = (data[i] + data[i+1] + data[i+2]) / 3;
-          data[i] = avg; data[i+1] = avg; data[i+2] = avg;
-        } else if (type === 'invert') {
-          data[i] = 255 - data[i];
-          data[i+1] = 255 - data[i+1];
-          data[i+2] = 255 - data[i+2];
-        } else if (type === 'sepia') {
-          let r = data[i], g = data[i+1], b = data[i+2];
-          data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
-          data[i+1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
-          data[i+2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
-        }
-      }
-
-      ctx.putImageData(imgData, 0, 0);
-      saveHistory();
-      renderMainCanvas();
-    }
-
-    function rotateActiveLayer(deg) {
-      if (!layers[activeLayerIndex]) return;
-      const layer = layers[activeLayerIndex];
-      const tempC = document.createElement('canvas');
-      tempC.width = layer.canvas.width;
-      tempC.height = layer.canvas.height;
-      tempC.getContext('2d').drawImage(layer.canvas, 0, 0);
-
-      const ctx = layer.canvas.getContext('2d');
-      ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
-      ctx.save();
-      ctx.translate(layer.canvas.width/2, layer.canvas.height/2);
-      ctx.rotate(deg * Math.PI / 180);
-      ctx.drawImage(tempC, -tempC.width/2, -tempC.height/2);
-      ctx.restore();
-
-      saveHistory();
-      renderMainCanvas();
-    }
-
-    function flipActiveLayer(dir) {
-      if (!layers[activeLayerIndex]) return;
-      const layer = layers[activeLayerIndex];
-      const tempC = document.createElement('canvas');
-      tempC.width = layer.canvas.width;
-      tempC.height = layer.canvas.height;
-      tempC.getContext('2d').drawImage(layer.canvas, 0, 0);
-
-      const ctx = layer.canvas.getContext('2d');
-      ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
-      ctx.save();
-      if (dir === 'h') {
-        ctx.scale(-1, 1);
-        ctx.drawImage(tempC, -layer.canvas.width, 0);
-      }
-      ctx.restore();
-
-      saveHistory();
-      renderMainCanvas();
-    }
-
-    // Масштаб и сдвиг
-    function adjustZoom(delta) {
-      zoomLevel = Math.min(Math.max(0.1, zoomLevel + delta), 5);
-      updateTransform();
-    }
-
-    function resetZoom() {
-      zoomLevel = 1;
-      panX = 0;
-      panY = 0;
-      updateTransform();
-    }
-
-    function updateTransform() {
-      wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
-      document.getElementById('zoomLevel').innerText = Math.round(zoomLevel * 100) + '%';
-    }
-
-    // История (Undo/Redo)
-    function saveHistory() {
-      historyStep++;
-      history = history.slice(0, historyStep);
-      
-      // Глубокая копия состояния слоев
-      const snap = layers.map(l => {
-        const c = document.createElement('canvas');
-        c.width = l.canvas.width;
-        c.height = l.canvas.height;
-        c.getContext('2d').drawImage(l.canvas, 0, 0);
-        return {
-        id: l.id,
-          name: l.name,
-          canvas: c,
-          visible: l.visible,
-          opacity: l.opacity,
-          x: l.x,
-          y: l.y,
-          filters: {...l.filters}
-        };
       });
-
-      history.push(snap);
     }
 
-    function undo() {
-      if (historyStep > 0) {
-        historyStep--;
-        restoreState(history[historyStep]);
-      }
+    function openTicketModal(city, venue, date) {
+      document.getElementById('modalCityName').innerText = `${city} — ${date}`;
+      document.getElementById('modalVenueName').innerText = venue;
+      document.getElementById('ticketModal').classList.remove('hidden');
+      document.getElementById('ticketModal').classList.add('flex');
     }
 
-    function redo() {
-      if (historyStep < history.length - 1) {
-        historyStep++;
-        restoreState(history[historyStep]);
-      }
+    function closeTicketModal() {
+      document.getElementById('ticketModal').classList.add('hidden');
+      document.getElementById('ticketModal').classList.remove('flex');
     }
 
-    function restoreState(snap) {
-      layers = snap.map(l => {
-        const c = document.createElement('canvas');
-        c.width = l.canvas.width;
-        c.height = l.canvas.height;
-        c.getContext('2d').drawImage(l.canvas, 0, 0);
-        return {
-          id: l.id,
-          name: l.name,
-          canvas: c,
-          visible: l.visible,
-          opacity: l.opacity,
-          x: l.x,
-          y: l.y,
-          filters: {...l.filters}
-        };
-      });
-      activeLayerIndex = Math.min(activeLayerIndex, layers.length - 1);
-      renderLayersList();
-      renderMainCanvas();
+    function openMerchModal(title, price) {
+      document.getElementById('modalMerchTitle').innerText = title;
+      document.getElementById('modalMerchPrice').innerText = price;
+      document.getElementById('merchModal').classList.remove('hidden');
+      document.getElementById('merchModal').classList.add('flex');
     }
 
-    // Загрузка файла пользователем
-    function handleFileOpen(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const img = new Image();
-        img.onload = () => {
-          createNewCanvas(img.width, img.height);
-          const ctx = layers[0].canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-          saveHistory();
-          renderMainCanvas();
-        };
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
+    function closeMerchModal() {
+      document.getElementById('merchModal').classList.add('hidden');
+      document.getElementById('merchModal').classList.remove('flex');
     }
 
-    // Экспорт результатов
-    function exportImage(format) {
-      const link = document.createElement('a');
-      link.download = `art-${Date.now()}.${format}`;
-      link.href = mainCanvas.toDataURL(`image/${format}`, 0.95);
-      link.click();
-    }
-
-    // Работа с Модальными окнами
-    function openNewCanvasModal() {
-      document.getElementById('newCanvasModal').style.display = 'flex';
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
-    }
-
-    function createCustomCanvas() {
-      const w = parseInt(document.getElementById('newWidth').value);
-      const h = parseInt(document.getElementById('newHeight').value);
-      if (w > 0 && h > 0) {
-        createNewCanvas(w, h);
-        closeModal('newCanvasModal');
-      }
-    }
-
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    function handleOrderSubmit(e) {
+      e.preventDefault();
+      alert('Заказ успешно оформлен! Наш менеджер свяжется с вами для подтверждения.');
+      closeTicketModal();
+      closeMerchModal();
     }
   </script>
 </body>
 </html>
+```
