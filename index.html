@@ -3,673 +3,1873 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>GAZAN — Официальный сайт артиста | Концерты & Мерч</title>
-  <!-- Tailwind CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>WaveGram — Общий чат и Звонки</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Иконки -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              accent: '#f97316',
-              glow: '#ffedd5',
-              dark: '#0b0f19',
-              card: 'rgba(23, 31, 51, 0.75)',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap');
+    /* Flat Telegram-inspired theme variables (Light mint-green & Dark night-blue) */
+    :root {
+      --app-bg: #e7ebf0;
+      --sidebar-bg: #ffffff;
+      --header-bg: #ffffff;
+      --footer-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #707579;
+      --accent-color: #3390ec;
+      --accent-hover: #267fd8;
+      --accent-soft: rgba(51, 144, 236, 0.12);
+      --active-chat-bg: #3390ec;
+      --active-chat-text: #ffffff;
+      --hover-chat-bg: #f4f4f5;
+      --input-bg: #f4f4f5;
+      --danger-color: #e53935;
+
+      /* Seamless patterned wallpaper in light mint-green theme */
+      --wallpaper-gradient: linear-gradient(135deg, #d7e8c7 0%, #c8e4c8 48%, #b8decb 100%);
+      --wallpaper-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%234a7a52' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.14'%3E%3Cpath d='M28 42l26-10-9 26-6-10-11-6z'/%3E%3Cpath d='M132 30l4 8 9 1-6 6 1 9-8-4-8 4 1-9-6-6 9-1z'/%3E%3Cpath d='M185 75c0-6 5-10 10-10s10 4 10 10c0 8-10 15-10 15s-10-7-10-15z'/%3E%3Ccircle cx='55' cy='115' r='11'/%3E%3Cellipse cx='55' cy='115' rx='18' ry='5' transform='rotate(-22 55 115)'/%3E%3Cpath d='M118 112h22a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6h-14l-6 5v-5h-2a6 6 0 0 1-6-6v-10a6 6 0 0 1 6-6z'/%3E%3Cpath d='M178 165v-8a11 11 0 0 1 22 0v8'/%3E%3Crect x='174' y='163' width='5' height='9' rx='2'/%3E%3Crect x='200' y='163' width='5' height='9' rx='2'/%3E%3Cpath d='M34 176l18-18m-4 0h4v4M32 172l-4 4m8 0l-4 4'/%3E%3Cpath d='M96 184c3-5 10-5 13 0 3-5 10-5 13 0 0 7-13 14-13 14s-13-7-13-14z'/%3E%3Ccircle cx='88' cy='62' r='2'/%3E%3Ccircle cx='164' cy='38' r='2'/%3E%3Ccircle cx='24' cy='142' r='2'/%3E%3Ccircle cx='148' cy='182' r='2'/%3E%3C/g%3E%3C/svg%3E");
+
+      /* Message bubbles (Light theme) */
+      --bubble-theirs-bg: #ffffff;
+      --bubble-theirs-text: #0f172a;
+      --bubble-theirs-meta: #8c969e;
+      --bubble-mine-bg: #eeffde;
+      --bubble-mine-text: #0f172a;
+      --bubble-mine-meta: #4fae4e;
+      --bubble-check: #4fae4e;
+      --system-pill-bg: rgba(74, 122, 82, 0.25);
+      --system-pill-text: #ffffff;
+      --badge-bg: #4fae4e;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    [data-theme="dark"] {
+      --app-bg: #0e1621;
+      --sidebar-bg: #17212b;
+      --header-bg: #17212b;
+      --footer-bg: #17212b;
+      --border-color: #232e3c;
+      --text-main: #f5f5f5;
+      --text-muted: #7f91a4;
+      --accent-color: #5288c1;
+      --accent-hover: #659bd4;
+      --accent-soft: rgba(82, 136, 193, 0.16);
+      --active-chat-bg: #2b5278;
+      --active-chat-text: #ffffff;
+      --hover-chat-bg: #202b36;
+      --input-bg: #242f3d;
+      --danger-color: #ef5350;
+
+      /* Seamless patterned wallpaper in dark night-blue theme */
+      --wallpaper-gradient: linear-gradient(160deg, #0e1621 0%, #121c29 52%, #0b121b 100%);
+      --wallpaper-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%235288c1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.11'%3E%3Cpath d='M28 42l26-10-9 26-6-10-11-6z'/%3E%3Cpath d='M132 30l4 8 9 1-6 6 1 9-8-4-8 4 1-9-6-6 9-1z'/%3E%3Cpath d='M185 75c0-6 5-10 10-10s10 4 10 10c0 8-10 15-10 15s-10-7-10-15z'/%3E%3Ccircle cx='55' cy='115' r='11'/%3E%3Cellipse cx='55' cy='115' rx='18' ry='5' transform='rotate(-22 55 115)'/%3E%3Cpath d='M118 112h22a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6h-14l-6 5v-5h-2a6 6 0 0 1-6-6v-10a6 6 0 0 1 6-6z'/%3E%3Cpath d='M178
+      165v-8a11 11 0 0 1 22 0v8'/%3E%3Crect x='174' y='163' width='5' height='9' rx='2'/%3E%3Crect x='200' y='163' width='5' height='9' rx='2'/%3E%3Cpath d='M34 176l18-18m-4 0h4v4M32 172l-4 4m8 0l-4 4'/%3E%3Cpath d='M96 184c3-5 10-5 13 0 3-5 10-5 13 0 0 7-13 14-13 14s-13-7-13-14z'/%3E%3Ccircle cx='88' cy='62' r='2'/%3E%3Ccircle cx='164' cy='38' r='2'/%3E%3Ccircle cx='24' cy='142' r='2'/%3E%3Ccircle cx='148' cy='182' r='2'/%3E%3C/g%3E%3C/svg%3E");
+
+      /* Message bubbles (Dark theme) */
+      --bubble-theirs-bg: #182533;
+      --bubble-theirs-text: #f5f5f5;
+      --bubble-theirs-meta: #6c7f93;
+      --bubble-mine-bg: #2b5278;
+      --bubble-mine-text: #ffffff;
+      --bubble-mine-meta: #8ab4dc;
+      --bubble-check: #64b5f6;
+      --system-pill-bg: rgba(24, 37, 51, 0.84);
+      --system-pill-text: #d7e3ef;
+      --badge-bg: #5288c1;
+    }
 
     * {
-      font-family: 'Montserrat', sans-serif;
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--app-bg);
+      color: var(--text-main);
     }
 
     body {
-      background: radial-gradient(circle at 50% -20%, #1e293b 0%, #0b0f19 70%);
-      color: #f8fafc;
-      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
     }
 
-    /* Glassmorphism эффекты */
-    .glass-card {
-      background: rgba(30, 41, 59, 0.6);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 22, 33, 0.68);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
     }
 
-    .glass-nav {
-      background: rgba(11, 15, 25, 0.85);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    .modal-card {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px 20px;
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
     }
 
-    /* 3D Кнопки */
-    .btn-3d {
-      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-      box-shadow: 0 6px 0 #c2410c, 0 10px 20px rgba(249, 115, 22, 0.4);
-      transition: all 0.15s ease;
-    }
-    .btn-3d:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 0 #c2410c, 0 14px 24px rgba(249, 115, 22, 0.5);
-    }
-    .btn-3d:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #c2410c, 0 4px 10px rgba(249, 115, 22, 0.4);
+    .wg-logo-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .btn-3d-secondary {
-      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-      border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: 0 6px 0 #0f172a, 0 10px 20px rgba(0, 0, 0, 0.4);
-      transition: all 0.15s ease;
-    }
-    .btn-3d-secondary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 0 #0f172a, 0 14px 24px rgba(0, 0, 0, 0.5);
-    }
-    .btn-3d-secondary:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #0f172a, 0 4px 10px rgba(0, 0, 0, 0.4);
+    .danger-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(229, 57, 53, 0.14);
+      color: var(--danger-color);
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Неоновое свечение */
-    .neon-text {
-      text-shadow: 0 0 20px rgba(249, 115, 22, 0.6), 0 0 40px rgba(249, 115, 22, 0.3);
+    .modal-card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
     }
 
-    /* Полоса прокрутки */
-    ::-webkit-scrollbar {
-      width: 8px;
+    .modal-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.45;
     }
-    ::-webkit-scrollbar-track {
-      background: #0b0f19;
+
+    .modal-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 16px;
+      outline: none;
+      text-align: center;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
+
+    .modal-input:focus {
+      border-color: var(--accent-color);
+      background: var(--sidebar-bg);
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #f97316;
+
+    .modal-error {
+      color: var(--danger-color);
+      font-size: 13px;
+      min-height: 18px;
+      font-weight: 500;
+    }
+
+    .modal-btn-primary {
+      width: 100%;
+      min-height: 46px;
+      background: var(--accent-color);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .modal-btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .modal-actions-row {
+      width: 100%;
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .modal-btn-secondary {
+      flex: 1;
+      min-height: 44px;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .modal-btn-secondary:hover {
+      background: var(--hover-chat-bg);
+    }
+
+    .modal-btn-danger {
+      flex: 1;
+      min-height: 44px;
+      background: var(--danger-color);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .modal-btn-danger:hover {
+      opacity: 0.92;
+    }
+
+    /* Two-pane flat layout */
+    .wg-app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      background: var(--sidebar-bg);
+    }
+
+    /* Left sidebar */
+    .wg-sidebar {
+      width: 320px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 30;
+    }
+
+    .sidebar-brand-bar {
+      padding: 10px 14px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .sidebar-top {
+      padding: 8px 12px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--border-color);
+      min-height: 56px;
+    }
+
+    .search-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    .search-input {
+      width: 100%;
+      min-height: 40px;
+      background: var(--input-bg);
+      border: 1px solid transparent;
+      border-radius: 20px;
+      padding: 8px 12px 8px 34px;
+      font-size: 16px;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-color);
+      background: var(--sidebar-bg);
+    }
+
+    .icon-btn {
+      min-width: 40px;
+      min-height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 17px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      background: var(--hover-chat-bg);
+      color: var(--text-main);
+    }
+
+    .clear-all-btn {
+      min-height: 36px;
+      padding: 0 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(229, 57, 53, 0.35);
+      background: rgba(229, 57, 53, 0.1);
+      color: var(--danger-color);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .clear-all-btn:hover {
+      background: rgba(229, 57, 53, 0.18);
+    }
+
+    /* Profile bar */
+    .my-profile-bar {
+      padding: 8px 14px;
+      background: var(--accent-soft);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .my-profile-bar:hover {
+      opacity: 0.92;
+    }
+
+    .my-profile-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .avatar-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .avatar-circle.small {
+      width: 36px;
+      height: 36px;
+      font-size: 14px;
+    }
+
+    .my-profile-text {
+      min-width: 0;
+    }
+
+    .my-profile-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .my-profile-sub {
+      font-size: 12px;
+      color: var(--accent-color);
+    }
+
+    /* Chats and participants list */
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .list-section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 10px 12px 4px;
+    }
+
+    .chat-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      min-height: 58px;
+    }
+
+    .chat-row:hover {
+      background: var(--hover-chat-bg);
+    }
+
+    .chat-row.active {
+      background: var(--active-chat-bg);
+      color: var(--active-chat-text);
+    }
+
+    .chat-row-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .chat-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chat-row-title {
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-row-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .chat-row.active .chat-row-time,
+    .chat-row.active .chat-row-preview {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .chat-row-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chat-row-preview {
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wg-badge {
+      background: var(--badge-bg);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chat-row.active .wg-badge {
+      background: #ffffff;
+      color: var(--active-chat-bg);
+    }
+
+    /* Right chat panel with seamless patterned wallpaper */
+    .wg-chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      position: relative;
+      background-image: var(--wallpaper-pattern), var(--wallpaper-gradient);
+      background-repeat: repeat, no-repeat;
+      background-size: 220px 220px, cover;
+    }
+
+    /* Active chat header */
+    .chat-topbar {
+      min-height: 58px;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .mobile-back-btn {
+      display: none;
+    }
+
+    .topbar-titles {
+      min-width: 0;
+    }
+
+    .topbar-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-status {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Message stream */
+    .messages-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .messages-inner {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .msg-system {
+      align-self: center;
+      background: var(--system-pill-bg);
+      color: var(--system-pill-text);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 14px;
+      margin: 4px 0;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .msg-bubble {
+      position: relative;
+      max-width: 78%;
+      padding: 7px 11px 6px;
+      border-radius: 14px;
+      font-size: 15px;
+      line-height: 1.38;
+      word-wrap: break-word;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg-bubble.theirs {
+      align-self: flex-start;
+      background: var(--bubble-theirs-bg);
+      color: var(--bubble-theirs-text);
+      border-bottom-left-radius: 4px;
+      margin-left: 6px;
+    }
+
+    .msg-bubble.theirs::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: -6px;
+      width: 10px;
+      height: 12px;
+      background: var(--bubble-theirs-bg);
+      clip-path: polygon(100% 0, 0 100%, 100% 100%);
+    }
+
+    .msg-bubble.mine {
+      align-self: flex-end;
+      background: var(--bubble-mine-bg);
+      color: var(--bubble-mine-text);
+      border-bottom-right-radius: 4px;
+      margin-right: 6px;
+    }
+
+    .msg-bubble.mine::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: -6px;
+      width: 10px;
+      height: 12px;
+      background: var(--bubble-mine-bg);
+      clip-path: polygon(0 0, 0 100%, 100% 100%);
+    }
+
+    .msg-sender {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-color);
+      margin-bottom: 2px;
+      cursor: pointer;
+    }
+
+    .msg-content {
+      display: inline;
+    }
+
+    .msg-content img {
+      max-width: 240px;
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 4px;
+      display: block;
+    }
+
+    .msg-meta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      font-size: 11px;
+      margin-top: 2px;
+      margin-left: 10px;
+      align-self: flex-end;
+      user-select: none;
+    }
+
+    .msg-bubble.theirs .msg-meta {
+      color: var(--bubble-theirs-meta);
+    }
+
+    .msg-bubble.mine .msg-meta {
+      color: var(--bubble-mine-meta);
+    }
+
+    .msg-checks {
+      color: var(--bubble-check);
+      font-weight: 700;
+      letter-spacing: -2px;
+      font-size: 12px;
+    }
+
+    .msg-del-btn {
+      background: none;
+      border: none;
+      color: inherit;
+      opacity: 0.65;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 2px;
+    }
+
+    .msg-del-btn:hover {
+      opacity: 1;
+      color: var(--danger-color);
+    }
+
+    /* Emoji & GIF drawer */
+    .emoji-drawer {
+      background: var(--footer-bg);
+      border-top: 1px solid var(--border-color);
+      padding: 8px 12px;
+      display: none;
+      gap: 6px;
+      overflow-x: auto;
+      flex-shrink: 0;
+      scrollbar-width: none;
+    }
+
+    .emoji-drawer.open {
+      display: flex;
+    }
+
+    .emoji-drawer::-webkit-scrollbar {
+      display: none;
+    }
+
+    .quick-chip {
+      min-height: 36px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .quick-chip:hover {
+      background: var(--hover-chat-bg);
+    }
+
+    /* Message composer */
+    .chat-composer {
+      background: var(--footer-bg);
+      border-top: 1px solid var(--border-color);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .composer-inner {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .composer-input-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: var(--input-bg);
+      border-radius: 22px;
+      padding: 2px 10px 2px 6px;
+      min-height: 44px;
+    }
+
+    #messageInput {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-main);
+      font-size: 16px;
+      padding: 8px 6px;
+      outline: none;
+      min-width: 0;
+    }
+
+    .send-circle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent-color);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .send-circle-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Embedded Jitsi Meet call overlay */
+    .call-overlay {
+      position: fixed;
+      inset: 0;
+      background: #0e1621;
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+    }
+
+    .call-header {
+      min-height: 54px;
+      background: #17212b;
+      border-bottom: 1px solid #232e3c;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .call-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .call-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .call-pill-btn {
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: 18px;
+      border: 1px solid #2f3e50;
+      background: #242f3d;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .call-end-btn {
+      min-height: 36px;
+      padding: 6px 14px;
+      border-radius: 18px;
+      border: none;
+      background: var(--danger-color);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .call-iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
+    }
+
+    /* Mobile drawer behavior */
+    @media (max-width: 768px) {
+      .wg-sidebar {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        transform: translateX(0);
+        transition: transform 0.24s ease;
+      }
+
+      .wg-app.chat-opened .wg-sidebar {
+        transform: translateX(-100%);
+        pointer-events: none;
+      }
+
+      .mobile-back-btn {
+        display: inline-flex;
+      }
+
+      .msg-bubble {
+        max-width: 84%;
+      }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body data-theme="light">
 
-  <!-- Шапка сайта -->
-  <nav class="fixed top-0 left-0 right-0 z-50 glass-nav px-4 py-3 transition-all duration-300">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-      <a href="#" class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center font-black text-xl shadow-lg shadow-orange-500/30">
-          G
-        </div>
-        <span class="text-2xl font-black tracking-widest text-white">GAZAN</span>
-      </a>
-
-      <!-- Навигация для ПК -->
-      <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
-        <a href="#about" class="hover:text-orange-400 transition-colors">Об артисте</a>
-        <a href="#tours" class="hover:text-orange-400 transition-colors">Концертный тур</a>
-        <a href="#merch" class="hover:text-orange-400 transition-colors">Мерч</a>
-        <a href="#tracks" class="hover:text-orange-400 transition-colors">Треки</a>
+  <!-- One-time nickname modal (stored in Cookie for 365 days + localStorage) -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-card">
+      <div class="wg-logo-circle" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21.5 3.5L2.7 10.8c-1.3.5-1.3 1.3-.2 1.6l4.8 1.5 11.2-7.1c.5-.3 1-.1.6.2l-9.1 8.2-.3 5c.5 0 .7-.2 1-.5l2.4-2.3 5 3.7c.9.5 1.6.2 1.8-.9l3.2-15.1c.3-1.3-.5-1.9-1.6-1.6z"/>
+        </svg>
       </div>
-
-      <div class="hidden md:block">
-        <a href="#tours" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white inline-block">
-          <i class="fa-solid fa-ticket mr-2"></i>Купить билеты
-        </a>
-      </div>
-
-      <!-- Мобильная кнопка меню -->
-      <button class="md:hidden text-2xl text-slate-300 focus:outline-none" onclick="toggleMobileMenu()">
-        <i class="fa-solid fa-bars" id="menuIcon"></i>
-      </button>
-    </div>
-
-    <!-- Мобильное меню -->
-    <div id="mobileMenu" class="hidden md:hidden flex-col gap-4 pt-4 pb-2 border-t border-slate-800/80 mt-3 text-center">
-      <a href="#about" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-orange-400 font-semibold py-2">Об артисте</a>
-      <a href="#tours" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-orange-400 font-semibold py-2">Концертный тур</a>
-      <a href="#merch" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-orange-400 font-semibold py-2">Мерч</a>
-      <a href="#tracks" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-orange-400 font-semibold py-2">Треки</a>
-      <a href="#tours" onclick="toggleMobileMenu()" class="btn-3d py-3 rounded-xl font-bold text-sm text-white uppercase tracking-wider my-2">
-        Купить билеты
-      </a>
-    </div>
-  </nav>
-
-  <!-- Главный баннер (Hero Section) -->
-  <header id="about" class="pt-28 pb-16 px-4 relative overflow-hidden">
-    <!-- Декоративные фоновые элементы -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-orange-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-      
-      <!-- Текстовый блок -->
-      <div class="lg:col-span-7 flex flex-col gap-6 text-center lg:text-left z-10">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card w-max mx-auto lg:mx-0 border-orange-500/30">
-          <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping"></span>
-          <span class="text-xs font-bold uppercase tracking-wider text-orange-400">Большой тур по России 2026</span>
-        </div>
-
-        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black leading-none tracking-tight">
-          ОФИЦИАЛЬНЫЙ САЙТ <br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-500 to-orange-600 neon-text">GAZAN</span>
-        </h1>
-
-        <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium">
-          Добро пожаловать на официальный ресурс хип-хоп и поп-артиста **GAZAN**. Здесь вы можете узнать актуальные даты концертов, купить билеты из первых рук и заказать оригинальный фирменный мерч!
-        </p>
-
-        <div class="flex flex-wrap gap-4 justify-center lg:justify-start pt-2">
-          <a href="#tours" class="btn-3d px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-white flex items-center gap-3">
-            <i class="fa-solid fa-fire text-lg"></i> Афиша Концертов
-          </a>
-          <a href="#merch" class="btn-3d-secondary px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-white flex items-center gap-3">
-            <i class="fa-solid fa-shirt text-lg"></i> Магазин Мерча
-          </a>
-        </div>
-
-        <!-- Статистика -->
-        <div class="grid grid-cols-3 gap-4 pt-6 max-w-md mx-auto lg:mx-0">
-          <div class="glass-card p-3 rounded-2xl text-center">
-            <div class="text-2xl font-black text-orange-400">20+</div>
-            <div class="text-[10px] uppercase font-bold text-slate-400">Городов в туре</div>
-          </div>
-          <div class="glass-card p-3 rounded-2xl text-center">
-          <div class="text-2xl font-black text-orange-400">100M+</div>
-            <div class="text-[10px] uppercase font-bold text-slate-400">Прослушиваний</div>
-          </div>
-          <div class="glass-card p-3 rounded-2xl text-center">
-            <div class="text-2xl font-black text-orange-400">100%</div>
-            <div class="text-[10px] uppercase font-bold text-slate-400">Живой звук</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Главная фотография баннера (ГАЗ-66) -->
-      <div class="lg:col-span-5 relative z-10">
-        <div class="glass-card p-3 rounded-3xl relative group overflow-hidden border-orange-500/20">
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-square">
-            <img 
-              src="image_e589afba-f414-4321-bb4f-8975ac4ee0dc.jpg" 
-              alt="ГАЗан 67 ГАЗ-66" 
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              onerror="this.onerror=null; this.src='https://placehold.co/800x800/1e293b/f97316?text=GAZAN+67';"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent"></div>
-            
-            <div class="absolute bottom-4 left-4 right-4 text-left">
-              <span class="inline-block px-3 py-1 bg-orange-500/90 text-white font-black text-xs uppercase tracking-wider rounded-lg mb-1">Легендарная тачка</span>
-              <h3 class="text-xl font-extrabold text-white">ГАЗ-66 «ГАЗан 67»</h3>
-              <p class="text-xs text-slate-300">Символ фирменного стиля артиста GAZAN</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- Раздел расписания концертов (Tour Schedule) -->
-  <section id="tours" class="py-16 px-4 relative">
-    <div class="max-w-7xl mx-auto">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-        <div>
-          <span class="text-orange-500 font-bold uppercase text-xs tracking-widest">Афиша 2026</span>
-          <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white mt-1">
-            КОНЦЕРТНЫЙ ТУР ПО РОССИИ
-          </h2>
-        </div>
-
-        <!-- Поиск по городам -->
-        <div class="w-full md:w-72 relative">
-          <input 
-            type="text" 
-            id="searchCity" 
-            placeholder="Поиск города..." 
-            oninput="filterConcerts()"
-            class="w-full glass-card px-4 py-3 pl-11 rounded-2xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 transition-colors"
-          />
-          <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-        </div>
-      </div>
-
-      <!-- Карточки концертов -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="concertsGrid">
-        
-        <!-- Москва -->
-        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
-          <div class="flex justify-between items-start">
-            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
-              15 МАРТА 2026
-            </div>
-            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
-          </div>
-
-          <div>
-            <h3 class="text-2xl font-black text-white mb-1">Москва</h3>
-            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>Adrenaline Stadium</p>
-          </div>
-
-          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
-            <div>
-              <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
-              <div class="text-lg font-black text-white">1 800 ₽</div>
-            </div>
-            <button onclick="openTicketModal('Москва', 'Adrenaline Stadium', '15 Марта 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
-              Купить билет
-            </button>
-          </div>
-        </div>
-
-        <!-- Санкт-Петербург -->
-        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
-          <div class="flex justify-between items-start">
-            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
-              22 МАРТА 2026
-            </div>
-            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
-          </div>
-
-          <div>
-            <h3 class="text-2xl font-black text-white mb-1">Санкт-Петербург</h3>
-            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>A2 Green Concert</p>
-          </div>
-
-          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
-            <div>
-              <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
-              <div class="text-lg font-black text-white">1 600 ₽</div>
-            </div>
-            <button onclick="openTicketModal('Санкт-Петербург', 'A2 Green Concert', '22 Марта 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
-              Купить билет
-            </button>
-          </div>
-        </div>
-
-        <!-- Красноярск -->
-        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
-          <div class="flex justify-between items-start">
-            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
-              05 АПРЕЛЯ 2026
-            </div>
-            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
-          </div>
-
-          <div>
-            <h3 class="text-2xl font-black text-white mb-1">Красноярск</h3>
-            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>Гранд Холл Сибирь</p>
-          </div>
-
-          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
-            <div>
-              <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
-              <div class="text-lg font-black text-white">1 500 ₽</div>
-            </div>
-            <button onclick="openTicketModal('Красноярск', 'Гранд Холл Сибирь', '05 Апреля 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
-              Купить билет
-            </button>
-          </div>
-        </div>
-
-        <!-- Новосибирск -->
-        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
-          <div class="flex justify-between items-start">
-            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
-              12 АПРЕЛЯ 2026
-            </div>
-            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
-          </div>
-
-          <div>
-            <h3 class="text-2xl font-black text-white mb-1">Новосибирск</h3>
-            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>Экспоцентр</p>
-          </div>
-
-          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
-            <div>
-            <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
-              <div class="text-lg font-black text-white">1 700 ₽</div>
-            </div>
-            <button onclick="openTicketModal('Новосибирск', 'Экспоцентр', '12 Апреля 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
-              Купить билет
-            </button>
-          </div>
-        </div>
-
-        <!-- Екатеринбург -->
-        <div class="concert-card glass-card p-6 rounded-3xl flex flex-col justify-between gap-6 hover:border-orange-500/50 transition-all duration-300">
-          <div class="flex justify-between items-start">
-            <div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-xl font-extrabold text-xs">
-              19 АПРЕЛЯ 2026
-            </div>
-            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">В продаже</span>
-          </div>
-
-          <div>
-            <h3 class="text-2xl font-black text-white mb-1">Екатеринбург</h3>
-            <p class="text-sm font-semibold text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>Теле-Клуб</p>
-          </div>
-
-          <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
-            <div>
-              <div class="text-[10px] font-bold text-slate-400 uppercase">Билеты от</div>
-              <div class="text-lg font-black text-white">1 600 ₽</div>
-            </div>
-            <button onclick="openTicketModal('Екатеринбург', 'Теле-Клуб', '19 Апреля 2026')" class="btn-3d px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white">
-              Купить билет
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Раздел мерча (Merchandise Store) -->
-  <section id="merch" class="py-16 px-4 bg-slate-950/40 border-y border-slate-800/50">
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center max-w-2xl mx-auto mb-12">
-        <span class="text-orange-500 font-bold uppercase text-xs tracking-widest">Официальный Стор</span>
-        <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white mt-1">
-          МЕРЧ GAZAN
-        </h2>
-        <p class="text-slate-400 text-sm mt-3">Эксклюзивная коллекция одежды и аксессуаров из высшего качества</p>
-      </div>
-
-      <!-- Сетка товаров -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        <!-- Товар 1 -->
-        <div class="glass-card rounded-3xl p-4 flex flex-col justify-between group hover:border-orange-500/40 transition-all">
-          <div class="relative overflow-hidden rounded-2xl bg-slate-800/50 aspect-square mb-4">
-            <img src="https://placehold.co/500x500/1e293b/f97316?text=Hoodie+Чеченец" alt="Худи Чеченец" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            <span class="absolute top-3 left-3 bg-orange-500 text-white font-extrabold text-[10px] uppercase px-2.5 py-1 rounded-lg">Хит продаж</span>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-white">Худи GAZAN «Чеченец»</h3>
-            <p class="text-xs text-slate-400 mt-1 mb-3">Оверсайз крой, 100% плотный хлопок</p>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
-              <span class="text-xl font-black text-white">4 990 ₽</span>
-              <button onclick="openMerchModal('Худи GAZAN «Чеченец»', '4 990 ₽')" class="btn-3d px-4 py-2 rounded-xl text-xs font-bold text-white">
-                Заказать
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Товар 2 -->
-        <div class="glass-card rounded-3xl p-4 flex flex-col justify-between group hover:border-orange-500/40 transition-all">
-          <div class="relative overflow-hidden rounded-2xl bg-slate-800/50 aspect-square mb-4">
-          <img src="https://placehold.co/500x500/1e293b/f97316?text=T-Shirt+ГАЗан+67" alt="Футболка ГАЗан 67" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-white">Футболка «ГАЗан 67»</h3>
-            <p class="text-xs text-slate-400 mt-1 mb-3">Фирменный арт с легендарным ГАЗ-66</p>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
-              <span class="text-xl font-black text-white">2 490 ₽</span>
-              <button onclick="openMerchModal('Футболка «ГАЗан 67»', '2 490 ₽')" class="btn-3d px-4 py-2 rounded-xl text-xs font-bold text-white">
-                Заказать
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Товар 3 -->
-        <div class="glass-card rounded-3xl p-4 flex flex-col justify-between group hover:border-orange-500/40 transition-all">
-          <div class="relative overflow-hidden rounded-2xl bg-slate-800/50 aspect-square mb-4">
-            <img src="https://placehold.co/500x500/1e293b/f97316?text=Cap+GAZAN" alt="Кепка GAZAN" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-white">Брендированная Кепка</h3>
-            <p class="text-xs text-slate-400 mt-1 mb-3">Стильный вышитый логотип 3D</p>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
-              <span class="text-xl font-black text-white">1 890 ₽</span>
-              <button onclick="openMerchModal('Брендированная Кепка GAZAN', '1 890 ₽')" class="btn-3d px-4 py-2 rounded-xl text-xs font-bold text-white">
-                Заказать
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Товар 4 -->
-        <div class="glass-card rounded-3xl p-4 flex flex-col justify-between group hover:border-orange-500/40 transition-all">
-          <div class="relative overflow-hidden rounded-2xl bg-slate-800/50 aspect-square mb-4">
-            <img src="https://placehold.co/500x500/1e293b/f97316?text=Accessory+Pack" alt="Набор Аксессуаров" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-white">VIP Набор Аксессуаров</h3>
-            <p class="text-xs text-slate-400 mt-1 mb-3">Браслет + стикерпак + брелок</p>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
-              <span class="text-xl font-black text-white">990 ₽</span>
-              <button onclick="openMerchModal('VIP Набор Аксессуаров', '990 ₽')" class="btn-3d px-4 py-2 rounded-xl text-xs font-bold text-white">
-                Заказать
-              </button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Аудиоплеер треков -->
-  <section id="tracks" class="py-16 px-4">
-    <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-10">
-        <span class="text-orange-500 font-bold uppercase text-xs tracking-widest">Дискография</span>
-        <h2 class="text-3xl sm:text-4xl font-black text-white mt-1">ТОП ТРЕКИ GAZAN</h2>
-      </div>
-
-      <div class="glass-card p-6 rounded-3xl flex flex-col gap-4">
-        
-        <!-- Трек 1 -->
-        <div class="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-800/50 transition-colors">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 font-black">
-              <i class="fa-solid fa-play"></i>
-            </div>
-            <div>
-              <h4 class="font-bold text-white">Чеченец</h4>
-              <span class="text-xs text-slate-400">GAZAN</span>
-            </div>
-          </div>
-          <a href="https://music.yandex.ru" target="_blank" class="text-xs font-bold text-orange-400 hover:underline">Яндекс Музыка <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
-        </div>
-
-        <!-- Трек 2 -->
-        <div class="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-800/50 transition-colors">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 font-black">
-              <i class="fa-solid fa-play"></i>
-            </div>
-            <div>
-              <h4 class="font-bold text-white">Бархатный кросс</h4>
-              <span class="text-xs text-slate-400">GAZAN</span>
-            </div>
-          </div>
-          <a href="https://music.yandex.ru" target="_blank" class="text-xs font-bold text-orange-400 hover:underline">Яндекс Музыка <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
-        </div>
-
-        <!-- Трек 3 -->
-        <div class="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-800/50 transition-colors">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 font-black">
-              <i class="fa-solid fa-play"></i>
-            </div>
-            <div>
-              <h4 class="font-bold text-white">Ауф</h4>
-              <span class="text-xs text-slate-400">GAZAN</span>
-            </div>
-          </div>
-          <a href="https://music.yandex.ru" target="_blank" class="text-xs font-bold text-orange-400 hover:underline">Яндекс Музыка <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Подвал (Footer) -->
-  <footer class="bg-slate-950 border-t border-slate-800/80 pt-12 pb-8 px-4 mt-12">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
-      <div>
-        <div class="flex items-center gap-3 justify-center md:justify-start mb-2">
-          <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center font-black text-white">G</div>
-          <span class="text-xl font-black tracking-widest text-white">GAZAN</span>
-        </div>
-        <p class="text-xs text-slate-400">Официальный сайт артиста. Все права защищены © 2026</p>
-      </div>
-
-      <!-- Соцсети -->
-      <div class="flex gap-4">
-        <a href="#" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-slate-300 hover:text-orange-400 hover:border-orange-500/40 transition-colors">
-          <i class="fa-brands fa-vk text-lg"></i>
-        </a>
-        <a href="#" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-slate-300 hover:text-orange-400 hover:border-orange-500/40 transition-colors">
-          <i class="fa-brands fa-telegram text-lg"></i>
-        </a>
-        <a href="#" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-slate-300 hover:text-orange-400 hover:border-orange-500/40 transition-colors">
-          <i class="fa-brands fa-youtube text-lg"></i>
-        </a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Модальное окно покупки билетов -->
-  <div id="ticketModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden justify-center items-center p-4">
-    <div class="glass-card max-w-md w-full rounded-3xl p-6 relative border-orange-500/30">
-      <button onclick="closeTicketModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
-
-      <h3 class="text-2xl font-black text-white mb-1" id="modalCityName">Покупка билета</h3>
-      <p class="text-xs text-orange-400 font-bold mb-4" id="modalVenueName">Концертный зал</p>
-
-      <form onsubmit="handleOrderSubmit(event)" class="space-y-4">
-        <div>
-        <label class="block text-xs font-bold text-slate-400 mb-1">ФИО зрителя</label>
-          <input type="text" required placeholder="Иван Иванов" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Ваш Телефон</label>
-          <input type="tel" required placeholder="+7 (999) 000-00-00" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Email (для получения электронных билетов)</label>
-          <input type="email" required placeholder="user@example.com" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
-        </div>
-
-        <button type="submit" class="btn-3d w-full py-3.5 rounded-xl font-extrabold text-sm uppercase text-white mt-4">
-          Перейти к оплате билета
-        </button>
-      </form>
+      <h2 id="authTitle">Вход в WaveGram</h2>
+      <p id="authDesc">Введите свой ник один раз — он сохранится в Cookie на 365 дней.</p>
+      <input
+        type="text"
+        id="authNickInput"
+        class="modal-input"
+        placeholder="Ваш никнейм"
+        maxlength="24"
+        onkeydown="if (event.key === 'Enter') saveNickname()"
+      >
+      <div class="modal-error" id="authError"></div>
+      <button class="modal-btn-primary" onclick="saveNickname()">Продолжить</button>
     </div>
   </div>
 
-  <!-- Модальное окно заказа мерча -->
-  <div id="merchModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden justify-center items-center p-4">
-    <div class="glass-card max-w-md w-full rounded-3xl p-6 relative border-orange-500/30">
-      <button onclick="closeMerchModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
-
-      <h3 class="text-2xl font-black text-white mb-1" id="modalMerchTitle">Оформление заказа</h3>
-      <p class="text-xs text-orange-400 font-bold mb-4" id="modalMerchPrice">Цена товара</p>
-
-      <form onsubmit="handleOrderSubmit(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Размер</label>
-          <select class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
-            <option value="S" class="bg-slate-900">S</option>
-            <option value="M" class="bg-slate-900" selected>M</option>
-            <option value="L" class="bg-slate-900">L</option>
-            <option value="XL" class="bg-slate-900">XL</option>
-            <option value="XXL" class="bg-slate-900">XXL (Оверсайз)</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Ваше Имя</label>
-          <input type="text" required placeholder="Имя" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Телефон для связи</label>
-          <input type="tel" required placeholder="+7 (999) 000-00-00" class="w-full glass-card p-3 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500">
-        </div>
-
-        <button type="submit" class="btn-3d w-full py-3.5 rounded-xl font-extrabold text-sm uppercase text-white mt-4">
-          Подтвердить заказ в 1 клик
-        </button>
-      </form>
+  <!-- Confirmation modal for clearing cloud messages and visitors -->
+  <div class="modal-backdrop" id="clearConfirmModal">
+    <div class="modal-card">
+      <div class="danger-circle" aria-hidden="true">🗑</div>
+      <h2>Очистить всё?</h2>
+      <p>Все сообщения и список участников в облаке будут удалены. Ваш сохранённый ник на этом устройстве останется.</p>
+      <div class="modal-error" id="clearError"></div>
+      <div class="modal-actions-row">
+        <button class="modal-btn-secondary" onclick="closeClearModal()">Отмена</button>
+        <button class="modal-btn-danger" id="confirmClearBtn" onclick="executeClearAll()">Очистить всё</button>
+      </div>
     </div>
   </div>
 
-  <!-- Скрипты взаимодействия -->
+  <!-- Main WaveGram messenger layout -->
+  <div class="wg-app chat-opened" id="wgApp">
+    <!-- Left drawer: chats, search, profile, participants -->
+    <aside class="wg-sidebar">
+      <div class="sidebar-brand-bar">
+        <div class="brand-title">
+          <span>🌊</span>
+          <span>WaveGram</span>
+        </div>
+        <button class="clear-all-btn" onclick="openClearModal()" title="Очистить все сообщения и участников">Очистить всё</button>
+      </div>
+
+      <div class="sidebar-top">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Поиск по нику..."
+            oninput="renderUI()"
+          >
+        </div>
+        <button class="icon-btn" id="themeBtnSidebar" onclick="toggleTheme()" title="Сменить тему">🌙</button>
+      </div>
+
+      <!-- Profile strip with nickname edit trigger -->
+      <div class="my-profile-bar" onclick="openNicknameEditor()" title="Нажмите, чтобы изменить ник">
+        <div class="my-profile-info">
+          <div class="avatar-circle small" id="myAvatarLetter">W</div>
+          <div class="my-profile-text">
+            <div class="my-profile-name" id="myProfileName">Гость</div>
+            <div class="my-profile-sub">Нажмите, чтобы сменить ник</div>
+          </div>
+        </div>
+        <span style="color: var(--accent-color); font-size: 15px;">✎</span>
+      </div>
+
+      <!-- Chats and participants list -->
+      <div class="chat-list" id="chatList"></div>
+    </aside>
+
+    <!-- Right active chat area -->
+    <main class="wg-chat-area">
+      <header class="chat-topbar">
+        <div class="topbar-left">
+          <button class="icon-btn mobile-back-btn" onclick="showMobileChatList()" aria-label="К списку чатов">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <div class="avatar-circle small" id="topbarAvatar">💬</div>
+          <div class="topbar-titles">
+            <div class="topbar-name" id="topbarName">Общий чат</div>
+            <div class="topbar-status" id="topbarStatus">участников: 0</div>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="icon-btn" onclick="startActiveChatCall(false)" title="Аудиозвонок">📞</button>
+          <button class="icon-btn" onclick="startActiveChatCall(true)" title="Видеозвонок">📹</button>
+          <button class="icon-btn" id="themeBtnTop" onclick="toggleTheme()" title="Сменить тему">🌙</button>
+        </div>
+      </header>
+
+      <!-- Messages stream -->
+      <div class="messages-scroll" id="msgScroll">
+        <div class="messages-inner" id="msgContainer">
+          <div class="msg-system">Загрузка сообщений...</div>
+        </div>
+      </div>
+
+      <!-- Emoji & GIF picker bar -->
+      <div class="emoji-drawer" id="emojiDrawer">
+        <button class="quick-chip" onclick="addEmoji('👍')">👍</button>
+        <button class="quick-chip" onclick="addEmoji('❤️')">❤️</button>
+        <button class="quick-chip" onclick="addEmoji('🔥')">🔥</button>
+        <button class="quick-chip" onclick="addEmoji('😂')">😂</button>
+        <button class="quick-chip" onclick="addEmoji('😎')">😎</button>
+        <button class="quick-chip" onclick="addEmoji('👋')">👋</button>
+        <button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif')">🔥 Огонь GIF</button>
+        <button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/LmNwrBhejkK9EFP504/giphy.gif')">🐱 Котик GIF</button>
+        <button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/7UQ9oB80a6Z3m/giphy.gif')">💰 Голда GIF</button>
+      </div>
+
+      <!-- Message composer -->
+      <footer class="chat-composer">
+        <div class="composer-inner">
+          <div class="composer-input-box">
+            <button class="icon-btn" onclick="toggleEmojiDrawer()" title="Смайлики и GIF">😊</button>
+            <input
+              type="text"
+              id="messageInput"
+              placeholder="Сообщение"
+              maxlength="600"
+              onkeydown="if (event.key === 'Enter') sendMsg()"
+            >
+          </div>
+          <button class="send-circle-btn" onclick="sendMsg()" aria-label="Отправить сообщение">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Embedded Jitsi Meet audio & video call modal -->
+  <div class="call-overlay" id="callOverlay">
+    <div class="call-header">
+      <div class="call-title" id="callTitle">📹 Видеозвонок — Общий чат</div>
+      <div class="call-actions">
+        <button class="call-pill-btn" id="callModeBtn" onclick="toggleCallVideoMode()">🎙 Только аудио</button>
+        <button class="call-end-btn" onclick="closeCallOverlay()">Завершить</button>
+      </div>
+    </div>
+    <iframe
+      class="call-iframe"
+      id="callIframe"
+      allow="camera; microphone; display-capture; autoplay; fullscreen"
+    ></iframe>
+  </div>
+
   <script>
-    function toggleMobileMenu() {
-      const menu = document.getElementById('mobileMenu');
-      menu.classList.toggle('hidden');
-      menu.classList.toggle('flex');
+    // Target npoint.io API endpoint and local fallback storage key
+    const API_URL = "https://api.npoint.io/80185a88336abe28de83";
+    const LOCAL_BACKUP_KEY = "wavegram_backup_80185a88336abe28de83";
+
+    // Cookie & localStorage keys
+    const COOKIE_ID = "wavegram_uid";
+    const COOKIE_NICK = "wavegram_nick";
+    const COOKIE_THEME = "wavegram_theme";
+
+    function setCookie(name, value, days = 365) {
+      try {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+      } catch (e) {
+        // Ignore restricted cookie contexts
+      }
     }
 
-    function filterConcerts() {
-      const query = document.getElementById('searchCity').value.toLowerCase();
-      const cards = document.querySelectorAll('.concert-card');
-
-      cards.forEach(card => {
-        const text = card.innerText.toLowerCase();
-        if (text.includes(query)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
+    function getCookie(name) {
+      try {
+        const prefix = `${encodeURIComponent(name)}=`;
+        const parts = document.cookie.split("; ");
+        for (const item of parts) {
+          if (item.startsWith(prefix)) {
+            return decodeURIComponent(item.slice(prefix.length));
+          }
         }
+      } catch (e) {
+        return "";
+      }
+      return "";
+    }
+
+    function loadSavedProfile() {
+      let id = "";
+      let nick = "";
+      try {
+        id = getCookie(COOKIE_ID) || localStorage.getItem(COOKIE_ID) || "";
+        nick = getCookie(COOKIE_NICK) || localStorage.getItem(COOKIE_NICK) || "";
+        if (id) {
+          setCookie(COOKIE_ID, id, 365);
+          localStorage.setItem(COOKIE_ID, id);
+        }
+        if (nick) {
+          setCookie(COOKIE_NICK, nick, 365);
+          localStorage.setItem(COOKIE_NICK, nick);
+        }
+      } catch (e) {
+        // Fallback when storage is unavailable
+      }
+      return { id, nick };
+    }
+
+    function saveProfileStorage(id, nick) {
+      setCookie(COOKIE_ID, id, 365);
+      setCookie(COOKIE_NICK, nick, 365);
+      try {
+        localStorage.setItem(COOKIE_ID, id);
+        localStorage.setItem(COOKIE_NICK, nick);
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+
+    // Messenger state
+    const savedProfile = loadSavedProfile();
+    let myUserId = savedProfile.id;
+    let myUserNick = savedProfile.nick;
+    let allMessages = [];
+    let visitorsList = [];
+    let activeChatType = "main"; // "main" | "private"
+    let activePeer = null; // { id, name }
+    let unreadMain = 0;
+    let unreadByPeer = {}; // { [peerId]: number }
+    let isSyncing = false;
+    let isClearing = false;
+
+    // Call state
+    let currentCallRoom = "wavegram-general-room";
+    let currentCallLabel = "Общий чат";
+    let currentCallVideo = true;
+
+    // Theme initialization
+    let currentTheme = getCookie(COOKIE_THEME) || "light";
+    try {
+      currentTheme = getCookie(COOKIE_THEME) || localStorage.getItem(COOKIE_THEME) || "light";
+    } catch (e) {
+      // Keep default or cookie theme
+    }
+    applyTheme(currentTheme);
+
+    function toggleTheme() {
+      currentTheme = currentTheme === "light" ? "dark" : "light";
+      setCookie(COOKIE_THEME, currentTheme, 365);
+      try {
+        localStorage.setItem(COOKIE_THEME, currentTheme);
+      } catch (e) {
+        // Ignore storage errors
+      }
+      applyTheme(currentTheme);
+    }
+
+    function applyTheme(theme) {
+      document.body.setAttribute("data-theme", theme);
+      const icon = theme === "light" ? "🌙" : "☀️";
+      const btn1 = document.getElementById("themeBtnSidebar");
+      const btn2 = document.getElementById("themeBtnTop");
+      if (btn1) btn1.innerText = icon;
+      if (btn2) btn2.innerText = icon;
+    }
+
+    function updateProfileCard() {
+      const nameEl = document.getElementById("myProfileName");
+      const avatarEl = document.getElementById("myAvatarLetter");
+      const display = myUserNick || "Гость";
+      if (nameEl) nameEl.innerText = display;
+      if (avatarEl) avatarEl.innerText = getInitials(display);
+    }
+
+    function getInitials(name) {
+      const clean = (name || "?").trim();
+      if (!clean) return "?";
+      const words = clean.split(/\s+/);
+      if (words.length >= 2) {
+        return (words[0][0] + words[1][0]).toUpperCase();
+      }
+      return clean.slice(0, 2).toUpperCase();
+    }
+
+    function getAvatarColor(seed) {
+      const palette = ["#e17076", "#eda86c", "#a695e7", "#7bc862", "#6ec9cb", "#65aadd", "#ee7aae"];
+      let hash = 0;
+      const str = String(seed || "wg");
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return palette[Math.abs(hash) % palette.length];
+    }
+
+    // One-time nickname registration & editing
+    function openNicknameEditor() {
+      const modal = document.getElementById("authModal");
+      const title = document.getElementById("authTitle");
+      const desc = document.getElementById("authDesc");
+      const input = document.getElementById("authNickInput");
+      const err = document.getElementById("authError");
+
+      title.innerText = "Изменить ник";
+      desc.innerText = "Новый ник сохранится в Cookie на 365 дней.";
+      input.value = myUserNick || "";
+      err.innerText = "";
+      modal.style.display = "flex";
+      setTimeout(() => input.focus(), 80);
+    }
+
+    function saveNickname() {
+      const input = document.getElementById("authNickInput");
+      const err = document.getElementById("authError");
+      const nick = (input.value || "").trim();
+
+      if (nick.length < 2) {
+        err.innerText = "Введите ник длиной от 2 символов.";
+        input.focus();
+        return;
+      }
+
+      const isNewUser = !myUserId;
+      if (!myUserId) {
+        myUserId = "wg_" + Math.random().toString(36).substring(2, 10);
+      }
+
+      const oldNick = myUserNick;
+      myUserNick = nick;
+      saveProfileStorage(myUserId, myUserNick);
+      updateProfileCard();
+
+      document.getElementById("authModal").style.display = "none";
+      requestNotificationsSafe();
+
+      if (isNewUser) {
+        loadData(true);
+      } else if (oldNick && oldNick !== myUserNick) {
+        allMessages.push({
+          id: "sys_" + Date.now(),
+          userId: "system",
+          author: "Система",
+          text: `${oldNick} сменил(а) ник на ${myUserNick}`,
+          type: "system",
+          time: getCurrentTime()
+        });
+        saveLocalBackup();
+        renderUI();
+        saveToCloud(allMessages, visitorsList);
+      }
+    }
+
+    function requestNotificationsSafe() {
+      try {
+        if ("Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission();
+        }
+      } catch (e) {
+        // Ignore notification errors
+      }
+    }
+
+    // Confirmed clear-all for messages and visitors in the bin
+    function openClearModal() {
+      document.getElementById("clearError").innerText = "";
+      document.getElementById("clearConfirmModal").style.display = "flex";
+    }
+
+    function closeClearModal() {
+      if (isClearing) return;
+      document.getElementById("clearConfirmModal").style.display = "none";
+    }
+
+    async function executeClearAll() {
+      if (isClearing) return;
+      isClearing = true;
+
+      const btn = document.getElementById("confirmClearBtn");
+      const errEl = document.getElementById("clearError");
+      btn.disabled = true;
+      btn.innerText = "Очистка...";
+      errEl.innerText = "";
+
+      allMessages = [];
+      visitorsList = [];
+      unreadMain = 0;
+      unreadByPeer = {};
+      activeChatType = "main";
+      activePeer = null;
+      saveLocalBackup();
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [],
+            visitors: []
+          })
+        });
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+
+        if (myUserId && myUserNick) {
+          visitorsList = [{ id: myUserId, name: myUserNick, time: Date.now() }];
+          saveLocalBackup();
+          await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: [],
+              visitors: visitorsList
+            })
+          });
+        }
+
+        renderUI();
+        document.getElementById("clearConfirmModal").style.display = "none";
+      } catch (e) {
+        errEl.innerText = "Не удалось очистить облако. Локальные данные сброшены.";
+        renderUI();
+      } finally {
+        isClearing = false;
+        btn.disabled = false;
+        btn.innerText = "Очистить всё";
+      }
+    }
+
+    // Mobile drawer navigation
+    function showMobileChatList() {
+      document.getElementById("wgApp").classList.remove("chat-opened");
+    }
+
+    function showMobileActiveChat() {
+      document.getElementById("wgApp").classList.add("chat-opened");
+    }
+
+    function selectMainChat() {
+      activeChatType = "main";
+      activePeer = null;
+      unreadMain = 0;
+      showMobileActiveChat();
+      renderUI();
+    }
+
+    function selectPrivateChat(peerId, peerName) {
+      activeChatType = "private";
+      activePeer = { id: peerId, name: peerName };
+      unreadByPeer[peerId] = 0;
+      showMobileActiveChat();
+      renderUI();
+    }
+
+    function toggleEmojiDrawer() {
+      document.getElementById("emojiDrawer").classList.toggle("open");
+    }
+
+    function addEmoji(emoji) {
+      const input = document.getElementById("messageInput");
+      input.value += emoji;
+      input.focus();
+    }
+
+    // Embedded Jitsi Meet audio & video calls
+    function buildJitsiUrl(roomSlug, withVideo) {
+      const cleanRoom = roomSlug.replace(/[^a-zA-Z0-9_-]/g, "");
+      const displayName = encodeURIComponent(myUserNick || "Участник");
+      const audioOnly = withVideo ? "false" : "true";
+      const videoMuted = withVideo ? "false" : "true";
+      return `https://meet.jit.si/${cleanRoom}#userInfo.displayName="${displayName}"&config.startAudioOnly=${audioOnly}&config.startWithVideoMuted=${videoMuted}&config.prejoinPageEnabled=false`;
+    }
+
+    function startActiveChatCall(withVideo) {
+      currentCallVideo = withVideo;
+      if (activeChatType === "private" && activePeer) {
+        const sortedPair = [myUserId, activePeer.id].sort().join("_");
+        currentCallRoom = `wavegram-dm-${sortedPair}`;
+        currentCallLabel = activePeer.name;
+      } else {
+        currentCallRoom = "wavegram-general-room";
+        currentCallLabel = "Общий чат";
+      }
+      updateCallFrame();
+      document.getElementById("callOverlay").style.display = "flex";
+    }
+
+    function updateCallFrame() {
+      const titleEl = document.getElementById("callTitle");
+      const modeBtn = document.getElementById("callModeBtn");
+      const iframe = document.getElementById("callIframe");
+
+      titleEl.innerText = currentCallVideo
+        ? `📹 Видеозвонок — ${currentCallLabel}`
+        : `📞 Аудиозвонок — ${currentCallLabel}`;
+      modeBtn.innerText = currentCallVideo ? "🎙 Только аудио" : "📹 Вкл. видео";
+      iframe.src = buildJitsiUrl(currentCallRoom, currentCallVideo);
+    }
+
+    function toggleCallVideoMode() {
+      currentCallVideo = !currentCallVideo;
+      updateCallFrame();
+    }
+
+    function closeCallOverlay() {
+      document.getElementById("callIframe").src = "";
+      document.getElementById("callOverlay").style.display = "none";
+    }
+
+    function saveLocalBackup() {
+      try {
+        localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify({
+          messages: allMessages,
+          visitors: visitorsList
+        }));
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+
+    function readLocalBackup() {
+      try {
+        const raw = localStorage.getItem(LOCAL_BACKUP_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function loadData(isFirstJoin = false) {
+      if (!myUserId || isClearing) return;
+
+      let loadedCloud = false;
+      try {
+        const res = await fetch(`${API_URL}?t=${Date.now()}`, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === "object") {
+            const cloudMsgs = Array.isArray(data.messages) ? data.messages : [];
+            const cloudVisitors = Array.isArray(data.visitors) ? data.visitors : [];
+
+            if (allMessages.length > 0 && cloudMsgs.length > allMessages.length) {
+              const incoming = cloudMsgs.slice(allMessages.length);
+              incoming.forEach(msg => {
+                if (!msg || msg.userId === myUserId || msg.type === "system") return;
+                if (!msg.targetId) {
+                  if (activeChatType !== "main") {
+                    unreadMain += 1;
+                    notifyBrowser("WaveGram — Общий чат", `${msg.author}: ${msg.text}`);
+                  }
+                } else if (msg.targetId === myUserId) {
+                  if (activeChatType !== "private" || !activePeer || activePeer.id !== msg.userId) {
+                    unreadByPeer[msg.userId] = (unreadByPeer[msg.userId] || 0) + 1;
+                    notifyBrowser(`WaveGram — ${msg.author || "Личное сообщение"}`, msg.text || "");
+                  }
+                }
+              });
+            }
+
+            allMessages = cloudMsgs;
+            visitorsList = cloudVisitors;
+            loadedCloud = true;
+            saveLocalBackup();
+          }
+        }
+      } catch (e) {
+        // Fallback to localStorage backup on error
+      }
+
+      if (!loadedCloud) {
+        const backup = readLocalBackup();
+        if (backup) {
+          allMessages = Array.isArray(backup.messages) ? backup.messages : allMessages;
+          visitorsList = Array.isArray(backup.visitors) ? backup.visitors : visitorsList;
+        }
+      }
+
+      const idx = visitorsList.findIndex(u => u && u.id === myUserId);
+      const meRecord = { id: myUserId, name: myUserNick, time: Date.now() };
+      if (idx === -1) {
+        visitorsList.push(meRecord);
+        if (isFirstJoin) {
+          allMessages.push({
+            id: "sys_" + Date.now(),
+            userId: "system",
+            author: "Система",
+            text: `${myUserNick} присоединился(ась) к WaveGram`,
+            type: "system",
+            time: getCurrentTime()
+          });
+        }
+        saveLocalBackup();
+        if (loadedCloud) {
+          await saveToCloud(allMessages, visitorsList);
+        }
+      } else {
+        visitorsList[idx] = meRecord;
+        saveLocalBackup();
+      }
+
+      renderUI();
+    }
+
+    function notifyBrowser(title, body) {
+      try {
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification(title, { body });
+        }
+      } catch (e) {
+        // Ignore notification errors
+      }
+    }
+
+    function renderUI() {
+      renderChatList();
+      renderTopbar();
+      renderMessages();
+    }
+
+    function renderChatList() {
+      const listEl = document.getElementById("chatList");
+      const query = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+      listEl.innerHTML = "";
+
+      const publicMsgs = allMessages.filter(m => m && !m.targetId);
+      const lastPublic = publicMsgs[publicMsgs.length - 1];
+      const mainRow = document.createElement("div");
+      mainRow.className = `chat-row ${activeChatType === "main" ? "active" : ""}`;
+      mainRow.innerHTML = `
+        <div class="avatar-circle" style="background: #3390ec;">💬</div>
+        <div class="chat-row-body">
+          <div class="chat-row-top">
+            <span class="chat-row-title">Общий чат</span>
+            <span class="chat-row-time">${lastPublic ? escapeHTML(lastPublic.time || "") : ""}</span>
+          </div>
+          <div class="chat-row-bottom">
+            <span class="chat-row-preview">${lastPublic ? escapeHTML((lastPublic.author ? lastPublic.author + ": " : "") + (lastPublic.text || "")) : "Нет сообщений"}</span>
+            ${unreadMain > 0 ? `<span class="wg-badge">${unreadMain}</span>` : ""}
+          </div>
+        </div>
+      `;
+      mainRow.onclick = () => selectMainChat();
+      listEl.appendChild(mainRow);
+
+      const peers = visitorsList.filter(u => u && u.id && u.id !== myUserId);
+      const filteredPeers = peers.filter(u => !query || (u.name || "").toLowerCase().includes(query));
+
+      const label = document.createElement("div");
+      label.className = "list-section-label";
+      label.innerText = `Участники (${filteredPeers.length})`;
+      listEl.appendChild(label);
+
+      if (filteredPeers.length === 0) {
+        const empty = document.createElement("div");
+        empty.style.cssText = "padding: 16px 12px; font-size: 13px; color: var(--text-muted); text-align: center;";
+        empty.innerText = query ? "Собеседник не найден" : "Пока нет других участников";
+        listEl.appendChild(empty);
+        return;
+      }
+
+      filteredPeers.forEach(user => {
+        const dmMsgs = allMessages.filter(m =>
+          m &&
+          ((m.userId === myUserId && m.targetId === user.id) ||
+            (m.userId === user.id && m.targetId === myUserId))
+        );
+        const lastDm = dmMsgs[dmMsgs.length - 1];
+        const unreadCount = unreadByPeer[user.id] || 0;
+        const isActive = activeChatType === "private" && activePeer && activePeer.id === user.id;
+
+        const row = document.createElement("div");
+        row.className = `chat-row ${isActive ? "active" : ""}`;
+        row.innerHTML = `
+          <div class="avatar-circle" style="background: ${getAvatarColor(user.id)};">${escapeHTML(getInitials(user.name))}</div>
+          <div class="chat-row-body">
+            <div class="chat-row-top">
+              <span class="chat-row-title">${escapeHTML(user.name || "Участник")}</span>
+              <span class="chat-row-time">${lastDm ? escapeHTML(lastDm.time || "") : ""}</span>
+            </div>
+            <div class="chat-row-bottom">
+              <span class="chat-row-preview">${lastDm ? escapeHTML(lastDm.text || "") : "Нажмите, чтобы написать в ЛС"}</span>
+              ${unreadCount > 0 ? `<span class="wg-badge">${unreadCount}</span>` : ""}
+            </div>
+            </div>
+        `;
+        row.onclick = () => selectPrivateChat(user.id, user.name || "Участник");
+        listEl.appendChild(row);
       });
     }
 
-    function openTicketModal(city, venue, date) {
-      document.getElementById('modalCityName').innerText = `${city} — ${date}`;
-      document.getElementById('modalVenueName').innerText = venue;
-      document.getElementById('ticketModal').classList.remove('hidden');
-      document.getElementById('ticketModal').classList.add('flex');
+    function renderTopbar() {
+      const avatarEl = document.getElementById("topbarAvatar");
+      const nameEl = document.getElementById("topbarName");
+      const statusEl = document.getElementById("topbarStatus");
+
+      if (activeChatType === "private" && activePeer) {
+        avatarEl.innerText = getInitials(activePeer.name);
+        avatarEl.style.background = getAvatarColor(activePeer.id);
+        nameEl.innerText = activePeer.name;
+        statusEl.innerText = "личные сообщения";
+      } else {
+        avatarEl.innerText = "💬";
+        avatarEl.style.background = "#3390ec";
+        nameEl.innerText = "Общий чат";
+        statusEl.innerText = `участников: ${visitorsList.length}`;
+      }
     }
 
-    function closeTicketModal() {
-      document.getElementById('ticketModal').classList.add('hidden');
-      document.getElementById('ticketModal').classList.remove('flex');
+    function renderMessages() {
+      const scrollBox = document.getElementById("msgScroll");
+      const container = document.getElementById("msgContainer");
+      const nearBottom = scrollBox.scrollHeight - scrollBox.scrollTop - scrollBox.clientHeight < 100;
+
+      container.innerHTML = "";
+
+      let visible = [];
+      if (activeChatType === "private" && activePeer) {
+        visible = allMessages.filter(m =>
+          m &&
+          ((m.userId === myUserId && m.targetId === activePeer.id) ||
+            (m.userId === activePeer.id && m.targetId === myUserId))
+        );
+      } else {
+        visible = allMessages.filter(m => m && !m.targetId);
+      }
+
+      if (visible.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "msg-system";
+        empty.innerText = activeChatType === "private" && activePeer
+          ? `Начните личную переписку с ${activePeer.name}`
+          : "Сообщений пока нет. Напишите первым!";
+        container.appendChild(empty);
+        return;
+      }
+
+      visible.forEach(msg => {
+        if (msg.type === "system") {
+          const sys = document.createElement("div");
+          sys.className = "msg-system";
+          sys.innerText = msg.text || "";
+          container.appendChild(sys);
+          return;
+        }
+
+        const isMine = msg.userId === myUserId;
+        const bubble = document.createElement("div");
+        bubble.className = `msg-bubble ${isMine ? "mine" : "theirs"}`;
+
+        if (!isMine && activeChatType === "main") {
+          const sender = document.createElement("div");
+          sender.className = "msg-sender";
+          sender.style.color = getAvatarColor(msg.userId);
+          sender.innerText = msg.author || "Участник";
+          sender.onclick = () => {
+            if (msg.userId) selectPrivateChat(msg.userId, msg.author || "Участник");
+          };
+          bubble.appendChild(sender);
+        }
+
+        const content = document.createElement("div");
+        content.className = "msg-content";
+        if (msg.type === "gif" && msg.gifUrl) {
+          const safeUrl = sanitizeUrl(msg.gifUrl);
+          if (safeUrl) {
+            content.innerHTML = `<img src="${safeUrl}" alt="GIF">`;
+          } else {
+            content.innerText = msg.text || "GIF";
+          }
+        } else {
+          content.innerText = msg.text || "";
+        }
+        bubble.appendChild(content);
+
+        const meta = document.createElement("div");
+        meta.className = "msg-meta";
+        const delHtml = isMine
+          ? `<button class="msg-del-btn" onclick="deleteMsg('${escapeAttr(msg.id || "")}')" title="Удалить">✕</button>`
+          : "";
+        const checksHtml = isMine ? `<span class="msg-checks">✓✓</span>` : "";
+
+        meta.innerHTML = `
+          <span>${escapeHTML(msg.time || "")}</span>
+          ${checksHtml}
+          ${delHtml}
+        `;
+        bubble.appendChild(meta);
+
+        container.appendChild(bubble);
+      });
+
+      if (nearBottom || visible.length <= 15) {
+        scrollBox.scrollTop = scrollBox.scrollHeight;
+      }
     }
 
-    function openMerchModal(title, price) {
-      document.getElementById('modalMerchTitle').innerText = title;
-      document.getElementById('modalMerchPrice').innerText = price;
-      document.getElementById('merchModal').classList.remove('hidden');
-      document.getElementById('merchModal').classList.add('flex');
+    async function sendMsg() {
+      if (!myUserId) return;
+      const input = document.getElementById("messageInput");
+      const text = (input.value || "").trim();
+      if (!text) return;
+
+      allMessages.push({
+        id: "msg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
+        userId: myUserId,
+        author: myUserNick,
+        text,
+        type: "text",
+        targetId: activeChatType === "private" && activePeer ? activePeer.id : null,
+        time: getCurrentTime()
+      });
+
+      input.value = "";
+      saveLocalBackup();
+      renderUI();
+      document.getElementById("msgScroll").scrollTop = document.getElementById("msgScroll").scrollHeight;
+      await saveToCloud(allMessages, visitorsList);
     }
 
-    function closeMerchModal() {
-      document.getElementById('merchModal').classList.add('hidden');
-      document.getElementById('merchModal').classList.remove('flex');
+    async function sendGif(gifUrl) {
+      if (!myUserId) return;
+
+      allMessages.push({
+        id: "gif_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
+        userId: myUserId,
+        author: myUserNick,
+        text: "GIF",
+        type: "gif",
+        gifUrl,
+        targetId: activeChatType === "private" && activePeer ? activePeer.id : null,
+        time: getCurrentTime()
+      });
+
+      document.getElementById("emojiDrawer").classList.remove("open");
+      saveLocalBackup();
+      renderUI();
+      document.getElementById("msgScroll").scrollTop = document.getElementById("msgScroll").scrollHeight;
+      await saveToCloud(allMessages, visitorsList);
     }
 
-    function handleOrderSubmit(e) {
-      e.preventDefault();
-      alert('Заказ успешно оформлен! Наш менеджер свяжется с вами для подтверждения.');
-      closeTicketModal();
-      closeMerchModal();
+    async function deleteMsg(msgId) {
+      if (!msgId) return;
+      allMessages = allMessages.filter(m => m && (m.id !== msgId || m.userId !== myUserId));
+      saveLocalBackup();
+      renderUI();
+      await saveToCloud(allMessages, visitorsList);
     }
+
+    async function saveToCloud(msgs, visitors) {
+      if (isSyncing || isClearing) return;
+      isSyncing = true;
+      try {
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: msgs,
+            visitors: visitors
+          })
+        });
+      } catch (e) {
+        // Local backup is already persisted
+      } finally {
+        isSyncing = false;
+      }
+    }
+
+    function getCurrentTime() {
+      return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function sanitizeUrl(url) {
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+          return escapeAttr(parsed.href);
+        }
+      } catch (e) {
+        return "";
+      }
+      return "";
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>'"]/g, tag => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;"
+      }[tag] || tag));
+    }
+
+    function escapeAttr(str) {
+      return String(str).replace(/[^a-zA-Z0-9_.:/?=&-]/g, "");
+    }
+
+    // Mobile keyboard viewport adjustment
+    if (window.visualViewport) {
+      const onViewportResize = () => {
+        const app = document.getElementById("wgApp");
+        if (window.innerWidth <= 768 && app) {
+          app.style.height = `${window.visualViewport.height}px`;
+          const scrollBox = document.getElementById("msgScroll");
+          if (scrollBox) scrollBox.scrollTop = scrollBox.scrollHeight;
+        } else if (app) {
+          app.style.height = "";
+        }
+      };
+      window.visualViewport.addEventListener("resize", onViewportResize);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateProfileCard();
+
+      if (myUserId && myUserNick) {
+        document.getElementById("authModal").style.display = "none";
+        loadData(false);
+        setInterval(() => loadData(false), 3000);
+      } else {
+        document.getElementById("authModal").style.display = "flex";
+        setTimeout(() => document.getElementById("authNickInput").focus(), 100);
+        setInterval(() => {
+          if (myUserId && myUserNick) loadData(false);
+        }, 3000);
+        }
+    });
   </script>
 </body>
 </html>
-```
