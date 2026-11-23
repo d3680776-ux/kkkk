@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -64,7 +63,8 @@
       /* Seamless patterned wallpaper in dark night-blue theme */
       --wallpaper-gradient: linear-gradient(160deg, #0e1621 0%, #121c29 52%, #0b121b 100%);
       --wallpaper-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%235288c1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.11'%3E%3Cpath d='M28 42l26-10-9 26-6-10-11-6z'/%3E%3Cpath d='M132 30l4 8 9 1-6 6 1 9-8-4-8 4 1-9-6-6 9-1z'/%3E%3Cpath d='M185 75c0-6 5-10 10-10s10 4 10 10c0 8-10 15-10 15s-10-7-10-15z'/%3E%3Ccircle cx='55' cy='115' r='11'/%3E%3Cellipse cx='55' cy='115' rx='18' ry='5' transform='rotate(-22 55 115)'/%3E%3Cpath d='M118 112h22a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6h-14l-6 5v-5h-2a6 6 0 0 1-6-6v-10a6 6 0 0 1 6-6z'/%3E%3Cpath d='M178
-      165v-8a11 11 0 0 1 22 0v8'/%3E%3Crect x='174' y='163' width='5' height='9' rx='2'/%3E%3Crect x='200' y='163' width='5' height='9' rx='2'/%3E%3Cpath d='M34 176l18-18m-4 0h4v4M32 172l-4 4m8 0l-4 4'/%3E%3Cpath d='M96 184c3-5 10-5 13 0 3-5 10-5 13 0 0 7-13 14-13 14s-13-7-13-14z'/%3E%3Ccircle cx='88' cy='62' r='2'/%3E%3Ccircle cx='164' cy='38' r='2'/%3E%3Ccircle cx='24' cy='142' r='2'/%3E%3Ccircle cx='148' cy='182' r='2'/%3E%3C/g%3E%3C/svg%3E");
+22:39
+165v-8a11 11 0 0 1 22 0v8'/%3E%3Crect x='174' y='163' width='5' height='9' rx='2'/%3E%3Crect x='200' y='163' width='5' height='9' rx='2'/%3E%3Cpath d='M34 176l18-18m-4 0h4v4M32 172l-4 4m8 0l-4 4'/%3E%3Cpath d='M96 184c3-5 10-5 13 0 3-5 10-5 13 0 0 7-13 14-13 14s-13-7-13-14z'/%3E%3Ccircle cx='88' cy='62' r='2'/%3E%3Ccircle cx='164' cy='38' r='2'/%3E%3Ccircle cx='24' cy='142' r='2'/%3E%3Ccircle cx='148' cy='182' r='2'/%3E%3C/g%3E%3C/svg%3E");
 
       /* Message bubbles (Dark theme) */
       --bubble-theirs-bg: #182533;
@@ -223,7 +223,8 @@
       padding: 10px 14px;
       font-weight: 600;
       font-size: 14px;
-      cursor: pointer;
+22:39
+cursor: pointer;
     }
 
     .modal-btn-secondary:hover {
@@ -417,7 +418,8 @@
       font-size: 14px;
       font-weight: 600;
       color: var(--text-main);
-      white-space: nowrap;
+22:39
+white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -614,7 +616,8 @@
       width: 100%;
       max-width: 760px;
       margin: 0 auto;
-      display: flex;
+22:39
+display: flex;
       flex-direction: column;
       gap: 6px;
     }
@@ -805,7 +808,8 @@
       flex: 1;
       display: flex;
       align-items: center;
-      background: var(--input-bg);
+22:39
+background: var(--input-bg);
       border-radius: 22px;
       padding: 2px 10px 2px 6px;
       min-height: 44px;
@@ -965,7 +969,8 @@
     <div class="modal-card">
       <div class="danger-circle" aria-hidden="true">🗑</div>
       <h2>Очистить всё?</h2>
-      <p>Все сообщения и список участников в облаке будут удалены. Ваш сохранённый ник на этом устройстве останется.</p>
+22:39
+<p>Все сообщения и список участников в облаке будут удалены. Ваш сохранённый ник на этом устройстве останется.</p>
       <div class="modal-error" id="clearError"></div>
       <div class="modal-actions-row">
         <button class="modal-btn-secondary" onclick="closeClearModal()">Отмена</button>
@@ -980,7 +985,7 @@
     <aside class="wg-sidebar">
       <div class="sidebar-brand-bar">
         <div class="brand-title">
-          <span>🌊</span>
+          <span>🌊 </span>
           <span>WaveGram</span>
         </div>
         <button class="clear-all-btn" onclick="openClearModal()" title="Очистить все сообщения и участников">Очистить всё</button>
@@ -988,7 +993,7 @@
 
       <div class="sidebar-top">
         <div class="search-wrapper">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon">🔍 </span>
           <input
             type="text"
             id="searchInput"
@@ -997,7 +1002,7 @@
             oninput="renderUI()"
           >
         </div>
-        <button class="icon-btn" id="themeBtnSidebar" onclick="toggleTheme()" title="Сменить тему">🌙</button>
+        <button class="icon-btn" id="themeBtnSidebar" onclick="toggleTheme()" title="Сменить тему">🌙 </button>
       </div>
 
       <!-- Profile strip with nickname edit trigger -->
@@ -1025,7 +1030,7 @@
               <path d="M15 18l-6-6 6-6"/>
             </svg>
           </button>
-          <div class="avatar-circle small" id="topbarAvatar">💬</div>
+          <div class="avatar-circle small" id="topbarAvatar">💬 </div>
           <div class="topbar-titles">
             <div class="topbar-name" id="topbarName">Общий чат</div>
             <div class="topbar-status" id="topbarStatus">участников: 0</div>
@@ -1033,9 +1038,9 @@
         </div>
 
         <div class="topbar-actions">
-          <button class="icon-btn" onclick="startActiveChatCall(false)" title="Аудиозвонок">📞</button>
-          <button class="icon-btn" onclick="startActiveChatCall(true)" title="Видеозвонок">📹</button>
-          <button class="icon-btn" id="themeBtnTop" onclick="toggleTheme()" title="Сменить тему">🌙</button>
+          <button class="icon-btn" onclick="startActiveChatCall(false)" title="Аудиозвонок">📞 </button>
+          <button class="icon-btn" onclick="startActiveChatCall(true)" title="Видеозвонок">📹 </button>
+          <button class="icon-btn" id="themeBtnTop" onclick="toggleTheme()" title="Сменить тему">🌙 </button>
         </div>
       </header>
 
@@ -1048,22 +1053,23 @@
 
       <!-- Emoji & GIF picker bar -->
       <div class="emoji-drawer" id="emojiDrawer">
-        <button class="quick-chip" onclick="addEmoji('👍')">👍</button>
-        <button class="quick-chip" onclick="addEmoji('❤️')">❤️</button>
-        <button class="quick-chip" onclick="addEmoji('🔥')">🔥</button>
-        <button class="quick-chip" onclick="addEmoji('😂')">😂</button>
-        <button class="quick-chip" onclick="addEmoji('😎')">😎</button>
-        <button class="quick-chip" onclick="addEmoji('👋')">👋</button>
-        <button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif')">🔥 Огонь GIF</button>
-        <button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/LmNwrBhejkK9EFP504/giphy.gif')">🐱 Котик GIF</button>
-        <button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/7UQ9oB80a6Z3m/giphy.gif')">💰 Голда GIF</button>
+        <button class="quick-chip" onclick="addEmoji('👍 ')">👍 </button>
+        <button class="quick-chip" onclick="addEmoji('❤️ ')">❤️ </button>
+        <button class="quick-chip" onclick="addEmoji('🔥 ')">🔥 </button>
+        <button class="quick-chip" onclick="addEmoji('😂 ')">😂 </button>
+        <button class="quick-chip" onclick="addEmoji('😎 ')">😎 </button>
+        <button class="quick-chip" onclick="addEmoji('👋 ')">👋 </button>
+22:39
+<button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif')">🔥  Огонь GIF</button>
+        <button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/LmNwrBhejkK9EFP504/giphy.gif')">🐱  Котик GIF</button>
+        <button class="quick-chip" onclick="sendGif('https://media.giphy.com/media/7UQ9oB80a6Z3m/giphy.gif')">💰  Голда GIF</button>
       </div>
 
       <!-- Message composer -->
       <footer class="chat-composer">
         <div class="composer-inner">
           <div class="composer-input-box">
-            <button class="icon-btn" onclick="toggleEmojiDrawer()" title="Смайлики и GIF">😊</button>
+            <button class="icon-btn" onclick="toggleEmojiDrawer()" title="Смайлики и GIF">😊 </button>
             <input
               type="text"
               id="messageInput"
@@ -1085,7 +1091,7 @@
   <!-- Embedded Jitsi Meet audio & video call modal -->
   <div class="call-overlay" id="callOverlay">
     <div class="call-header">
-      <div class="call-title" id="callTitle">📹 Видеозвонок — Общий чат</div>
+      <div class="call-title" id="callTitle">📹  Видеозвонок — Общий чат</div>
       <div class="call-actions">
         <button class="call-pill-btn" id="callModeBtn" onclick="toggleCallVideoMode()">🎙 Только аудио</button>
         <button class="call-end-btn" onclick="closeCallOverlay()">Завершить</button>
@@ -1167,7 +1173,8 @@
     const savedProfile = loadSavedProfile();
     let myUserId = savedProfile.id;
     let myUserNick = savedProfile.nick;
-    let allMessages = [];
+22:39
+let allMessages = [];
     let visitorsList = [];
     let activeChatType = "main"; // "main" | "private"
     let activePeer = null; // { id, name }
@@ -1203,7 +1210,7 @@
 
     function applyTheme(theme) {
       document.body.setAttribute("data-theme", theme);
-      const icon = theme === "light" ? "🌙" : "☀️";
+      const icon = theme === "light" ? "🌙 " : "☀️ ";
       const btn1 = document.getElementById("themeBtnSidebar");
       const btn2 = document.getElementById("themeBtnTop");
       if (btn1) btn1.innerText = icon;
@@ -1286,7 +1293,8 @@
           userId: "system",
           author: "Система",
           text: `${oldNick} сменил(а) ник на ${myUserNick}`,
-          type: "system",
+22:39
+type: "system",
           time: getCurrentTime()
         });
         saveLocalBackup();
@@ -1419,7 +1427,8 @@
     function startActiveChatCall(withVideo) {
       currentCallVideo = withVideo;
       if (activeChatType === "private" && activePeer) {
-        const sortedPair = [myUserId, activePeer.id].sort().join("_");
+22:39
+const sortedPair = [myUserId, activePeer.id].sort().join("_");
         currentCallRoom = `wavegram-dm-${sortedPair}`;
         currentCallLabel = activePeer.name;
       } else {
@@ -1436,9 +1445,9 @@
       const iframe = document.getElementById("callIframe");
 
       titleEl.innerText = currentCallVideo
-        ? `📹 Видеозвонок — ${currentCallLabel}`
-        : `📞 Аудиозвонок — ${currentCallLabel}`;
-      modeBtn.innerText = currentCallVideo ? "🎙 Только аудио" : "📹 Вкл. видео";
+        ? `📹  Видеозвонок — ${currentCallLabel}`
+        : `📞  Аудиозвонок — ${currentCallLabel}`;
+      modeBtn.innerText = currentCallVideo ? "🎙 Только аудио" : "📹  Вкл. видео";
       iframe.src = buildJitsiUrl(currentCallRoom, currentCallVideo);
     }
 
@@ -1529,7 +1538,8 @@
             id: "sys_" + Date.now(),
             userId: "system",
             author: "Система",
-            text: `${myUserNick} присоединился(ась) к WaveGram`,
+22:39
+text: `${myUserNick} присоединился(ась) к WaveGram`,
             type: "system",
             time: getCurrentTime()
           });
@@ -1572,7 +1582,7 @@
       const mainRow = document.createElement("div");
       mainRow.className = `chat-row ${activeChatType === "main" ? "active" : ""}`;
       mainRow.innerHTML = `
-        <div class="avatar-circle" style="background: #3390ec;">💬</div>
+        <div class="avatar-circle" style="background: #3390ec;">💬 </div>
         <div class="chat-row-body">
           <div class="chat-row-top">
             <span class="chat-row-title">Общий чат</span>
@@ -1626,7 +1636,8 @@
               <span class="chat-row-preview">${lastDm ? escapeHTML(lastDm.text || "") : "Нажмите, чтобы написать в ЛС"}</span>
               ${unreadCount > 0 ? `<span class="wg-badge">${unreadCount}</span>` : ""}
             </div>
-            </div>
+22:39
+</div>
         `;
         row.onclick = () => selectPrivateChat(user.id, user.name || "Участник");
         listEl.appendChild(row);
@@ -1644,7 +1655,7 @@
         nameEl.innerText = activePeer.name;
         statusEl.innerText = "личные сообщения";
       } else {
-        avatarEl.innerText = "💬";
+        avatarEl.innerText = "💬 ";
         avatarEl.style.background = "#3390ec";
         nameEl.innerText = "Общий чат";
         statusEl.innerText = `участников: ${visitorsList.length}`;
@@ -1740,7 +1751,8 @@
     }
 
     async function sendMsg() {
-      if (!myUserId) return;
+22:39
+if (!myUserId) return;
       const input = document.getElementById("messageInput");
       const text = (input.value || "").trim();
       if (!text) return;
@@ -1868,7 +1880,10 @@
         setInterval(() => {
           if (myUserId && myUserNick) loadData(false);
         }, 3000);
-        }
+22:39
+
+
+}
     });
   </script>
 </body>
