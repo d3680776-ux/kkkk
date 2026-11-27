@@ -3,553 +3,629 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telegram — Мессенджер и Звонки</title>
+  <title>3D Telegram — Объёмный Мессенджер</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     * { box-sizing: border-box; }
-    :root {
-      --tg-blue: #3390ec;
-      --tg-blue-dark: #2678cb;
-      --tg-bg: #ffffff;
-      --tg-chat-bg: #dce8d8;
-      --tg-out: #eeffde;
-      --tg-in: #ffffff;
-      --tg-border: #e5e7eb;
-      --tg-muted: #707579;
-      --tg-text: #111827;
-    }
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #cfd9e6;
-      color: var(--tg-text);
-    }
-    .app-wrap {
       width: 100%;
-      max-width: 960px;
       height: 100%;
-      margin: 0 auto;
-      background: var(--tg-bg);
-      display: flex;
       overflow: hidden;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
-    }
-    @media (min-width: 768px) {
-      body { padding: 16px; }
-      .app-wrap {
-        height: calc(100vh - 32px);
-        border-radius: 16px;
-      }
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #090d16;
+      color: #f8fafc;
     }
 
-    /* Левая колонка: чаты */
-    .sidebar {
-      width: 300px;
-      border-right: 1px solid var(--tg-border);
-      display: flex;
-      flex-direction: column;
-      background: #ffffff;
-      flex-shrink: 0;
-    }
-    .side-header {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--tg-border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .tg-logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--tg-blue);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-    .search-input {
-      flex: 1;
-      background: #f3f4f6;
-      border: 1px solid transparent;
-      border-radius: 20px;
-      padding: 8px 14px;
-      font-size: 14px;
-      outline: none;
-      color: var(--tg-text);
-    }
-    .search-input:focus {
-      background: #fff;
-      border-color: var(--tg-blue);
-    }
-    .chat-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 6px;
-    }
-    .chat-row {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.12s;
-    }
-    .chat-row:hover { background: #f3f4f6; }
-    .chat-row.active {
-      background: var(--tg-blue);
-      color: #ffffff;
-    }
-    .chat-row.active .chat-preview,
-    .chat-row.active .chat-date {
-      color: rgba(255, 255, 255, 0.88);
-    }
-    .avatar {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 21px;
-      color: #fff;
-      flex-shrink: 0;
-    }
-    .av-1 { background: linear-gradient(135deg, #2aabee, #229ed9); }
-    .av-2 { background: linear-gradient(135deg, #10b981, #059669); }
-    .av-3 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
-    .chat-meta {
-      flex: 1;
-      min-width: 0;
-    }
-    .chat-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-    }
-    .chat-name {
-      font-weight: 700;
-      font-size: 15px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .chat-date {
-      font-size: 11px;
-      color: var(--tg-muted);
-    }
-    .chat-preview {
-      font-size: 13px;
-      color: var(--tg-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-top: 3px;
-    }
-    .side-bottom {
-      padding: 10px 14px;
-      border-top: 1px solid var(--tg-border);
-      font-size: 12px;
-      color: var(--tg-muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* Правая колонка: диалог */
-    .main-chat {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      background: linear-gradient(180deg, #d6e5d1 0%, #c8dec9 55%, #d5e4ed 100%);
-      position: relative;
-    }
-    .chat-topbar {
-      height: 58px;
-      background: #ffffff;
-      border-bottom: 1px solid var(--tg-border);
-      padding: 0 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-    .top-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-    .mobile-menu-btn {
-      display: none;
-      background: #f3f4f6;
-      border: none;
-      border-radius: 10px;
-      width: 36px;
-      height: 36px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-    .room-title {
-      font-weight: 700;
-      font-size: 15.5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .room-sub {
-      font-size: 12px;
-      color: var(--tg-blue);
-    }
-    .top-btns {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .top-btn {
-      background: #f3f4f6;
-      border: none;
-      border-radius: 10px;
-      padding: 8px 11px;
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--tg-text);
-    }
-    .top-btn:hover { background: #e5e7eb; }
-
-    .name-bar {
-      background: rgba(255, 255, 255, 0.92);
-      padding: 7px 14px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12.5px;
-      flex-shrink: 0;
-    }
-    .name-input {
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      padding: 5px 10px;
-      font-size: 13.5px;
-      width: 165px;
-      outline: none;
-      background: #fff;
-      color: var(--tg-text);
-    }
-    .name-input:focus { border-color: var(--tg-blue); }
-
-    .messages-box {
-      flex: 1;
-      overflow-y: auto;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .day-badge {
-      align-self: center;
-      background: rgba(17, 24, 39, 0.3);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 999px;
-      margin: 2px 0 6px;
-    }
-    .msg-bubble {
-      max-width: 78%;
-      padding: 8px 12px 6px;
-      border-radius: 14px;
-      font-size: 14.5px;
-      line-height: 1.38;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      word-break: break-word;
-    }
-    .msg-bubble.in {
-      align-self: flex-start;
-      background: var(--tg-in);
-      border-bottom-left-radius: 4px;
-    }
-    .msg-bubble.out {
-      align-self: flex-end;
-      background: var(--tg-out);
-      border-bottom-right-radius: 4px;
-    }
-    .msg-sender {
-      font-size: 12px;
-      font-weight: 700;
-      color: #2563eb;
-      margin-bottom: 2px;
-    }
-    .msg-foot {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: #6b7280;
-      margin-top: 3px;
-    }
-    .msg-bubble.out .msg-foot { color: #4d8b3c; }
-
-    /* Нижняя панель ввода — всегда активна и поверх всего */
-    .composer-form {
-      background: #ffffff;
-      border-top: 1px solid var(--tg-border);
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-      position: relative;
-      z-index: 10;
-    }
-    .composer-input {
-      flex: 1;
-      border: 1.5px solid #e5e7eb;
-      background: #f9fafb;
-      border-radius: 22px;
-      padding: 11px 16px;
-      font-size: 15px;
-      font-family: inherit;
-      color: #111827;
-      outline: none;
-      min-width: 0;
-    }
-    .composer-input:focus {
-      background: #ffffff;
-      border-color: var(--tg-blue);
-    }
-    .send-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: none;
-      background: var(--tg-blue);
-      color: #ffffff;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .send-btn:hover { background: var(--tg-blue-dark); }
-    .send-btn:active { transform: scale(0.95); }
-
-    @media (max-width: 720px) {
-      .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; }
-      .sidebar {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        z-index: 30;
-        display: none;
-      }
-      .sidebar.open { display: flex; }
-    }
-
-    /* Модалка звонка */
-    .call-modal {
-      display: none;
+    /* 3D холст на весь экран */
+    #canvas3d {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.75);
-      z-index: 50;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .call-modal.open { display: flex; }
-    .call-box {
       width: 100%;
-      max-width: 330px;
-      background: linear-gradient(160deg, #1d3b5c, #0f172a);
-      color: #fff;
-      border-radius: 24px;
-      padding: 28px 20px;
-      text-align: center;
+      height: 100%;
+      z-index: 1;
+      display: block;
     }
-    .call-circle {
-      width: 74px;
-      height: 74px;
+
+    /* Верхняя панель управления камерой и статусом */
+    .hud-top {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .hud-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+      flex-wrap: wrap;
+    }
+    .glass-pill {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 999px;
+      padding: 7px 13px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+    .cam-btn {
+      background: rgba(51, 144, 236, 0.24);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(51, 144, 236, 0.55);
+      color: #bae6fd;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .cam-btn:hover { background: rgba(51, 144, 236, 0.42); }
+    .cam-btn.active {
+      background: #3390ec;
+      color: #ffffff;
+      border-color: #60a5fa;
+    }
+
+    /* Плавающее окно 3D-мессенджера */
+    .messenger-dock {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: min(430px, calc(100vw - 32px));
+      height: min(560px, calc(100vh - 82px));
+      z-index: 12;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(125, 211, 252, 0.25);
+      border-radius: 22px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.18s ease-out;
+    }
+    .messenger-dock.minimized {
+      height: 58px;
+    }
+
+    .dock-header {
+      padding: 11px 14px;
+      background: linear-gradient(90deg, rgba(29, 142, 201, 0.85), rgba(51, 144, 236, 0.85));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .dock-title {
+      font-weight: 800;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dock-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .mini-btn {
+      background: rgba(15, 23, 42, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mini-btn:hover { background: rgba(15, 23, 42, 0.55); }
+
+    .room-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      background: rgba(2, 6, 23, 0.45);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    }
+    .room-tab {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #cbd5e1;
+      border-radius: 10px;
+      padding: 6px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .room-tab.active {
+      background: #3390ec;
+      color: #ffffff;
+      border-color: #60a5fa;
+    }
+
+    .name-row {
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #94a3b8;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .name-row input {
+      width: 145px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 8px;
+      padding: 4px 8px;
+      color: #f8fafc;
+      font-size: 12.5px;
+      outline: none;
+    }
+    .name-row input:focus { border-color: #3390ec; }
+
+    .msg-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .msg-card {
+      max-width: 84%;
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      line-height: 1.38;
+      word-break: break-word;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+    .msg-card.in {
+      align-self: flex-start;
+      background: rgba(30, 41, 59, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      color: #f1f5f9;
+      border-bottom-left-radius: 4px;
+    }
+    .msg-card.out {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-meta {
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0.85;
+      margin-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .msg-time {
+      font-weight: 400;
+      font-size: 10.5px;
+      opacity: 0.78;
+    }
+
+    .send-form {
+      padding: 9px 10px;
+      background: rgba(2, 6, 23, 0.75);
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .send-input {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 18px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      min-width: 0;
+    }
+    .send-input:focus { border-color: #38bdf8; }
+    .send-circle {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: var(--tg-blue);
-      margin: 0 auto 14px;
+      border: none;
+      background: #3390ec;
+      color: #fff;
+      font-size: 17px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
+      flex-shrink: 0;
     }
-    .end-call-btn {
-      margin-top: 20px;
-      background: #ef4444;
-      color: #fff;
-      border: none;
-      border-radius: 999px;
-      padding: 12px 26px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
+    .send-circle:hover { background: #2578cc; }
+
+    @media (max-width: 640px) {
+      .messenger-dock {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        width: auto;
+        height: min(440px, calc(100vh - 115px));
+      }
+      .hud-top { top: 8px; left: 8px; right: 8px; }
     }
   </style>
 </head>
 <body>
-  <div class="app-wrap">
-    <!-- Список чатов -->
-    <aside class="sidebar" id="sidebar">
-      <div class="side-header">
-        <div class="tg-logo">✈</div>
-        <input class="search-input" id="searchBox" type="text" placeholder="Поиск" oninput="filterChatList()" />
-      </div>
-      <div class="chat-list" id="chatList">
-        <div class="chat-row active" data-room="general" onclick="selectRoom('general')">
-          <div class="avatar av-1">💬</div>
-          <div class="chat-meta">
-            <div class="chat-top">
-              <span class="chat-name">Общий чат</span>
-              <span class="chat-date" id="date-general">сейчас</span>
-            </div>
-            <div class="chat-preview" id="prev-general">Облако npoint.io подключено</div>
-          </div>
-        </div>
+  <canvas id="canvas3d"></canvas>
 
-        <div class="chat-row" data-room="saved" onclick="selectRoom('saved')">
-          <div class="avatar av-2">🔖</div>
-          <div class="chat-meta">
-            <div class="chat-top">
-              <span class="chat-name">Избранное</span>
-              <span class="chat-date" id="date-saved">заметки</span>
-            </div>
-            <div class="chat-preview" id="prev-saved">Сохранённые сообщения</div>
-          </div>
-        </div>
-
-        <div class="chat-row" data-room="friends" onclick="selectRoom('friends')">
-          <div class="avatar av-3">👥</div>
-          <div class="chat-meta">
-            <div class="chat-top">
-              <span class="chat-name">Друзья</span>
-              <span class="chat-date" id="date-friends">чат</span>
-            </div>
-            <div class="chat-preview" id="prev-friends">Погулять и поиграть</div>
-          </div>
-        </div>
-      </div>
-      <div class="side-bottom">
-        <span id="netStatus">Подключение...</span>
-        <span id="visitorsPill">👀 0</span>
-      </div>
-    </aside>
-
-    <!-- Окно переписки -->
-    <main class="main-chat">
-      <header class="chat-topbar">
-        <div class="top-left">
-          <button type="button" class="mobile-menu-btn" onclick="toggleDrawer()">☰</button>
-          <div>
-            <div class="room-title" id="roomTitle">Общий чат</div>
-            <div class="room-sub" id="roomSub">в сети • npoint.io</div>
-          </div>
-        </div>
-        <div class="top-btns">
-          <button type="button" class="top-btn" onclick="openCall()">📞 Звонок</button>
-          <button type="button" class="top-btn" style="color:#dc2626;" onclick="clearRoom()">Очистить</button>
-        </div>
-      </header>
-
-      <div class="name-bar">
-        <span>Имя:</span>
-        <input class="name-input" id="userNameInput" type="text" placeholder="Дима" maxlength="24" onchange="persistName()" />
-        <span id="saveState" style="margin-left:auto; color:#707579;">Готово</span>
-      </div>
-
-      <div class="messages-box" id="messagesBox">
-        <div class="day-badge">Сегодня</div>
-      </div>
-
-      <form class="composer-form" id="composerForm" onsubmit="return handleFormSubmit(event)">
-        <input
-          class="composer-input"
-          id="messageField"
-          type="text"
-          autocomplete="off"
-          placeholder="Написать сообщение..."
-          maxlength="500"
-        />
-        <button type="submit" class="send-btn" title="Отправить">➤</button>
-      </form>
-    </main>
-  </div>
-
-  <!-- Окно звонка -->
-  <div class="call-modal" id="callModal">
-    <div class="call-box">
-      <div class="call-circle">📞</div>
-      <div style="font-size:20px; font-weight:800;" id="callName">Общий чат</div>
-      <div style="font-size:13px; color:#93c5fd; margin-top:6px;" id="callStatus">Вызов...</div>
-      <button type="button" class="end-call-btn" onclick="closeCall()">Сбросить</button>
+  <div class="hud-top">
+    <div class="hud-group">
+      <div class="glass-pill">🧊 3D Telegram</div>
+      <div class="glass-pill" id="cloudBadge">npoint.io...</div>
+      <div class="glass-pill" id="visBadge">👀 0</div>
+    </div>
+    <div class="hud-group">
+      <button type="button" class="cam-btn active" id="camOrbitBtn" onclick="setCamMode('orbit')">Орбита</button>
+      <button type="button" class="cam-btn" id="camFollowBtn" onclick="setCamMode('follow')">За кубами</button>
+      <button type="button" class="cam-btn" onclick="resetCamera()">Центр</button>
     </div>
   </div>
 
-  <script>
-    // Твой exact бин со скриншота: https://api.npoint.io/80185a88336abe28de83
-    // Работает прямо с твоим JSON: { "messages": [], "visitors": [] }
-    const API_URL = "https://api.npoint.io/80185a88336abe28de83";
-    const LS_MSGS = "tg_web_msgs_v4";
-    const LS_NAME = "tg_web_name_v4";
-    const SS_VISIT = "tg_web_visit_v4";
+  <section class="messenger-dock" id="dock">
+    <div class="dock-header" onclick="toggleDock()">
+      <div class="dock-title">✈️ 3D Чат <span style="font-size:11px; font-weight:600; opacity:0.9;" id="dockStatus">онлайн</span></div>
+      <div class="dock-actions" onclick="event.stopPropagation()">
+        <button type="button" class="mini-btn" onclick="clearCurrentRoom()">Очистить</button>
+        <button type="button" class="mini-btn" onclick="toggleDock()">—</button>
+      </div>
+    </div>
 
-    const ROOMS = {
-      general: { title: "Общий чат", sub: "в сети • npoint.io" },
-      saved: { title: "Избранное", sub: "личные облачные заметки" },
-      friends: { title: "Друзья", sub: "чат компании" }
+    <div class="room-tabs">
+      <button type="button" class="room-tab active" data-r="general" onclick="switchRoom('general')">💬 Общий</button>
+      <button type="button" class="room-tab" data-r="saved" onclick="switchRoom('saved')">🔖 Избранное</button>
+      <button type="button" class="room-tab" data-r="friends" onclick="switchRoom('friends')">👥 Друзья</button>
+    </div>
+
+    <div class="name-row">
+      <span>Имя:</span>
+      <input id="nickInput" type="text" placeholder="Дима" maxlength="24" onchange="saveNick()" />
+      <span style="margin-left:auto; font-size:11px;" id="syncNote">Тяни мышкой фон 3D</span>
+    </div>
+
+    <div class="msg-stream" id="msgStream"></div>
+
+    <form class="send-form" onsubmit="return onSend(event)">
+      <input
+        class="send-input"
+        id="chatInput"
+        type="text"
+        autocomplete="off"
+        placeholder="Написать сообщение в 3D..."
+        maxlength="400"
+      />
+      <button type="submit" class="send-circle" title="Отправить">➤</button>
+    </form>
+  </section>
+
+  <script>
+    // Твой бин npoint.io со структурой {"messages": [], "visitors": []}
+    const API_URL = "https://api.npoint.io/80185a88336abe28de83";
+    const LS_MSGS = "tg_3d_msgs_v1";
+    const LS_NICK = "tg_3d_nick_v1";
+    const SS_VISIT = "tg_3d_visit_v1";
+
+    const ROOM_NAMES = {
+      general: "Общий",
+      saved: "Избранное",
+      friends: "Друзья"
     };
 
-    let activeRoom = "general";
-    let messagesList = [];
-    let visitorsList = [];
-    let callTimerId = null;
+    let currentRoom = "general";
+    let messages = [];
+    let visitors = [];
+    let camMode = "orbit";
 
-    const tgApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    if (tgApp) {
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
       try {
-        tgApp.ready();
-        tgApp.expand();
-        const u = tgApp.initDataUnsafe && tgApp.initDataUnsafe.user;
-        if (u && u.first_name && !localStorage.getItem(LS_NAME)) {
-          localStorage.setItem(LS_NAME, u.first_name);
+        tg.ready();
+        tg.expand();
+        const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+        if (u && u.first_name && !localStorage.getItem(LS_NICK)) {
+          localStorage.setItem(LS_NICK, u.first_name);
         }
       } catch (_) {}
     }
 
-    function currentUser() {
-      const v = (document.getElementById("userNameInput").value || "").trim();
+    // ==================== THREE.JS 3D СЦЕНА ====================
+    const canvas = document.getElementById("canvas3d");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x090d16, 0.024);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 150);
+    camera.position.set(0, 4.5, 14);
+
+    // Освещение
+    const ambient = new THREE.AmbientLight(0x93c5fd, 0.9);
+    scene.add(ambient);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.35);
+    keyLight.position.set(8, 14, 10);
+    scene.add(keyLight);
+
+    const rimLight = new THREE.PointLight(0x3390ec, 2.5, 35);
+    rimLight.position.set(-8, 5, -6);
+    scene.add(rimLight);
+
+    const mintLight = new THREE.PointLight(0x22c55e, 1.8, 28);
+    mintLight.position.set(7, 3, -5);
+    scene.add(mintLight);
+
+    // Объёмная сетка-арена и парящие кольца
+    const gridHelper = new THREE.GridHelper(36, 36, 0x3390ec, 0x1e293b);
+    gridHelper.position.y = -4.5;
+    scene.add(gridHelper);
+
+    const ringGeo = new THREE.TorusGeometry(6.8, 0.04, 16, 100);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
+    const outerRing = new THREE.Mesh(ringGeo, ringMat);
+    outerRing.rotation.x = Math.PI / 2.4;
+    scene.add(outerRing);
+
+    const innerRing = new THREE.Mesh(
+      new THREE.TorusGeometry(4.3, 0.03, 12, 80),
+      new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.3 })
+    );
+    innerRing.rotation.x = Math.PI / 3;
+    scene.add(innerRing);
+
+    // Звёздная пыль вокруг
+    const starCount = 420;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i += 3) {
+      starPositions[i] = (Math.random() - 0.5) * 44;
+      starPositions[i + 1] = (Math.random() - 0.5) * 26;
+      starPositions[i + 2] = (Math.random() - 0.5) * 44;
+    }
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+    const starPoints = new THREE.Points(
+      starGeo,
+      new THREE.PointsMaterial({ color: 0xbae6fd, size: 0.14, transparent: true, opacity: 0.75 })
+    );
+    scene.add(starPoints);
+
+    // Группа 3D-кубов сообщений
+    const msgCubesGroup = new THREE.Group();
+    scene.add(msgCubesGroup);
+
+    function createMessageTexture(author, text, isMine) {
+      const c = document.createElement("canvas");
+      c.width = 512;
+      c.height = 256;
+      const ctx = c.getContext("2d");
+
+      // Фон плашки
+      ctx.fillStyle = isMine ? "#14532d" : "#0f172a";
+      ctx.fillRect(0, 0, c.width, c.height);
+
+      // Рамка
+      ctx.strokeStyle = isMine ? "#4ade80" : "#38bdf8";
+      ctx.lineWidth = 8;
+      ctx.strokeRect(10, 10, c.width - 20, c.height - 20);
+
+      // Имя отправителя
+      ctx.fillStyle = isMine ? "#86efac" : "#7dd3fc";
+      ctx.font = "bold 28px Arial, sans-serif";
+      ctx.fillText(String(author || "Участник").slice(0, 22), 28, 56);
+
+      // Текст сообщения (перенос слов)
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "26px Arial, sans-serif";
+      const words = String(text || "").split(" ");
+      let line = "";
+      let y = 104;
+      for (let i = 0; i < words.length; i++) {
+        const test = line + words[i] + " ";
+        if (ctx.measureText(test).width > c.width - 56 && line !== "") {
+          ctx.fillText(line.trim(), 28, y);
+          line = words[i] + " ";
+          y += 38;
+          if (y > 215) break;
+        } else {
+          line = test;
+        }
+      }
+      if (y <= 215 && line.trim()) {
+        ctx.fillText(line.trim(), 28, y);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    function rebuild3DMessages() {
+      while (msgCubesGroup.children.length > 0) {
+        const obj = msgCubesGroup.children.pop();
+        if (obj.geometry) obj.geometry.dispose();
+      }
+
+      const me = getNick();
+      const filtered = messages.filter((m) => (m.room || m.chat || "general") === currentRoom).slice(-14);
+
+      filtered.forEach((m, idx) => {
+        const author = m.author || m.name || "Участник";
+        const text = m.text || "";
+        const isMine = author.toLowerCase() === me.toLowerCase() || currentRoom === "saved";
+
+        const angle = (idx / Math.max(filtered.length, 1)) * Math.PI * 2;
+        const radius = 3.2 + (idx % 3) * 1.45;
+        const y = ((idx % 4) - 1.5) * 1.35;
+
+        const tex = createMessageTexture(author, text, isMine);
+        const sideMat = new THREE.MeshStandardMaterial({
+          color: isMine ? 0x22c55e : 0x3390ec,
+          roughness: 0.35,
+          metalness: 0.25
+        });
+        const faceMat = new THREE.MeshStandardMaterial({
+          map: tex,
+          roughness: 0.3,
+          metalness: 0.1
+        });
+
+        // Порядок граней BoxGeometry: +x, -x, +y, -y, +z, -z
+        const materials = [sideMat, sideMat, sideMat, sideMat, faceMat, faceMat];
+        const geo = new THREE.BoxGeometry(2.6, 1.35, 0.38);
+        const cube = new THREE.Mesh(geo, materials);
+
+        cube.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+        cube.lookAt(0, y, 0);
+        cube.userData = {
+          baseAngle: angle,
+          radius: radius,
+          baseY: y,
+          speed: 0.004 + (idx % 3) * 0.0015,
+          phase: idx * 0.9
+        };
+        msgCubesGroup.add(cube);
+      });
+    }
+
+    // Управление камерой мышкой/пальцем
+    let isDragging = false;
+    let prevX = 0;
+    let prevY = 0;
+    let yaw = 0;
+    let pitch = 0.25;
+    let camDist = 13.5;
+
+    canvas.addEventListener("pointerdown", (e) => {
+      isDragging = true;
+      prevX = e.clientX;
+      prevY = e.clientY;
+    });
+    window.addEventListener("pointerup", () => { isDragging = false; });
+    window.addEventListener("pointermove", (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevX;
+      const dy = e.clientY - prevY;
+      prevX = e.clientX;
+      prevY = e.clientY;
+      yaw -= dx * 0.007;
+      pitch = Math.max(-0.65, Math.min(1.15, pitch + dy * 0.006));
+    });
+    canvas.addEventListener("wheel", (e) => {
+      camDist = Math.max(6.5, Math.min(24, camDist + e.deltaY * 0.008));
+    }, { passive: true });
+
+    function setCamMode(mode) {
+      camMode = mode;
+      document.getElementById("camOrbitBtn").classList.toggle("active", mode === "orbit");
+      document.getElementById("camFollowBtn").classList.toggle("active", mode === "follow");
+    }
+
+    function resetCamera() {
+      yaw = 0;
+      pitch = 0.25;
+      camDist = 13.5;
+    }
+
+    let clockT = 0;
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      clockT += 0.016;
+
+      outerRing.rotation.z += 0.0025;
+      innerRing.rotation.z -= 0.0035;
+      starPoints.rotation.y += 0.0006;
+
+      msgCubesGroup.children.forEach((cube) => {
+        const d = cube.userData;
+        d.baseAngle += d.speed;
+        cube.position.x = Math.cos(d.baseAngle) * d.radius;
+        cube.position.z = Math.sin(d.baseAngle) * d.radius;
+        cube.position.y = d.baseY + Math.sin(clockT * 2 + d.phase) * 0.22;
+        cube.lookAt(0, cube.position.y, 0);
+      });
+
+      if (camMode === "follow" && msgCubesGroup.children.length > 0) {
+        const targetCube = msgCubesGroup.children[msgCubesGroup.children.length - 1];
+        camera.position.lerp(
+          new THREE.Vector3(
+            targetCube.position.x * 1.45,
+            targetCube.position.y + 1.8,
+            targetCube.position.z * 1.45 + 4.5
+          ),
+          0.04
+        );
+        camera.lookAt(targetCube.position);
+      } else {
+        const x = Math.sin(yaw) * Math.cos(pitch) * camDist;
+        const y = Math.sin(pitch) * camDist;
+        const z = Math.cos(yaw) * Math.cos(pitch) * camDist;
+        camera.position.lerp(new THREE.Vector3(x, y, z), 0.08);
+        camera.lookAt(0, 0, 0);
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate3D();
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ==================== ЛОГИКА МЕССЕНДЖЕРА И NPOINT.IO ====================
+    function getNick() {
+      const v = (document.getElementById("nickInput").value || "").trim();
       return v || "Дима";
     }
 
-    function persistName() {
-      const v = (document.getElementById("userNameInput").value || "").trim();
-      if (v) localStorage.setItem(LS_NAME, v);
+    function saveNick() {
+      const v = (document.getElementById("nickInput").value || "").trim();
+      if (v) localStorage.setItem(LS_NICK, v);
+      renderUI();
     }
 
-    function getTimeHM() {
+    function nowHM() {
       return new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
     }
 
-    function getDateTime() {
+    function nowFull() {
       return new Date().toLocaleString("ru-RU", {
         day: "2-digit",
         month: "2-digit",
@@ -565,7 +641,7 @@
         .replace(/>/g, "&gt;");
     }
 
-    async function loadCloud() {
+    async function fetchCloud() {
       try {
         const r = await fetch(`${API_URL}?_=${Date.now()}`);
         if (r.ok) {
@@ -582,10 +658,10 @@
       try {
         local = JSON.parse(localStorage.getItem(LS_MSGS) || "[]");
       } catch (_) {}
-      return { ok: false, messages: local, visitors: visitorsList };
+      return { ok: false, messages: local, visitors: visitors };
     }
 
-    async function saveCloud(msgs, vis) {
+    async function pushCloud(msgs, vis) {
       try {
         const r = await fetch(API_URL, {
           method: "POST",
@@ -598,190 +674,145 @@
       }
     }
 
-    function drawMessages(scrollBottom) {
-      const box = document.getElementById("messagesBox");
-      const me = currentUser();
-      const roomMsgs = messagesList.filter((m) => (m.room || m.chat || "general") === activeRoom);
+    function renderUI() {
+      const stream = document.getElementById("msgStream");
+      const me = getNick();
+      const list = messages.filter((m) => (m.room || m.chat || "general") === currentRoom);
 
-      let out = '<div class="day-badge">Сегодня</div>';
-      if (!roomMsgs.length) {
-        out += `<div class="msg-bubble in"><div class="msg-sender">Telegram</div><div>Напиши первое сообщение в «${esc(ROOMS[activeRoom].title)}» снизу!</div><div class="msg-foot"><span>${getTimeHM()}</span></div></div>`;
+      if (!list.length) {
+        stream.innerHTML = `<div style="text-align:center; color:#94a3b8; font-size:13px; margin:auto 0;">В комнате «${esc(ROOM_NAMES[currentRoom])}» пока пусто — напиши сообщение, и оно появится в 3D!</div>`;
       } else {
-        out += roomMsgs
+        stream.innerHTML = list
           .map((m) => {
             const sender = m.author || m.name || "Участник";
-            const mine = sender.toLowerCase() === me.toLowerCase() || activeRoom === "saved";
+            const mine = sender.toLowerCase() === me.toLowerCase() || currentRoom === "saved";
             return `
-              <div class="msg-bubble ${mine ? "out" : "in"}">
-                ${!mine ? `<div class="msg-sender">${esc(sender)}</div>` : ""}
-                <div>${esc(m.text || "")}</div>
-                <div class="msg-foot">
-                  <span>${esc(m.time || "")}</span>
-                  ${mine ? "<span>✓✓</span>" : ""}
+              <div class="msg-card ${mine ? "out" : "in"}">
+                <div class="msg-meta">
+                  <span>${esc(sender)}</span>
+                  <span class="msg-time">${esc(m.time || "")}</span>
                 </div>
+                <div>${esc(m.text || "")}</div>
               </div>
             `;
           })
           .join("");
+        stream.scrollTop = stream.scrollHeight;
       }
 
-      box.innerHTML = out;
-      if (scrollBottom) {
-        box.scrollTop = box.scrollHeight;
-      }
-
-      document.getElementById("visitorsPill").textContent = `👀 ${visitorsList.length}`;
-      ["general", "saved", "friends"].forEach((rid) => {
-        const list = messagesList.filter((m) => (m.room || m.chat || "general") === rid);
-        if (list.length) {
-          const last = list[list.length - 1];
-          document.getElementById("prev-" + rid).textContent = `${last.author || "Я"}: ${last.text || ""}`;
-          document.getElementById("date-" + rid).textContent = last.time || "";
-        }
-      });
+      document.getElementById("visBadge").textContent = `👀 ${visitors.length}`;
+      rebuild3DMessages();
     }
 
-    function handleFormSubmit(e) {
+    function onSend(e) {
       if (e) e.preventDefault();
-      const field = document.getElementById("messageField");
-      const text = field.value.trim();
+      const inp = document.getElementById("chatInput");
+      const text = inp.value.trim();
       if (!text) return false;
 
-      // Сразу очищаем поле и фокусируем его обратно, чтобы можно было писать дальше без задержек
-      field.value = "";
-      field.focus();
-      persistName();
+      inp.value = "";
+      inp.focus();
+      saveNick();
 
       const item = {
         id: Date.now(),
-        room: activeRoom,
-        author: currentUser(),
+        room: currentRoom,
+        author: getNick(),
         text: text,
-        time: getTimeHM(),
-        date: getDateTime()
+        time: nowHM(),
+        date: nowFull()
       };
 
-      // Мгновенно добавляем в интерфейс
-      messagesList = [...messagesList, item].slice(-120);
+      messages = [...messages, item].slice(-120);
       try {
-        localStorage.setItem(LS_MSGS, JSON.stringify(messagesList));
+        localStorage.setItem(LS_MSGS, JSON.stringify(messages));
       } catch (_) {}
-      drawMessages(true);
+      renderUI();
 
-      // В фоне отправляем в npoint.io
-      const stateEl = document.getElementById("saveState");
-      stateEl.textContent = "Отправка...";
-      loadCloud().then((fresh) => {
-        const merged = fresh.ok
-          ? [...fresh.messages.filter((m) => m.id !== item.id), item].slice(-120)
-          : messagesList;
-        messagesList = merged;
-        visitorsList = fresh.visitors;
-        return saveCloud(merged, visitorsList);
-      }).then((ok) => {
-        stateEl.textContent = ok ? "В облаке ✓" : "Локально";
-        document.getElementById("netStatus").textContent = ok ? "npoint.io онлайн ✓" : "Офлайн";
-      });
+      document.getElementById("dockStatus").textContent = "сохраняю...";
+      fetchCloud()
+        .then((fresh) => {
+          const merged = fresh.ok
+            ? [...fresh.messages.filter((m) => m.id !== item.id), item].slice(-120)
+            : messages;
+          messages = merged;
+          visitors = fresh.visitors;
+          return pushCloud(merged, visitors);
+        })
+        .then((ok) => {
+          document.getElementById("dockStatus").textContent = ok ? "в облаке ✓" : "локально";
+          document.getElementById("cloudBadge").textContent = ok ? "npoint.io ✓" : "офлайн";
+        });
 
       return false;
     }
 
-    function selectRoom(rid) {
-      activeRoom = rid;
-      document.querySelectorAll(".chat-row").forEach((el) => {
-        el.classList.toggle("active", el.dataset.room === rid);
+    function switchRoom(rid) {
+      currentRoom = rid;
+      document.querySelectorAll(".room-tab").forEach((b) => {
+        b.classList.toggle("active", b.dataset.r === rid);
       });
-      document.getElementById("roomTitle").textContent = ROOMS[rid].title;
-      document.getElementById("roomSub").textContent = ROOMS[rid].sub;
-      document.getElementById("sidebar").classList.remove("open");
-      drawMessages(true);
-      document.getElementById("messageField").focus();
+      renderUI();
+      document.getElementById("chatInput").focus();
     }
 
-    function toggleDrawer() {
-      document.getElementById("sidebar").classList.toggle("open");
+    function toggleDock() {
+      document.getElementById("dock").classList.toggle("minimized");
     }
 
-    function filterChatList() {
-      const q = document.getElementById("searchBox").value.trim().toLowerCase();
-      document.querySelectorAll(".chat-row").forEach((el) => {
-        el.style.display = el.textContent.toLowerCase().includes(q) ? "flex" : "none";
-      });
-    }
-
-    async function clearRoom() {
-      if (!confirm(`Очистить переписку в «${ROOMS[activeRoom].title}»?`)) return;
-      const fresh = await loadCloud();
-      const rest = fresh.messages.filter((m) => (m.room || m.chat || "general") !== activeRoom);
-      messagesList = rest;
-      visitorsList = fresh.visitors;
+    async function clearCurrentRoom() {
+      if (!confirm(`Очистить сообщения в «${ROOM_NAMES[currentRoom]}»?`)) return;
+      const fresh = await fetchCloud();
+      const rest = fresh.messages.filter((m) => (m.room || m.chat || "general") !== currentRoom);
+      messages = rest;
+      visitors = fresh.visitors;
       try {
         localStorage.setItem(LS_MSGS, JSON.stringify(rest));
       } catch (_) {}
-      drawMessages(true);
-      await saveCloud(rest, visitorsList);
+      renderUI();
+      await pushCloud(rest, visitors);
     }
 
-    function openCall() {
-      document.getElementById("callName").textContent = ROOMS[activeRoom].title;
-      const st = document.getElementById("callStatus");
-      st.textContent = "Соединение...";
-      document.getElementById("callModal").classList.add("open");
-      let s = 0;
-      clearInterval(callTimerId);
-      callTimerId = setInterval(() => {
-        s++;
-        const mm = String(Math.floor(s / 60)).padStart(2, "0");
-        const ss = String(s % 60).padStart(2, "0");
-        st.textContent = `Разговор • ${mm}:${ss}`;
-      }, 1000);
-    }
+    async function init() {
+      const savedNick = localStorage.getItem(LS_NICK);
+      if (savedNick) document.getElementById("nickInput").value = savedNick;
 
-    function closeCall() {
-      clearInterval(callTimerId);
-      document.getElementById("callModal").classList.remove("open");
-    }
+      const fresh = await fetchCloud();
+      messages = fresh.messages;
+      visitors = fresh.visitors;
 
-    async function startApp() {
-      const saved = localStorage.getItem(LS_NAME);
-      if (saved) document.getElementById("userNameInput").value = saved;
-
-      const res = await loadCloud();
-      messagesList = res.messages;
-      visitorsList = res.visitors;
-
-      if (res.ok) {
-        document.getElementById("netStatus").textContent = "npoint.io онлайн ✓";
-        document.getElementById("saveState").textContent = "Облако ✓";
+      if (fresh.ok) {
+        document.getElementById("cloudBadge").textContent = "npoint.io ✓";
+        document.getElementById("dockStatus").textContent = "онлайн";
         if (!sessionStorage.getItem(SS_VISIT)) {
           sessionStorage.setItem(SS_VISIT, "1");
-          visitorsList = [
+          visitors = [
             {
-              name: currentUser(),
-              time: getDateTime(),
+              name: getNick(),
+              time: nowFull(),
               device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? "Телефон" : "Ноутбук"
             },
-            ...visitorsList
+            ...visitors
           ].slice(0, 60);
-          await saveCloud(messagesList, visitorsList);
+          await pushCloud(messages, visitors);
         }
       } else {
-        document.getElementById("netStatus").textContent = "Офлайн-режим";
-        document.getElementById("saveState").textContent = "Локально";
+        document.getElementById("cloudBadge").textContent = "офлайн";
+        document.getElementById("dockStatus").textContent = "локально";
       }
 
-      drawMessages(true);
+      renderUI();
     }
 
-    startApp();
+    init();
     setInterval(async () => {
-      const res = await loadCloud();
-      if (res.ok) {
-        messagesList = res.messages;
-        visitorsList = res.visitors;
-        drawMessages(false);
+      const fresh = await fetchCloud();
+      if (fresh.ok) {
+        messages = fresh.messages;
+        visitors = fresh.visitors;
+        renderUI();
       }
-    }, 4000);
+    }, 4500);
   </script>
 </body>
 </html>
