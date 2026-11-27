@@ -2,12 +2,11 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3D Telegram — Объёмный Мессенджер</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>3D Arcade Hub — Портал 3D Игр</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0;
       padding: 0;
@@ -15,11 +14,12 @@
       height: 100%;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #090d16;
+      background: #070b14;
       color: #f8fafc;
+      user-select: none;
     }
 
-    #canvas3d {
+    #bgCanvas {
       position: fixed;
       inset: 0;
       width: 100%;
@@ -28,580 +28,1288 @@
       display: block;
     }
 
-    .hud-top {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      right: 14px;
-      z-index: 10;
-      display: flex;
-      justify-content: space-between;
+    /* 3D КНОПКИ */
+    .btn-3d {
+      position: relative;
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
-      pointer-events: none;
-    }
-    .hud-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      pointer-events: auto;
-      flex-wrap: wrap;
-    }
-    .glass-pill {
-      background: rgba(15, 23, 42, 0.72);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 999px;
-      padding: 7px 13px;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: #e2e8f0;
-      display: flex;
-      align-items: center;
+      justify-content: center;
       gap: 6px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-    }
-    .cam-btn {
-      background: rgba(51, 144, 236, 0.24);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(51, 144, 236, 0.55);
-      color: #bae6fd;
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-    }
-    .cam-btn:hover { background: rgba(51, 144, 236, 0.42); }
-    .cam-btn.active {
-      background: #3390ec;
+      border: none;
+      border-radius: 14px;
+      padding: 11px 18px;
+      font-size: 14px;
+      font-weight: 800;
       color: #ffffff;
-      border-color: #60a5fa;
+      cursor: pointer;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+      box-shadow: 0 5px 0 #0369a1, 0 10px 20px rgba(2, 132, 199, 0.35);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.12s;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    }
+    .btn-3d:hover { filter: brightness(1.08); }
+    .btn-3d:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #0369a1, 0 4px 10px rgba(2, 132, 199, 0.3);
     }
 
-    .messenger-dock {
+    .btn-3d.green {
+      background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%);
+      box-shadow: 0 5px 0 #15803d, 0 10px 20px rgba(22, 163, 74, 0.35);
+    }
+    .btn-3d.green:active { box-shadow: 0 1px 0 #15803d, 0 4px 10px rgba(22, 163, 74, 0.3); }
+
+    .btn-3d.purple {
+      background: linear-gradient(180deg, #c084fc 0%, #7e22ce 100%);
+      box-shadow: 0 5px 0 #581c87, 0 10px 20px rgba(126, 34, 206, 0.35);
+    }
+    .btn-3d.purple:active { box-shadow: 0 1px 0 #581c87, 0 4px 10px rgba(126, 34, 206, 0.3); }
+
+    .btn-3d.orange {
+      background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+      box-shadow: 0 5px 0 #9a3412, 0 10px 20px rgba(234, 88, 12, 0.35);
+    }
+    .btn-3d.orange:active { box-shadow: 0 1px 0 #9a3412, 0 4px 10px rgba(234, 88, 12, 0.3); }
+
+    .btn-3d.dark {
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      box-shadow: 0 5px 0 #0f172a, 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+    .btn-3d.dark:active { box-shadow: 0 1px 0 #0f172a, 0 3px 8px rgba(0, 0, 0, 0.4); }
+
+    .btn-3d.sm {
+      padding: 8px 12px;
+      font-size: 12.5px;
+      border-radius: 11px;
+    }
+
+    /* ЭКРАН ЛОББИ */
+    #lobbyScreen {
       position: fixed;
-      right: 16px;
-      bottom: 16px;
-      width: min(430px, calc(100vw - 32px));
-      height: min(560px, calc(100vh - 82px));
-      z-index: 12;
+      inset: 0;
+      z-index: 10;
+      overflow-y: auto;
+      padding: 18px 16px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .lobby-header {
+      width: 100%;
+      max-width: 1040px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 22px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      background: linear-gradient(90deg, #38bdf8, #a855f7, #4ade80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-sub {
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+
+    .games-grid {
+      width: 100%;
+      max-width: 1040px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 18px;
+    }
+
+    .game-card {
       background: rgba(15, 23, 42, 0.78);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(125, 211, 252, 0.25);
-      border-radius: 22px;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      border-radius: 24px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      transition: height 0.18s ease-out;
-    }
-    .messenger-dock.minimized {
-      height: 58px;
-    }
-
-    .dock-header {
-      padding: 11px 14px;
-      background: linear-gradient(90deg, rgba(29, 142, 201, 0.85), rgba(51, 144, 236, 0.85));
-      display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      cursor: pointer;
-      user-select: none;
+      gap: 12px;
+      box-shadow: 0 14px 0 rgba(7, 11, 20, 0.85), 0 24px 48px rgba(0, 0, 0, 0.55);
+      transition: transform 0.16s ease, border-color 0.16s ease;
     }
-    .dock-title {
-      font-weight: 800;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .game-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.6);
     }
-    .dock-actions {
-      display: flex;
-      gap: 6px;
-    }
-    .mini-btn {
-      background: rgba(15, 23, 42, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      color: #fff;
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-size: 11.5px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .mini-btn:hover { background: rgba(15, 23, 42, 0.55); }
-
-    .room-tabs {
-      display: flex;
-      gap: 6px;
-      padding: 8px 12px;
-      background: rgba(2, 6, 23, 0.45);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-    }
-    .room-tab {
-      flex: 1;
-      background: rgba(30, 41, 59, 0.7);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      color: #cbd5e1;
-      border-radius: 10px;
-      padding: 6px 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
+    .card-art {
+      width: 100%;
+      height: 148px;
+      border-radius: 16px;
       overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .room-tab.active {
-      background: #3390ec;
-      color: #ffffff;
-      border-color: #60a5fa;
-    }
-
-    .name-row {
-      padding: 7px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: #94a3b8;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-      background: rgba(15, 23, 42, 0.5);
-    }
-    .name-row input {
-      width: 145px;
-      background: rgba(30, 41, 59, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      border-radius: 8px;
-      padding: 4px 8px;
-      color: #f8fafc;
-      font-size: 12.5px;
-      outline: none;
-    }
-    .name-row input:focus { border-color: #3390ec; }
-
-    .msg-stream {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .msg-card {
-      max-width: 84%;
-      padding: 8px 12px;
-      border-radius: 14px;
-      font-size: 13.5px;
-      line-height: 1.38;
-      word-break: break-word;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-    }
-    .msg-card.in {
-      align-self: flex-start;
-      background: rgba(30, 41, 59, 0.92);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      color: #f1f5f9;
-      border-bottom-left-radius: 4px;
-    }
-    .msg-card.out {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #16a34a, #15803d);
-      color: #ffffff;
-      border-bottom-right-radius: 4px;
-    }
-    .msg-meta {
-      font-size: 11px;
-      font-weight: 700;
-      opacity: 0.85;
-      margin-bottom: 2px;
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .msg-time {
-      font-weight: 400;
-      font-size: 10.5px;
-      opacity: 0.78;
-    }
-
-    .send-form {
-      padding: 9px 10px;
-      background: rgba(2, 6, 23, 0.75);
-      border-top: 1px solid rgba(148, 163, 184, 0.2);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .send-input {
-      flex: 1;
-      background: rgba(30, 41, 59, 0.95);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      border-radius: 18px;
-      padding: 10px 14px;
-      color: #ffffff;
-      font-size: 14px;
-      font-family: inherit;
-      outline: none;
-      min-width: 0;
-    }
-    .send-input:focus { border-color: #38bdf8; }
-    .send-circle {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: none;
-      background: #3390ec;
-      color: #fff;
-      font-size: 17px;
-      cursor: pointer;
+      background: #0b1222;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
     }
-    .send-circle:hover { background: #2578cc; }
+    .card-art svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .best-pill {
+      background: rgba(56, 189, 248, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #7dd3fc;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .card-desc {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #cbd5e1;
+      margin: 0;
+    }
 
-    @media (max-width: 640px) {
-      .messenger-dock {
-        left: 10px;
-        right: 10px;
-        bottom: 10px;
-        width: auto;
-        height: min(440px, calc(100vh - 115px));
-      }
-      .hud-top { top: 8px; left: 8px; right: 8px; }
+    /* ИГРОВОЙ ЭКРАН */
+    #gameScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      flex-direction: column;
+      pointer-events: none;
+    }
+    #gameScreen.active { display: flex; }
+
+    .game-hud {
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .hud-box {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 16px;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .game-controls {
+      margin-top: auto;
+      padding: 12px 14px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      max-width: 780px;
+    }
+    .hint-badge {
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: #cbd5e1;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <canvas id="canvas3d"></canvas>
+  <canvas id="bgCanvas"></canvas>
 
-  <div class="hud-top">
-    <div class="hud-group">
-      <div class="glass-pill">🧊 3D Telegram</div>
-      <div class="glass-pill" id="cloudBadge">подключение...</div>
-      <div class="glass-pill" id="visBadge">👀 0</div>
-    </div>
-    <div class="hud-group">
-      <button type="button" class="cam-btn active" id="camOrbitBtn" onclick="setCamMode('orbit')">Орбита</button>
-      <button type="button" class="cam-btn" id="camFollowBtn" onclick="setCamMode('follow')">За кубами</button>
-      <button type="button" class="cam-btn" onclick="resetCamera()">Центр</button>
-    </div>
-  </div>
-
-  <section class="messenger-dock" id="dock">
-    <div class="dock-header" onclick="toggleDock()">
-      <div class="dock-title">✈️ 3D Чат <span style="font-size:11px; font-weight:600; opacity:0.9;" id="dockStatus">запуск...</span></div>
-      <div class="dock-actions" onclick="event.stopPropagation()">
-        <button type="button" class="mini-btn" onclick="clearCurrentRoom()">Очистить</button>
-        <button type="button" class="mini-btn" onclick="toggleDock()">—</button>
+  <!-- ЛОББИ С 3D КАРТОЧКАМИ -->
+  <main id="lobbyScreen">
+    <header class="lobby-header">
+      <div class="brand">
+        <div style="font-size: 32px;">🎮</div>
+        <div>
+          <div class="brand-title">3D ARCADE HUB</div>
+          <div class="brand-sub">5 объёмных 3D-игр • Работает без интернета и баз данных</div>
+        </div>
       </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="btn-3d dark sm" id="soundToggleBtn" onclick="toggleSound()">🔊 Звук: ВКЛ</button>
+        <button type="button" class="btn-3d dark sm" onclick="resetAllRecords()">Сброс рекордов</button>
+      </div>
+    </header>
+
+    <section class="games-grid">
+      <!-- 1. КУБИК РУБИКА -->
+      <article class="game-card">
+        <div class="card-art">
+          <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#1e1b4b"/>
+                <stop offset="100%" stop-color="#0f172a"/>
+              </linearGradient>
+            </defs>
+            <rect width="320" height="160" fill="url(#g1)"/>
+            <g transform="translate(160,80)">
+              <polygon points="0,-56 54,-28 0,0 -54,-28" fill="#facc15" stroke="#0f172a" stroke-width="3"/>
+              <line x1="-18" y1="-47" x2="36" y2="-19" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="-36" y1="-38" x2="18" y2="-10" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="18" y1="-47" x2="-36" y2="-19" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="36" y1="-38" x2="-18" y2="-10" stroke="#0f172a" stroke-width="2.5"/>
+
+              <polygon points="-54,-28 0,0 0,58 -54,30" fill="#ef4444" stroke="#0f172a" stroke-width="3"/>
+              <line x1="-36" y1="-19" x2="-36" y2="39" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="-18" y1="-9" x2="-18" y2="49" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="-54" y1="-9" x2="0" y2="19" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="-54" y1="10" x2="0" y2="38" stroke="#0f172a" stroke-width="2.5"/>
+
+              <polygon points="0,0 54,-28 54,30 0,58" fill="#3b82f6" stroke="#0f172a" stroke-width="3"/>
+              <line x1="18" y1="-9" x2="18" y2="49" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="36" y1="-19" x2="36" y2="39" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="0" y1="19" x2="54" y2="-9" stroke="#0f172a" stroke-width="2.5"/>
+              <line x1="0" y1="38" x2="54" y2="10" stroke="#0f172a" stroke-width="2.5"/>
+            </g>
+          </svg>
+        </div>
+        <div class="card-top">
+          <div class="card-title">🎲 3D Кубик Рубика</div>
+          <span class="best-pill" id="best-rubik">Сборок: 0</span>
+        </div>
+        <p class="card-desc">Настоящий объёмный кубик 3×3×3: крути камеру пальцем или мышкой, перемешивай и собирай грани 3D-кнопками.</p>
+        <button type="button" class="btn-3d" onclick="openGame('rubik')">▶ Играть в 3D</button>
+      </article>
+
+      <!-- 2. 3D БАШНЯ -->
+      <article class="game-card">
+        <div class="card-art">
+          <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="160" fill="#0c192c"/>
+            <g transform="translate(160,115)">
+              <polygon points="0,-24 62,0 0,24 -62,0" fill="#0284c7"/>
+              <polygon points="-62,0 0,24 0,40 -62,16" fill="#0369a1"/>
+              <polygon points="0,24 62,0 62,16 0,40" fill="#075985"/>
+
+              <g transform="translate(0,-18)">
+                <polygon points="0,-24 52,0 0,24 -52,0" fill="#22c55e"/>
+                <polygon points="-52,0 0,24 0,40 -52,16" fill="#16a34a"/>
+                <polygon points="0,24 52,0 52,16 0,40" fill="#15803d"/>
+              </g>
+
+              <g transform="translate(0,-36)">
+                <polygon points="0,-24 42,0 0,24 -42,0" fill="#a855f7"/>
+                <polygon points="-42,0 0,24 0,40 -42,16" fill="#9333ea"/>
+                <polygon points="0,24 42,0 42,16 0,40" fill="#7e22ce"/>
+              </g>
+
+              <g transform="translate(14,-56)">
+                <polygon points="0,-22 36,0 0,22 -36,0" fill="#f97316"/>
+                <polygon points="-36,0 0,22 0,36 -36,14" fill="#ea580c"/>
+                <polygon points="0,22 36,0 36,14 0,36" fill="#c2410c"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="card-top">
+          <div class="card-title">🧱 3D Неоновая Башня</div>
+          <span class="best-pill" id="best-stack">Рекорд: 0</span>
+        </div>
+        <p class="card-desc">Ставь парящие 3D-плиты точно друг на друга. Лишние края отрезаются в реальном времени!</p>
+        <button type="button" class="btn-3d green" onclick="openGame('stack')">▶ Строить башню</button>
+      </article>
+
+      <!-- 3. 3D АЭРОХОККЕЙ -->
+      <article class="game-card">
+        <div class="card-art">
+          <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="160" fill="#091526"/>
+            <polygon points="65,30 255,30 290,135 30,135" fill="#0f294a" stroke="#38bdf8" stroke-width="3"/>
+            <line x1="48" y1="80" x2="272" y2="80" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6,6"/>
+            <circle cx="160" cy="80" r="22" fill="none" stroke="#38bdf8" stroke-width="2"/>
+            <ellipse cx="160" cy="45" rx="18" ry="8" fill="#ef4444"/>
+            <ellipse cx="160" cy="116" rx="22" ry="10" fill="#22c55e"/>
+            <ellipse cx="135" cy="78" rx="11" ry="6" fill="#facc15"/>
+          </svg>
+        </div>
+        <div class="card-top">
+          <div class="card-title">🏓 3D Аэрохоккей</div>
+          <span class="best-pill" id="best-hockey">Побед: 0</span>
+        </div>
+        <p class="card-desc">Неоновый 3D-стол с физикой отскоков. Забей 5 шайб сопернику, управляя битой пальцем или мышью.</p>
+        <button type="button" class="btn-3d purple" onclick="openGame('hockey')">▶ На лёд</button>
+      </article>
+
+      <!-- 4. 3D КОСМО-РАННЕР -->
+      <article class="game-card">
+        <div class="card-art">
+          <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="160" fill="#080b1a"/>
+            <polygon points="120,35 200,35 285,155 35,155" fill="#17203d"/>
+            <line x1="146" y1="35" x2="115" y2="155" stroke="#38bdf8" stroke-width="2"/>
+            <line x1="174" y1="35" x2="205" y2="155" stroke="#38bdf8" stroke-width="2"/>
+            <polygon points="160,96 140,136 160,126 180,136" fill="#38bdf8"/>
+            <polygon points="118,62 132,74 118,86 104,74" fill="#4ade80"/>
+            <rect x="184" y="54" width="24" height="20" rx="4" fill="#f43f5e"/>
+          </svg>
+        </div>
+        <div class="card-top">
+          <div class="card-title">🚀 3D Космо-Раннер</div>
+          <span class="best-pill" id="best-runner">Рекорд: 0</span>
+        </div>
+        <p class="card-desc">Мчись по неоновой 3D-трассе на звездолёте, собирай энергокристаллы и уворачивайся от блоков.</p>
+        <button type="button" class="btn-3d orange" onclick="openGame('runner')">▶ В полёт</button>
+      </article>
+
+      <!-- 5. 3D САПЁР -->
+      <article class="game-card">
+        <div class="card-art">
+          <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="160" fill="#0d1526"/>
+            <g transform="translate(88,24)">
+              <rect x="0" y="0" width="42" height="34" rx="7" fill="#334155" stroke="#64748b"/>
+              <rect x="50" y="0" width="42" height="34" rx="7" fill="#1e293b" stroke="#38bdf8"/>
+              <text x="71" y="23" fill="#38bdf8" font-size="18" font-weight="bold" text-anchor="middle">1</text>
+              <rect x="100" y="0" width="42" height="34" rx="7" fill="#334155" stroke="#64748b"/>
+
+              <rect x="0" y="42" width="42" height="34" rx="7" fill="#1e293b" stroke="#4ade80"/>
+              <text x="21" y="65" fill="#4ade80" font-size="18" font-weight="bold" text-anchor="middle">2</text>
+              <rect x="50" y="42" width="42" height="34" rx="7" fill="#7f1d1d" stroke="#ef4444"/>
+              <text x="71" y="65" fill="#fca5a5" font-size="18" text-anchor="middle">🚩</text>
+              <rect x="100" y="42" width="42" height="34" rx="7" fill="#334155" stroke="#64748b"/>
+
+              <rect x="0" y="84" width="42" height="34" rx="7" fill="#334155" stroke="#64748b"/>
+              <rect x="50" y="84" width="42" height="34" rx="7" fill="#334155" stroke="#64748b"/>
+              <rect x="100" y="84" width="42" height="34" rx="7" fill="#1e293b" stroke="#38bdf8"/>
+              <text x="121" y="107" fill="#38bdf8" font-size="18" font-weight="bold" text-anchor="middle">1</text>
+            </g>
+          </svg>
+        </div>
+        <div class="card-top">
+          <div class="card-title">💣 3D Сапёр</div>
+          <span class="best-pill" id="best-mines">Побед: 0</span>
+        </div>
+        <p class="card-desc">Объёмная сетка 6×6 из 3D-плиток. Открывай безопасные кубики и ставь неоновые флажки на мины.</p>
+        <button type="button" class="btn-3d" onclick="openGame('mines')">▶ Разминировать</button>
+      </article>
+    </section>
+  </main>
+
+  <!-- ИГРОВОЙ ИНТЕРФЕЙС -->
+  <section id="gameScreen">
+    <div class="game-hud">
+      <button type="button" class="btn-3d dark sm" onclick="backToLobby()">⬅ В меню игр</button>
+      <div class="hud-box" id="hudTitle">3D Игра</div>
+      <div class="hud-box" id="hudStats">Счёт: 0</div>
     </div>
 
-    <div class="room-tabs">
-      <button type="button" class="room-tab active" data-r="general" onclick="switchRoom('general')">💬 Общий</button>
-      <button type="button" class="room-tab" data-r="saved" onclick="switchRoom('saved')">🔖 Избранное</button>
-      <button type="button" class="room-tab" data-r="friends" onclick="switchRoom('friends')">👥 Друзья</button>
-    </div>
-
-    <div class="name-row">
-      <span>Имя:</span>
-      <input id="nickInput" type="text" placeholder="Дима" maxlength="24" onchange="saveNick()" />
-      <span style="margin-left:auto; font-size:11px;" id="syncNote">Тяни мышкой фон 3D</span>
-    </div>
-
-    <div class="msg-stream" id="msgStream"></div>
-
-    <form class="send-form" onsubmit="return onSend(event)">
-      <input
-        class="send-input"
-        id="chatInput"
-        type="text"
-        autocomplete="off"
-        placeholder="Написать сообщение в 3D..."
-        maxlength="400"
-      />
-      <button type="submit" class="send-circle" title="Отправить">➤</button>
-    </form>
+    <div class="game-controls" id="gameControls"></div>
   </section>
 
   <script>
-    // Твой новый личный бин (Yours): https://api.npoint.io/ebd8e7a181505cd2c08b
-    const API_URL = "https://api.npoint.io/ebd8e7a181505cd2c08b";
-    const LS_MSGS = "tg_3d_msgs_v3";
-    const LS_VIS = "tg_3d_vis_v3";
-    const LS_NICK = "tg_3d_nick_v3";
-    const SS_VISIT = "tg_3d_visit_v3";
-    const CHAN_NAME = "tg_3d_messenger_channel_v3";
+    // ==================== ЗВУКОВОЙ СИНТЕЗАТОР (БЕЗ ВНЕШНИХ ФАЙЛОВ) ====================
+    let soundEnabled = true;
+    let audioCtx = null;
 
-    const ROOM_NAMES = {
-      general: "Общий",
-      saved: "Избранное",
-      friends: "Друзья"
-    };
-
-    let currentRoom = "general";
-    let messages = [];
-    let visitors = [];
-    let camMode = "orbit";
-    let cloudAvailable = false;
-
-    const bc = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHAN_NAME) : null;
-    if (bc) {
-      bc.onmessage = (ev) => {
-        if (!ev || !ev.data) return;
-        if (Array.isArray(ev.data.messages)) messages = ev.data.messages;
-        if (Array.isArray(ev.data.visitors)) visitors = ev.data.visitors;
-        renderUI();
-      };
-    }
-
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    if (tg) {
+    function playTone(freq, type, duration, vol) {
+      if (!soundEnabled) return;
       try {
-        tg.ready();
-        tg.expand();
-        const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
-        if (u && u.first_name && !localStorage.getItem(LS_NICK)) {
-          localStorage.setItem(LS_NICK, u.first_name);
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || "sine";
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol || 0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (duration || 0.12));
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + (duration || 0.12));
       } catch (_) {}
     }
 
-    // ==================== THREE.JS 3D СЦЕНА ====================
-    const canvas = document.getElementById("canvas3d");
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 Звук: ВКЛ" : "🔇 Звук: ВЫКЛ";
+      if (soundEnabled) playTone(520, "triangle", 0.1, 0.09);
+    }
+
+    // ==================== РЕКОРДЫ В LOCALSTORAGE ====================
+    const RECORDS_KEY = "arcade_3d_records_v1";
+    function getRecords() {
+      try {
+        return JSON.parse(localStorage.getItem(RECORDS_KEY) || "{}") || {};
+      } catch (_) {
+        return {};
+      }
+    }
+    function saveRecord(key, val) {
+      const r = getRecords();
+      if ((r[key] || 0) < val) {
+        r[key] = val;
+        try { localStorage.setItem(RECORDS_KEY, JSON.stringify(r)); } catch (_) {}
+      }
+      refreshLobbyBadges();
+    }
+    function incRecord(key) {
+      const r = getRecords();
+      r[key] = (r[key] || 0) + 1;
+      try { localStorage.setItem(RECORDS_KEY, JSON.stringify(r)); } catch (_) {}
+      refreshLobbyBadges();
+    }
+    function resetAllRecords() {
+      if (!confirm("Сбросить все рекорды в 3D-играх?")) return;
+      localStorage.removeItem(RECORDS_KEY);
+      refreshLobbyBadges();
+      playTone(300, "sawtooth", 0.15, 0.08);
+    }
+    function refreshLobbyBadges() {
+      const r = getRecords();
+      document.getElementById("best-rubik").textContent = `Сборок: ${r.rubik || 0}`;
+      document.getElementById("best-stack").textContent = `Рекорд: ${r.stack || 0}`;
+      document.getElementById("best-hockey").textContent = `Побед: ${r.hockey || 0}`;
+      document.getElementById("best-runner").textContent = `Рекорд: ${r.runner || 0}`;
+      document.getElementById("best-mines").textContent = `Побед: ${r.mines || 0}`;
+    }
+    refreshLobbyBadges();
+
+    // ==================== БАЗОВАЯ THREE.JS СЦЕНА ====================
+    const canvas = document.getElementById("bgCanvas");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x090d16, 0.024);
+    scene.fog = new THREE.FogExp2(0x070b14, 0.022);
 
-    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 150);
-    camera.position.set(0, 4.5, 14);
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 160);
+    camera.position.set(0, 5, 13);
 
-    const ambient = new THREE.AmbientLight(0x93c5fd, 0.9);
-    scene.add(ambient);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.35);
-    keyLight.position.set(8, 14, 10);
-    scene.add(keyLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    dirLight.position.set(10, 16, 12);
+    scene.add(dirLight);
 
-    const rimLight = new THREE.PointLight(0x3390ec, 2.5, 35);
-    rimLight.position.set(-8, 5, -6);
-    scene.add(rimLight);
+    const blueLight = new THREE.PointLight(0x38bdf8, 1.6, 40);
+    blueLight.position.set(-10, 8, -8);
+    scene.add(blueLight);
 
-    const mintLight = new THREE.PointLight(0x22c55e, 1.8, 28);
-    mintLight.position.set(7, 3, -5);
-    scene.add(mintLight);
+    const rootGroup = new THREE.Group();
+    scene.add(rootGroup);
 
-    const gridHelper = new THREE.GridHelper(36, 36, 0x3390ec, 0x1e293b);
-    gridHelper.position.y = -4.5;
-    scene.add(gridHelper);
-
-    const outerRing = new THREE.Mesh(
-      new THREE.TorusGeometry(6.8, 0.04, 16, 100),
-      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 })
-    );
-    outerRing.rotation.x = Math.PI / 2.4;
-    scene.add(outerRing);
-
-    const innerRing = new THREE.Mesh(
-      new THREE.TorusGeometry(4.3, 0.03, 12, 80),
-      new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.3 })
-    );
-    innerRing.rotation.x = Math.PI / 3;
-    scene.add(innerRing);
-
-    const starCount = 420;
-    const starPositions = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount * 3; i += 3) {
-      starPositions[i] = (Math.random() - 0.5) * 44;
-      starPositions[i + 1] = (Math.random() - 0.5) * 26;
-      starPositions[i + 2] = (Math.random() - 0.5) * 44;
-    }
-    const starGeo = new THREE.BufferGeometry();
-    starGeo.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
-    const starPoints = new THREE.Points(
-      starGeo,
-      new THREE.PointsMaterial({ color: 0xbae6fd, size: 0.14, transparent: true, opacity: 0.75 })
-    );
-    scene.add(starPoints);
-
-    const msgCubesGroup = new THREE.Group();
-    scene.add(msgCubesGroup);
-
-    function createMessageTexture(author, text, isMine) {
-      const c = document.createElement("canvas");
-      c.width = 512;
-      c.height = 256;
-      const ctx = c.getContext("2d");
-
-      ctx.fillStyle = isMine ? "#14532d" : "#0f172a";
-      ctx.fillRect(0, 0, c.width, c.height);
-
-      ctx.strokeStyle = isMine ? "#4ade80" : "#38bdf8";
-      ctx.lineWidth = 8;
-      ctx.strokeRect(10, 10, c.width - 20, c.height - 20);
-
-      ctx.fillStyle = isMine ? "#86efac" : "#7dd3fc";
-      ctx.font = "bold 28px Arial, sans-serif";
-      ctx.fillText(String(author || "Участник").slice(0, 22), 28, 56);
-
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "26px Arial, sans-serif";
-      const words = String(text || "").split(" ");
-      let line = "";
-      let y = 104;
-      for (let i = 0; i < words.length; i++) {
-        const test = line + words[i] + " ";
-        if (ctx.measureText(test).width > c.width - 56 && line !== "") {
-          ctx.fillText(line.trim(), 28, y);
-          line = words[i] + " ";
-          y += 38;
-          if (y > 215) break;
-        } else {
-          line = test;
-        }
-      }
-      if (y <= 215 && line.trim()) {
-        ctx.fillText(line.trim(), 28, y);
-      }
-
-      const tex = new THREE.CanvasTexture(c);
-      tex.needsUpdate = true;
-      return tex;
-    }
-
-    function rebuild3DMessages() {
-      while (msgCubesGroup.children.length > 0) {
-        const obj = msgCubesGroup.children.pop();
+    function clearRootGroup() {
+      while (rootGroup.children.length > 0) {
+        const obj = rootGroup.children.pop();
         if (obj.geometry) obj.geometry.dispose();
       }
-
-      const me = getNick();
-      const filtered = messages.filter((m) => (m.room || m.chat || "general") === currentRoom).slice(-14);
-
-      filtered.forEach((m, idx) => {
-        const author = m.author || m.name || "Участник";
-        const text = m.text || "";
-        const isMine = author.toLowerCase() === me.toLowerCase() || currentRoom === "saved";
-
-        const angle = (idx / Math.max(filtered.length, 1)) * Math.PI * 2;
-        const radius = 3.2 + (idx % 3) * 1.45;
-        const y = ((idx % 4) - 1.5) * 1.35;
-
-        const tex = createMessageTexture(author, text, isMine);
-        const sideMat = new THREE.MeshStandardMaterial({
-          color: isMine ? 0x22c55e : 0x3390ec,
-          roughness: 0.35,
-          metalness: 0.25
-        });
-        const faceMat = new THREE.MeshStandardMaterial({
-          map: tex,
-          roughness: 0.3,
-          metalness: 0.1
-        });
-
-        const materials = [sideMat, sideMat, sideMat, sideMat, faceMat, faceMat];
-        const geo = new THREE.BoxGeometry(2.6, 1.35, 0.38);
-        const cube = new THREE.Mesh(geo, materials);
-
-        cube.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
-        cube.lookAt(0, y, 0);
-        cube.userData = {
-          baseAngle: angle,
-          radius: radius,
-          baseY: y,
-          speed: 0.004 + (idx % 3) * 0.0015,
-          phase: idx * 0.9
-        };
-        msgCubesGroup.add(cube);
-      });
     }
 
-    let isDragging = false;
-    let prevX = 0;
-    let prevY = 0;
-    let yaw = 0;
-    let pitch = 0.25;
-    let camDist = 13.5;
+    let activeGame = "lobby";
+    let gameLoopFn = null;
+    let pointerDownFn = null;
+    let pointerMoveFn = null;
+    let pointerUpFn = null;
+    let keyDownFn = null;
 
-    canvas.addEventListener("pointerdown", (e) => {
-      isDragging = true;
-      prevX = e.clientX;
-      prevY = e.clientY;
-    });
-    window.addEventListener("pointerup", () => { isDragging = false; });
-    window.addEventListener("pointermove", (e) => {
-      if (!isDragging) return;
-      const dx = e.clientX - prevX;
-      const dy = e.clientY - prevY;
-      prevX = e.clientX;
-      prevY = e.clientY;
-      yaw -= dx * 0.007;
-      pitch = Math.max(-0.65, Math.min(1.15, pitch + dy * 0.006));
-    });
-    canvas.addEventListener("wheel", (e) => {
-      camDist = Math.max(6.5, Math.min(24, camDist + e.deltaY * 0.008));
-    }, { passive: true });
+    // ==================== 0. ЖИВОЕ 3D ЛОББИ ====================
+    function setupLobby3D() {
+      clearRootGroup();
+      camera.position.set(0, 3.5, 13);
+      camera.lookAt(0, 0, 0);
 
-    function setCamMode(mode) {
-      camMode = mode;
-      document.getElementById("camOrbitBtn").classList.toggle("active", mode === "orbit");
-      document.getElementById("camFollowBtn").classList.toggle("active", mode === "follow");
-    }
+      const shapes = [];
+      const geos = [
+        new THREE.BoxGeometry(1.6, 1.6, 1.6),
+        new THREE.OctahedronGeometry(1.2),
+        new THREE.TorusGeometry(1.0, 0.35, 14, 36),
+        new THREE.IcosahedronGeometry(1.15)
+      ];
+      const colors = [0x38bdf8, 0x4ade80, 0xc084fc, 0xfb923c, 0xfacc15];
 
-    function resetCamera() {
-      yaw = 0;
-      pitch = 0.25;
-      camDist = 13.5;
-    }
-
-    let clockT = 0;
-    function animate3D() {
-      requestAnimationFrame(animate3D);
-      clockT += 0.016;
-
-      outerRing.rotation.z += 0.0025;
-      innerRing.rotation.z -= 0.0035;
-      starPoints.rotation.y += 0.0006;
-
-      msgCubesGroup.children.forEach((cube) => {
-        const d = cube.userData;
-        d.baseAngle += d.speed;
-        cube.position.x = Math.cos(d.baseAngle) * d.radius;
-        cube.position.z = Math.sin(d.baseAngle) * d.radius;
-        cube.position.y = d.baseY + Math.sin(clockT * 2 + d.phase) * 0.22;
-        cube.lookAt(0, cube.position.y, 0);
-      });
-
-      if (camMode === "follow" && msgCubesGroup.children.length > 0) {
-        const targetCube = msgCubesGroup.children[msgCubesGroup.children.length - 1];
-        camera.position.lerp(
-          new THREE.Vector3(
-            targetCube.position.x * 1.45,
-            targetCube.position.y + 1.8,
-            targetCube.position.z * 1.45 + 4.5
-          ),
-          0.04
+      for (let i = 0; i < 16; i++) {
+        const mesh = new THREE.Mesh(
+          geos[i % geos.length],
+          new THREE.MeshStandardMaterial({
+            color: colors[i % colors.length],
+            roughness: 0.25,
+            metalness: 0.35
+          })
         );
-        camera.lookAt(targetCube.position);
-      } else {
-        const x = Math.sin(yaw) * Math.cos(pitch) * camDist;
-        const y = Math.sin(pitch) * camDist;
-        const z = Math.cos(yaw) * Math.cos(pitch) * camDist;
-        camera.position.lerp(new THREE.Vector3(x, y, z), 0.08);
-        camera.lookAt(0, 0, 0);
+        const angle = (i / 16) * Math.PI * 2;
+        const rad = 5.5 + (i % 3) * 2.2;
+        mesh.position.set(Math.cos(angle) * rad, ((i % 5) - 2) * 1.6, Math.sin(angle) * rad - 2);
+        mesh.userData = { angle, rad, baseY: mesh.position.y, speed: 0.004 + (i % 4) * 0.001 };
+        rootGroup.add(mesh);
+        shapes.push(mesh);
       }
 
-      renderer.render(scene, camera);
+      gameLoopFn = (t) => {
+        shapes.forEach((m, idx) => {
+          m.userData.angle += m.userData.speed;
+          m.position.x = Math.cos(m.userData.angle) * m.userData.rad;
+          m.position.z = Math.sin(m.userData.angle) * m.userData.rad - 2;
+          m.position.y = m.userData.baseY + Math.sin(t * 2 + idx) * 0.35;
+          m.rotation.x += 0.01;
+          m.rotation.y += 0.014;
+        });
+      };
     }
-    animate3D();
+
+    // ==================== 1. 3D КУБИК РУБИКА (3x3x3) ====================
+    function startRubikGame() {
+      clearRootGroup();
+      document.getElementById("hudTitle").textContent = "🎲 3D Кубик Рубика";
+
+      let moves = 0;
+      let startTime = Date.now();
+      let isScrambled = false;
+      let cubies = [];
+      const pivot = new THREE.Group();
+      rootGroup.add(pivot);
+
+      // Цвета граней: +X синий, -X зелёный, +Y белый, -Y жёлтый, +Z красный, -Z оранжевый
+      const faceColors = [0x2563eb, 0x16a34a, 0xf8fafc, 0xfacc15, 0xdc2626, 0xf97316];
+      const innerColor = 0x111827;
+
+      function buildCube() {
+        while (pivot.children.length) pivot.remove(pivot.children[0]);
+        cubies = [];
+        const geo = new THREE.BoxGeometry(0.94, 0.94, 0.94);
+        for (let x = -1; x <= 1; x++) {
+          for (let y = -1; y <= 1; y++) {
+            for (let z = -1; z <= 1; z++) {
+              const mats = [
+                new THREE.MeshStandardMaterial({ color: x === 1 ? faceColors[0] : innerColor, roughness: 0.25 }),
+                new THREE.MeshStandardMaterial({ color: x === -1 ? faceColors[1] : innerColor, roughness: 0.25 }),
+                new THREE.MeshStandardMaterial({ color: y === 1 ? faceColors[2] : innerColor, roughness: 0.25 }),
+                new THREE.MeshStandardMaterial({ color: y === -1 ? faceColors[3] : innerColor, roughness: 0.25 }),
+                new THREE.MeshStandardMaterial({ color: z === 1 ? faceColors[4] : innerColor, roughness: 0.25 }),
+                new THREE.MeshStandardMaterial({ color: z === -1 ? faceColors[5] : innerColor, roughness: 0.25 })
+              ];
+              const m = new THREE.Mesh(geo, mats);
+              m.position.set(x, y, z);
+              pivot.add(m);
+              cubies.push(m);
+            }
+          }
+        }
+        moves = 0;
+        isScrambled = false;
+        startTime = Date.now();
+      }
+      buildCube();
+
+      let animQueue = [];
+      let currentTurn = null;
+
+      function enqueueMove(axis, layer, dir, countMove = true) {
+        animQueue.push({ axis, layer, dir, countMove, progress: 0 });
+      }
+
+      function checkSolved() {
+        if (!isScrambled || cubies.length === 0) return false;
+        const refQuat = cubies[0].quaternion;
+        for (let i = 1; i < cubies.length; i++) {
+          if (cubies[i].quaternion.angleTo(refQuat) > 0.15) return false;
+        }
+        return true;
+      }
+
+      window.rubikMove = (axis, layer, dir) => {
+        enqueueMove(axis, layer, dir, true);
+      };
+
+      window.rubikScramble = () => {
+        const axes = ["x", "y", "z"];
+        const layers = [-1, 0, 1];
+        for (let i = 0; i < 16; i++) {
+          const ax = axes[Math.floor(Math.random() * 3)];
+          const ly = layers[Math.floor(Math.random() * 3)];
+          const dr = Math.random() > 0.5 ? 1 : -1;
+          enqueueMove(ax, ly, dr, false);
+        }
+        moves = 0;
+        isScrambled = true;
+        startTime = Date.now();
+        playTone(440, "triangle", 0.15, 0.08);
+      };
+
+      window.rubikReset = () => {
+        animQueue = [];
+        currentTurn = null;
+        buildCube();
+        playTone(600, "sine", 0.12, 0.08);
+      };
+
+      // Вращение камеры пальцем / мышью
+      let dragging = false, px = 0, py = 0, yaw = 0.65, pitch = 0.45, dist = 6.5;
+      pointerDownFn = (e) => { dragging = true; px = e.clientX; py = e.clientY; };
+      pointerUpFn = () => { dragging = false; };
+      pointerMoveFn = (e) => {
+        if (!dragging) return;
+        yaw -= (e.clientX - px) * 0.01;
+        pitch = Math.max(-1.1, Math.min(1.1, pitch + (e.clientY - py) * 0.01));
+        px = e.clientX;
+        py = e.clientY;
+      };
+
+      document.getElementById("gameControls").innerHTML = `
+        <div class="controls-row">
+          <button type="button" class="btn-3d sm" onclick="rubikMove('y', 1, -1)">Верх ↻</button>
+          <button type="button" class="btn-3d sm" onclick="rubikMove('y', 1, 1)">Верх ↺</button>
+          <button type="button" class="btn-3d sm" onclick="rubikMove('y', -1, 1)">Низ ↻</button>
+          <button type="button" class="btn-3d sm" onclick="rubikMove('y', -1, -1)">Низ ↺</button>
+          <button type="button" class="btn-3d green sm" onclick="rubikMove('x', -1, 1)">Лево ↻</button>
+          <button type="button" class="btn-3d green sm" onclick="rubikMove('x', -1, -1)">Лево ↺</button>
+          <button type="button" class="btn-3d green sm" onclick="rubikMove('x', 1, -1)">Право ↻</button>
+          <button type="button" class="btn-3d green sm" onclick="rubikMove('x', 1, 1)">Право ↺</button>
+          <button type="button" class="btn-3d orange sm" onclick="rubikMove('z', 1, -1)">Перед ↻</button>
+          <button type="button" class="btn-3d orange sm" onclick="rubikMove('z', 1, 1)">Перед ↺</button>
+          <button type="button" class="btn-3d orange sm" onclick="rubikMove('z', -1, 1)">Зад ↻</button>
+          <button type="button" class="btn-3d orange sm" onclick="rubikMove('z', -1, -1)">Зад ↺</button>
+        </div>
+        <div class="controls-row">
+          <button type="button" class="btn-3d purple sm" onclick="rubikScramble()">🔀 Перемешать</button>
+          <button type="button" class="btn-3d dark sm" onclick="rubikReset()">🔄 Собрать заново</button>
+        </div>
+        <div class="hint-badge">Тяни пальцем или мышкой по фону, чтобы крутить кубик со всех сторон</div>
+      `;
+
+      const tempGroup = new THREE.Group();
+      pivot.add(tempGroup);
+
+      gameLoopFn = () => {
+        camera.position.set(
+          Math.sin(yaw) * Math.cos(pitch) * dist,
+          Math.sin(pitch) * dist,
+          Math.cos(yaw) * Math.cos(pitch) * dist
+        );
+        camera.lookAt(0, 0, 0);
+
+        if (!currentTurn && animQueue.length > 0) {
+          currentTurn = animQueue.shift();
+          tempGroup.rotation.set(0, 0, 0);
+          tempGroup.updateMatrixWorld();
+          const selected = cubies.filter((c) => Math.round(c.position[currentTurn.axis]) === currentTurn.layer);
+          selected.forEach((c) => tempGroup.attach(c));
+          currentTurn.selected = selected;
+          if (currentTurn.countMove) {
+            moves++;
+            playTone(380 + (moves % 5) * 40, "sine", 0.08, 0.07);
+          }
+        }
+
+        if (currentTurn) {
+          const step = 0.24;
+          currentTurn.progress += step;
+          const targetAngle = (Math.PI / 2) * currentTurn.dir;
+          if (currentTurn.progress >= Math.PI / 2) {
+            tempGroup.rotation[currentTurn.axis] = targetAngle;
+            tempGroup.updateMatrixWorld();
+            currentTurn.selected.forEach((c) => {
+              pivot.attach(c);
+              c.position.set(Math.round(c.position.x), Math.round(c.position.y), Math.round(c.position.z));
+            });
+            currentTurn = null;
+            if (checkSolved()) {
+              isScrambled = false;
+              incRecord("rubik");
+              playTone(660, "triangle", 0.25, 0.12);
+              setTimeout(() => alert(`🎉 Поздравляем! Кубик собран за ${moves} ходов!`), 80);
+            }
+          } else {
+            tempGroup.rotation[currentTurn.axis] = currentTurn.progress * currentTurn.dir;
+          }
+        }
+
+        const sec = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById("hudStats").textContent = `Ходы: ${moves} • Время: ${sec}с`;
+      };
+    }
+
+    // ==================== 2. 3D НЕОНОВАЯ БАШНЯ ====================
+    function startStackGame() {
+      clearRootGroup();
+      document.getElementById("hudTitle").textContent = "🧱 3D Неоновая Башня";
+
+      let stack = [];
+      let score = 0;
+      let gameOver = false;
+      let activeBox = null;
+      let moveAxis = "x";
+      let dir = 1;
+      let speed = 0.085;
+      const boxHeight = 0.55;
+
+      function addLayer(x, z, w, d, y, color) {
+        const mesh = new THREE.Mesh(
+          new THREE.BoxGeometry(w, boxHeight, d),
+          new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.2 })
+        );
+        mesh.position.set(x, y, z);
+        rootGroup.add(mesh);
+        return { mesh, x, z, w, d, y };
+      }
+
+      function spawnNext() {
+        const top = stack[stack.length - 1];
+        const y = top.y + boxHeight;
+        const hue = (stack.length * 24) % 360;
+        const color = new THREE.Color(`hsl(${hue}, 82%, 56%)`);
+        moveAxis = stack.length % 2 === 1 ? "x" : "z";
+        dir = 1;
+        const startPos = -5.5;
+        activeBox = addLayer(
+          moveAxis === "x" ? startPos : top.x,
+          moveAxis === "z" ? startPos : top.z,
+          top.w,
+          top.d,
+          y,
+          color
+        );
+      }
+
+      function initStack() {
+        clearRootGroup();
+        stack = [];
+        score = 0;
+        gameOver = false;
+        speed = 0.085;
+        stack.push(addLayer(0, 0, 3.6, 3.6, 0, new THREE.Color("#0284c7")));
+        spawnNext();
+      }
+      initStack();
+
+      window.placeStackBlock = () => {
+        if (gameOver) {
+          initStack();
+          return;
+        }
+        if (!activeBox) return;
+        const top = stack[stack.length - 1];
+        const delta = activeBox.mesh.position[moveAxis] - top[moveAxis];
+        const absDelta = Math.abs(delta);
+        const maxSize = moveAxis === "x" ? top.w : top.d;
+
+        if (absDelta >= maxSize) {
+          gameOver = true;
+          saveRecord("stack", score);
+          playTone(180, "sawtooth", 0.3, 0.1);
+          document.getElementById("hudStats").textContent = `💥 Башня упала! Счёт: ${score}`;
+          return;
+        }
+
+        const newSize = absDelta < 0.14 ? maxSize : maxSize - absDelta;
+        const newCenter = absDelta < 0.14 ? top[moveAxis] : top[moveAxis] + delta / 2;
+
+        rootGroup.remove(activeBox.mesh);
+        const placed = addLayer(
+          moveAxis === "x" ? newCenter : top.x,
+          moveAxis === "z" ? newCenter : top.z,
+          moveAxis === "x" ? newSize : top.w,
+          moveAxis === "z" ? newSize : top.d,
+          activeBox.y,
+          activeBox.mesh.material.color
+        );
+        stack.push(placed);
+        score++;
+        speed = Math.min(0.18, 0.085 + score * 0.0025);
+        saveRecord("stack", score);
+        playTone(320 + score * 18, "triangle", 0.1, 0.09);
+        spawnNext();
+      };
+
+      pointerDownFn = (e) => {
+        if (e.target === canvas) window.placeStackBlock();
+      };
+      keyDownFn = (e) => {
+        if (e.code === "Space" || e.code === "Enter") window.placeStackBlock();
+      };
+
+      document.getElementById("gameControls").innerHTML = `
+        <div class="controls-row">
+          <button type="button" class="btn-3d green" onclick="placeStackBlock()">🧱 Поставить блок (или нажми по экрану)</button>
+        </div>
+        <div class="hint-badge">Нажимай в момент точного совпадения плит</div>
+      `;
+
+      gameLoopFn = () => {
+        const targetY = Math.max(4.5, stack.length * boxHeight + 4.5);
+        camera.position.lerp(new THREE.Vector3(6.8, targetY, 6.8), 0.08);
+        camera.lookAt(0, Math.max(0, (stack.length - 3) * boxHeight), 0);
+
+        if (!gameOver && activeBox) {
+          activeBox.mesh.position[moveAxis] += speed * dir;
+          if (activeBox.mesh.position[moveAxis] > 5.5) dir = -1;
+          if (activeBox.mesh.position[moveAxis] < -5.5) dir = 1;
+          document.getElementById("hudStats").textContent = `Этажей: ${score}`;
+        }
+      };
+    }
+
+    // ==================== 3. 3D АЭРОХОККЕЙ ====================
+    function startHockeyGame() {
+      clearRootGroup();
+      document.getElementById("hudTitle").textContent = "🏓 3D Аэрохоккей";
+
+      const tableW = 6.4, tableL = 10.4;
+      const table = new THREE.Mesh(
+        new THREE.BoxGeometry(tableW, 0.4, tableL),
+        new THREE.MeshStandardMaterial({ color: 0x0f294a, roughness: 0.3 })
+      );
+      table.position.y = -0.2;
+      rootGroup.add(table);
+
+      const borderMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.4 });
+      const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.5, tableL), borderMat);
+      leftWall.position.set(-tableW / 2, 0.2, 0);
+      const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.5, tableL), borderMat);
+      rightWall.position.set(tableW / 2, 0.2, 0);
+      rootGroup.add(leftWall, rightWall);
+
+      const playerMallet = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.55, 0.6, 0.32, 24),
+        new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.25 })
+      );
+      playerMallet.position.set(0, 0.16, 3.8);
+      rootGroup.add(playerMallet);
+
+      const botMallet = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.55, 0.6, 0.32, 24),
+        new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.25 })
+      );
+      botMallet.position.set(0, 0.16, -3.8);
+      rootGroup.add(botMallet);
+
+      const puck = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.34, 0.34, 0.22, 24),
+        new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xca8a04, emissiveIntensity: 0.45 })
+      );
+      puck.position.set(0, 0.11, 0);
+      rootGroup.add(puck);
+
+      let vx = 0.08, vz = 0.11;
+      let pScore = 0, bScore = 0;
+      let targetX = 0;
+
+      function resetPuck(dirZ) {
+        puck.position.set(0, 0.11, 0);
+        vx = (Math.random() - 0.5) * 0.16;
+        vz = 0.12 * dirZ;
+      }
+
+      window.moveHockey = (dx) => {
+        targetX = Math.max(-2.4, Math.min(2.4, targetX + dx));
+      };
+
+      pointerMoveFn = (e) => {
+        const norm = (e.clientX / window.innerWidth) * 2 - 1;
+        targetX = Math.max(-2.4, Math.min(2.4, norm * 2.8));
+      };
+      pointerDownFn = pointerMoveFn;
+
+      document.getElementById("gameControls").innerHTML = `
+        <div class="controls-row">
+          <button type="button" class="btn-3d green sm" onclick="moveHockey(-0.8)">⬅ Влево</button>
+          <button type="button" class="btn-3d green sm" onclick="moveHockey(0.8)">Вправо ➡</button>
+        </div>
+        <div class="hint-badge">Веди пальцем по экрану или мышкой влево-вправо • Игра до 5 голов</div>
+      `;
+
+      camera.position.set(0, 7.6, 8.2);
+      camera.lookAt(0, 0, 0.5);
+
+      gameLoopFn = () => {
+        playerMallet.position.x += (targetX - playerMallet.position.x) * 0.22;
+
+        // ИИ соперника
+        const botTarget = Math.max(-2.4, Math.min(2.4, puck.position.x));
+        botMallet.position.x += (botTarget - botMallet.position.x) * 0.09;
+
+        puck.position.x += vx;
+        puck.position.z += vz;
+
+        if (puck.position.x > 2.75 || puck.position.x < -2.75) {
+          vx = -vx;
+          playTone(460, "sine", 0.06, 0.06);
+        }
+
+        // Столкновение с битой игрока
+        if (puck.position.distanceTo(playerMallet.position) < 0.92 && vz > 0) {
+          vz = -Math.min(0.22, Math.abs(vz) * 1.04 + 0.01);
+          vx += (puck.position.x - playerMallet.position.x) * 0.12;
+          playTone(580, "triangle", 0.08, 0.09);
+        }
+
+        // Столкновение с битой бота
+        if (puck.position.distanceTo(botMallet.position) < 0.92 && vz < 0) {
+          vz = Math.min(0.22, Math.abs(vz) * 1.03 + 0.01);
+          vx += (puck.position.x - botMallet.position.x) * 0.1;
+          playTone(420, "triangle", 0.08, 0.09);
+        }
+
+        if (puck.position.z < -5.1) {
+          pScore++;
+          playTone(720, "triangle", 0.2, 0.12);
+          if (pScore >= 5) {
+            incRecord("hockey");
+            alert("🏆 Победа в 3D Аэрохоккее! Счёт 5:" + bScore);
+            pScore = 0; bScore = 0;
+          }
+          resetPuck(1);
+        } else if (puck.position.z > 5.1) {
+          bScore++;
+          playTone(210, "sawtooth", 0.2, 0.1);
+          if (bScore >= 5) {
+            alert("Соперник победил со счётом 5:" + pScore + ". Попробуй ещё раз!");
+            pScore = 0; bScore = 0;
+          }
+          resetPuck(-1);
+        }
+
+        document.getElementById("hudStats").textContent = `Ты: ${pScore} • Бот: ${bScore}`;
+      };
+    }
+
+    // ==================== 4. 3D КОСМО-РАННЕР ====================
+    function startRunnerGame() {
+      clearRootGroup();
+      document.getElementById("hudTitle").textContent = "🚀 3D Космо-Раннер";
+
+      const lanes = [-2.2, 0, 2.2];
+      let currentLane = 1;
+      let score = 0;
+      let alive = true;
+      let items = [];
+      let spawnTimer = 0;
+
+      const track = new THREE.Mesh(
+        new THREE.BoxGeometry(7.2, 0.2, 46),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 })
+      );
+      track.position.set(0, -0.3, -15);
+      rootGroup.add(track);
+
+      const ship = new THREE.Mesh(
+        new THREE.ConeGeometry(0.55, 1.5, 6),
+        new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.45 })
+      );
+      ship.rotation.x = -Math.PI / 2;
+      ship.position.set(0, 0.35, 3);
+      rootGroup.add(ship);
+
+      window.runnerLane = (delta) => {
+        if (!alive) {
+          startRunnerGame();
+          return;
+        }
+        currentLane = Math.max(0, Math.min(2, currentLane + delta));
+        playTone(480, "sine", 0.06, 0.06);
+      };
+
+      keyDownFn = (e) => {
+        if (e.key === "ArrowLeft" || e.key === "a") window.runnerLane(-1);
+        if (e.key === "ArrowRight" || e.key === "d") window.runnerLane(1);
+      };
+
+      document.getElementById("gameControls").innerHTML = `
+        <div class="controls-row">
+          <button type="button" class="btn-3d orange" onclick="runnerLane(-1)">⬅ Левая полоса</button>
+          <button type="button" class="btn-3d orange" onclick="runnerLane(1)">Правая полоса ➡</button>
+        </div>
+        <div class="hint-badge">Собирай зелёные кристаллы (+10) и облетай красные блоки</div>
+      `;
+
+      camera.position.set(0, 3.8, 7.6);
+      camera.lookAt(0, 0.5, -4);
+
+      gameLoopFn = () => {
+        if (!alive) return;
+        ship.position.x += (lanes[currentLane] - ship.position.x) * 0.22;
+        ship.rotation.z = (ship.position.x - lanes[currentLane]) * 0.35;
+
+        spawnTimer++;
+        if (spawnTimer > 26) {
+          spawnTimer = 0;
+          const laneIdx = Math.floor(Math.random() * 3);
+          const isGem = Math.random() > 0.45;
+          const mesh = new THREE.Mesh(
+            isGem ? new THREE.OctahedronGeometry(0.45) : new THREE.BoxGeometry(1.1, 0.9, 1.1),
+            new THREE.MeshStandardMaterial({
+              color: isGem ? 0x4ade80 : 0xf43f5e,
+              emissive: isGem ? 0x16a34a : 0xbe123c,
+              emissiveIntensity: 0.4
+            })
+          );
+          mesh.position.set(lanes[laneIdx], 0.4, -34);
+          rootGroup.add(mesh);
+          items.push({ mesh, isGem });
+        }
+
+        const speed = 0.32 + Math.min(0.28, score * 0.0008);
+        for (let i = items.length - 1; i >= 0; i--) {
+          const it = items[i];
+          it.mesh.position.z += speed;
+          it.mesh.rotation.y += 0.05;
+
+          if (it.mesh.position.distanceTo(ship.position) < 0.95) {
+            if (it.isGem) {
+              score += 10;
+              saveRecord("runner", score);
+              playTone(680, "triangle", 0.09, 0.08);
+              rootGroup.remove(it.mesh);
+              items.splice(i, 1);
+              continue;
+            } else {
+              alive = false;
+              saveRecord("runner", score);
+              playTone(160, "sawtooth", 0.3, 0.12);
+              document.getElementById("hudStats").textContent = `💥 Столкновение! Очки: ${score}`;
+              document.getElementById("gameControls").innerHTML = `
+                <button type="button" class="btn-3d green" onclick="startRunnerGame()">🔄 Лететь заново</button>
+              `;
+              return;
+            }
+          }
+
+          if (it.mesh.position.z > 8) {
+            rootGroup.remove(it.mesh);
+            items.splice(i, 1);
+            score++;
+            saveRecord("runner", score);
+          }
+        }
+        document.getElementById("hudStats").textContent = `Очки: ${score}`;
+      };
+    }
+
+    // ==================== 5. 3D САПЁР (6x6) ====================
+    function startMinesGame() {
+      clearRootGroup();
+      document.getElementById("hudTitle").textContent = "💣 3D Сапёр (6×6)";
+
+      const size = 6;
+      const totalMines = 6;
+      let flagMode = false;
+      let gameOver = false;
+      let cells = [];
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+
+      function makeNumberTex(num, isFlag, isMine) {
+        const c = document.createElement("canvas");
+        c.width = 128; c.height = 128;
+        const ctx = c.getContext("2d");
+        ctx.fillStyle = isMine ? "#991b1b" : "#1e293b";
+        ctx.fillRect(0, 0, 128, 128);
+        ctx.strokeStyle = isMine ? "#f87171" : "#38bdf8";
+        ctx.lineWidth = 8;
+        ctx.strokeRect(6, 6, 116, 116);
+        ctx.fillStyle = isFlag ? "#facc15" : isMine ? "#ffffff" : "#7dd3fc";
+        ctx.font = "bold 62px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const label = isFlag ? "🚩" : isMine ? "💣" : (num > 0 ? String(num) : "");
+        ctx.fillText(label, 64, 68);
+        return new THREE.CanvasTexture(c);
+      }
+
+      function buildBoard() {
+        clearRootGroup();
+        cells = [];
+        gameOver = false;
+
+        const mineSet = new Set();
+        while (mineSet.size < totalMines) {
+          mineSet.add(Math.floor(Math.random() * size * size));
+        }
+
+        const geo = new THREE.BoxGeometry(0.92, 0.36, 0.92);
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            const idx = r * size + c;
+            const isMine = mineSet.has(idx);
+            let adj = 0;
+            for (let dr = -1; dr <= 1; dr++) {
+              for (let dc = -1; dc <= 1; dc++) {
+                const nr = r + dr, nc = c + dc;
+                if (nr >= 0 && nr < size && nc >= 0 && nc < size && mineSet.has(nr * size + nc)) adj++;
+              }
+            }
+            const mesh = new THREE.Mesh(
+              geo,
+              new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3 })
+            );
+            mesh.position.set((c - 2.5) * 1.08, 0, (r - 2.5) * 1.08);
+            rootGroup.add(mesh);
+            cells.push({ r, c, idx, isMine, adj, open: false, flagged: false, mesh });
+          }
+        }
+        updateStats();
+      }
+
+      function updateStats() {
+        const opened = cells.filter((x) => x.open).length;
+        const flags = cells.filter((x) => x.flagged).length;
+        document.getElementById("hudStats").textContent = `Открыто: ${opened}/${size * size - totalMines} • Флаги: ${flags}/${totalMines}`;
+      }
+
+      function revealCell(cell) {
+        if (cell.open || cell.flagged || gameOver) return;
+        cell.open = true;
+        cell.mesh.position.y = -0.12;
+        if (cell.isMine) {
+          gameOver = true;
+          cell.mesh.material = new THREE.MeshStandardMaterial({ map: makeNumberTex(0, false, true) });
+          playTone(150, "sawtooth", 0.35, 0.12);
+          alert("💥 Бах! Вы попали на мину.");
+          return;
+        }
+        cell.mesh.material = new THREE.MeshStandardMaterial({ map: makeNumberTex(cell.adj, false, false) });
+        playTone(460 + cell.adj * 60, "sine", 0.08, 0.07);
+
+        if (cell.adj === 0) {
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const nr = cell.r + dr, nc = cell.c + dc;
+              if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+                revealCell(cells[nr * size + nc]);
+              }
+            }
+          }
+        }
+
+        const safeOpened = cells.filter((x) => x.open && !x.isMine).length;
+        if (safeOpened === size * size - totalMines) {
+          gameOver = true;
+          incRecord("mines");
+          playTone(740, "triangle", 0.25, 0.12);
+          alert("🏆 Поле разминировано! Победа!");
+        }
+      }
+
+      pointerDownFn = (e) => {
+        if (e.target !== canvas || gameOver) return;
+        pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(cells.map((c) => c.mesh));
+        if (!hits.length) return;
+        const found = cells.find((c) => c.mesh === hits[0].object);
+        if (!found) return;
+
+        if (flagMode) {
+          if (found.open) return;
+          found.flagged = !found.flagged;
+          found.mesh.material = found.flagged
+            ? new THREE.MeshStandardMaterial({ map: makeNumberTex(0, true, false) })
+            : new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3 });
+          playTone(540, "triangle", 0.07, 0.07);
+        } else {
+          revealCell(found);
+        }
+        updateStats();
+      };
+
+      window.toggleMineFlag = () => {
+        flagMode = !flagMode;
+        const b = document.getElementById("mineFlagBtn");
+        b.textContent = flagMode ? "🚩 Режим: ФЛАЖОК" : "⛏️ Режим: ОТКРЫТЬ";
+        b.className = flagMode ? "btn-3d orange sm" : "btn-3d sm";
+      };
+      window.restartMines = () => buildBoard();
+
+      document.getElementById("gameControls").innerHTML = `
+        <div class="controls-row">
+          <button type="button" class="btn-3d sm" id="mineFlagBtn" onclick="toggleMineFlag()">⛏️ Режим: ОТКРЫТЬ</button>
+          <button type="button" class="btn-3d dark sm" onclick="restartMines()">🔄 Новое поле</button>
+        </div>
+        <div class="hint-badge">Нажимай на 3D-плитки, чтобы открыть их или отметить мину флажком</div>
+      `;
+
+      buildBoard();
+      camera.position.set(0, 7.2, 5.2);
+      camera.lookAt(0, 0, 0.2);
+      gameLoopFn = () => {};
+    }
+
+    // ==================== ПЕРЕКЛЮЧЕНИЕ ИГР ====================
+    function openGame(id) {
+      activeGame = id;
+      pointerDownFn = null;
+      pointerMoveFn = null;
+      pointerUpFn = null;
+      keyDownFn = null;
+
+      document.getElementById("lobbyScreen").style.display = "none";
+      document.getElementById("gameScreen").classList.add("active");
+      playTone(560, "triangle", 0.1, 0.08);
+
+      if (id === "rubik") startRubikGame();
+      else if (id === "stack") startStackGame();
+      else if (id === "hockey") startHockeyGame();
+      else if (id === "runner") startRunnerGame();
+      else if (id === "mines") startMinesGame();
+    }
+
+    function backToLobby() {
+      activeGame = "lobby";
+      pointerDownFn = null;
+      pointerMoveFn = null;
+      pointerUpFn = null;
+      keyDownFn = null;
+
+      document.getElementById("gameScreen").classList.remove("active");
+      document.getElementById("lobbyScreen").style.display = "flex";
+      refreshLobbyBadges();
+      setupLobby3D();
+      playTone(360, "sine", 0.1, 0.07);
+    }
+
+    canvas.addEventListener("pointerdown", (e) => { if (pointerDownFn) pointerDownFn(e); });
+    window.addEventListener("pointermove", (e) => { if (pointerMoveFn) pointerMoveFn(e); });
+    window.addEventListener("pointerup", (e) => { if (pointerUpFn) pointerUpFn(e); });
+    window.addEventListener("keydown", (e) => { if (keyDownFn) keyDownFn(e); });
 
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -609,239 +1317,15 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // ==================== ХРАНЕНИЕ И СИНХРОНИЗАЦИЯ ====================
-    function getNick() {
-      const v = (document.getElementById("nickInput").value || "").trim();
-      return v || "Дима";
+    setupLobby3D();
+    let clock = 0;
+    function mainAnimate() {
+      requestAnimationFrame(mainAnimate);
+      clock += 0.016;
+      if (gameLoopFn) gameLoopFn(clock);
+      renderer.render(scene, camera);
     }
-
-    function saveNick() {
-      const v = (document.getElementById("nickInput").value || "").trim();
-      if (v) localStorage.setItem(LS_NICK, v);
-      renderUI();
-    }
-
-    function nowHM() {
-      return new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
-    }
-
-    function nowFull() {
-      return new Date().toLocaleString("ru-RU", {
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-    }
-
-    function esc(s) {
-      return String(s || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    function readLocal() {
-      let localMsgs = [];
-      let localVis = [];
-      try { localMsgs = JSON.parse(localStorage.getItem(LS_MSGS) || "[]"); } catch (_) {}
-      try { localVis = JSON.parse(localStorage.getItem(LS_VIS) || "[]"); } catch (_) {}
-      return {
-        messages: Array.isArray(localMsgs) ? localMsgs : [],
-        visitors: Array.isArray(localVis) ? localVis : []
-      };
-    }
-
-    function writeLocal(msgs, vis) {
-      try { localStorage.setItem(LS_MSGS, JSON.stringify(msgs)); } catch (_) {}
-      try { localStorage.setItem(LS_VIS, JSON.stringify(vis)); } catch (_) {}
-      if (bc) {
-        try { bc.postMessage({ messages: msgs, visitors: vis }); } catch (_) {}
-      }
-    }
-
-    function mergeMessages(cloudArr, localArr) {
-      const map = new Map();
-      [...localArr, ...cloudArr].forEach((m) => {
-        if (!m) return;
-        const key = m.id != null ? String(m.id) : `${m.time || ""}_${m.author || ""}_${m.text || ""}`;
-        map.set(key, m);
-      });
-      return Array.from(map.values())
-        .sort((a, b) => Number(a.id || 0) - Number(b.id || 0))
-        .slice(-150);
-    }
-
-    async function fetchWithTimeout(url, opts, ms) {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), ms || 4500);
-      try {
-        return await fetch(url, { ...(opts || {}), signal: ctrl.signal });
-      } finally {
-        clearTimeout(t);
-      }
-    }
-
-    async function syncCloud(forcePush) {
-      const local = readLocal();
-      messages = mergeMessages(messages, local.messages);
-      visitors = visitors.length ? visitors : local.visitors;
-
-      try {
-        const r = await fetchWithTimeout(`${API_URL}?_=${Date.now()}`, {}, 4500);
-        if (r && r.ok) {
-          const j = await r.json();
-          const cMsgs = Array.isArray(j && j.messages) ? j.messages : [];
-          const cVis = Array.isArray(j && j.visitors) ? j.visitors : [];
-          cloudAvailable = true;
-
-          const mergedMsgs = mergeMessages(cMsgs, messages);
-          const mergedVis = cVis.length >= visitors.length ? cVis : visitors;
-
-          messages = mergedMsgs;
-          visitors = mergedVis;
-          writeLocal(messages, visitors);
-
-          document.getElementById("cloudBadge").textContent = "npoint.io ✓";
-          document.getElementById("dockStatus").textContent = "в облаке";
-
-          if (forcePush) {
-            await fetchWithTimeout(API_URL, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ messages: messages, visitors: visitors })
-            }, 4500).catch(() => {});
-          }
-          return true;
-        }
-      } catch (_) {}
-
-      cloudAvailable = false;
-      document.getElementById("cloudBadge").textContent = "локально ✓";
-      document.getElementById("dockStatus").textContent = "локальный режим";
-      return false;
-    }
-
-    function renderUI() {
-      const stream = document.getElementById("msgStream");
-      const me = getNick();
-      const list = messages.filter((m) => (m.room || m.chat || "general") === currentRoom);
-
-      if (!list.length) {
-        stream.innerHTML = `<div style="text-align:center; color:#94a3b8; font-size:13px; margin:auto 0;">В комнате «${esc(ROOM_NAMES[currentRoom])}» пока пусто — напиши сообщение, и оно появится в 3D!</div>`;
-      } else {
-        stream.innerHTML = list
-          .map((m) => {
-            const sender = m.author || m.name || "Участник";
-            const mine = sender.toLowerCase() === me.toLowerCase() || currentRoom === "saved";
-            return `
-              <div class="msg-card ${mine ? "out" : "in"}">
-                <div class="msg-meta">
-                  <span>${esc(sender)}</span>
-                  <span class="msg-time">${esc(m.time || "")}</span>
-                </div>
-                <div>${esc(m.text || "")}</div>
-              </div>
-            `;
-          })
-          .join("");
-        stream.scrollTop = stream.scrollHeight;
-      }
-
-      document.getElementById("visBadge").textContent = `👀 ${visitors.length}`;
-      rebuild3DMessages();
-    }
-
-    function onSend(e) {
-      if (e) e.preventDefault();
-      const inp = document.getElementById("chatInput");
-      const text = inp.value.trim();
-      if (!text) return false;
-
-      inp.value = "";
-      inp.focus();
-      saveNick();
-
-      const item = {
-        id: Date.now() + Math.floor(Math.random() * 100),
-        room: currentRoom,
-        author: getNick(),
-        text: text,
-        time: nowHM(),
-        date: nowFull()
-      };
-
-      messages = [...messages, item].slice(-150);
-      writeLocal(messages, visitors);
-      renderUI();
-
-      document.getElementById("dockStatus").textContent = "сохранено";
-      syncCloud(true).then((ok) => {
-        if (!ok) {
-          document.getElementById("dockStatus").textContent = "сохранено локально ✓";
-        }
-      });
-
-      return false;
-    }
-
-    function switchRoom(rid) {
-      currentRoom = rid;
-      document.querySelectorAll(".room-tab").forEach((b) => {
-        b.classList.toggle("active", b.dataset.r === rid);
-      });
-      renderUI();
-      document.getElementById("chatInput").focus();
-    }
-
-    function toggleDock() {
-      document.getElementById("dock").classList.toggle("minimized");
-    }
-
-    async function clearCurrentRoom() {
-      if (!confirm(`Очистить сообщения в «${ROOM_NAMES[currentRoom]}»?`)) return;
-      messages = messages.filter((m) => (m.room || m.chat || "general") !== currentRoom);
-      writeLocal(messages, visitors);
-      renderUI();
-      if (cloudAvailable) {
-        await fetchWithTimeout(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: messages, visitors: visitors })
-        }, 4500).catch(() => {});
-      }
-    }
-
-    async function init() {
-      const savedNick = localStorage.getItem(LS_NICK);
-      if (savedNick) document.getElementById("nickInput").value = savedNick;
-
-      const local = readLocal();
-      messages = local.messages;
-      visitors = local.visitors;
-
-      if (!sessionStorage.getItem(SS_VISIT)) {
-        sessionStorage.setItem(SS_VISIT, "1");
-        visitors = [
-          {
-            name: getNick(),
-            time: nowFull(),
-            device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? "Телефон" : "Ноутбук"
-          },
-          ...visitors
-        ].slice(0, 60);
-        writeLocal(messages, visitors);
-      }
-
-      renderUI();
-      await syncCloud(true);
-      renderUI();
-    }
-
-    init();
-    setInterval(() => {
-      syncCloud(false).then(() => renderUI());
-    }, 6000);
+    mainAnimate();
   </script>
 </body>
 </html>
