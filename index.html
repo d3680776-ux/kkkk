@@ -19,7 +19,6 @@
       color: #f8fafc;
     }
 
-    /* 3D холст на весь экран */
     #canvas3d {
       position: fixed;
       inset: 0;
@@ -29,7 +28,6 @@
       display: block;
     }
 
-    /* Верхняя панель управления камерой и статусом */
     .hud-top {
       position: fixed;
       top: 14px;
@@ -82,7 +80,6 @@
       border-color: #60a5fa;
     }
 
-    /* Плавающее окно 3D-мессенджера */
     .messenger-dock {
       position: fixed;
       right: 16px;
@@ -98,8 +95,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transform-style: preserve-3d;
-      transition: transform 0.18s ease-out;
+      transition: height 0.18s ease-out;
     }
     .messenger-dock.minimized {
       height: 58px;
@@ -287,7 +283,7 @@
   <div class="hud-top">
     <div class="hud-group">
       <div class="glass-pill">🧊 3D Telegram</div>
-      <div class="glass-pill" id="cloudBadge">npoint.io...</div>
+      <div class="glass-pill" id="cloudBadge">подключение...</div>
       <div class="glass-pill" id="visBadge">👀 0</div>
     </div>
     <div class="hud-group">
@@ -299,7 +295,7 @@
 
   <section class="messenger-dock" id="dock">
     <div class="dock-header" onclick="toggleDock()">
-      <div class="dock-title">✈️ 3D Чат <span style="font-size:11px; font-weight:600; opacity:0.9;" id="dockStatus">онлайн</span></div>
+      <div class="dock-title">✈️ 3D Чат <span style="font-size:11px; font-weight:600; opacity:0.9;" id="dockStatus">запуск...</span></div>
       <div class="dock-actions" onclick="event.stopPropagation()">
         <button type="button" class="mini-btn" onclick="clearCurrentRoom()">Очистить</button>
         <button type="button" class="mini-btn" onclick="toggleDock()">—</button>
@@ -334,11 +330,13 @@
   </section>
 
   <script>
-    // Твой бин npoint.io со структурой {"messages": [], "visitors": []}
-    const API_URL = "https://api.npoint.io/80185a88336abe28de83";
-    const LS_MSGS = "tg_3d_msgs_v1";
-    const LS_NICK = "tg_3d_nick_v1";
-    const SS_VISIT = "tg_3d_visit_v1";
+    // Твой новый личный бин (Yours): https://api.npoint.io/ebd8e7a181505cd2c08b
+    const API_URL = "https://api.npoint.io/ebd8e7a181505cd2c08b";
+    const LS_MSGS = "tg_3d_msgs_v3";
+    const LS_VIS = "tg_3d_vis_v3";
+    const LS_NICK = "tg_3d_nick_v3";
+    const SS_VISIT = "tg_3d_visit_v3";
+    const CHAN_NAME = "tg_3d_messenger_channel_v3";
 
     const ROOM_NAMES = {
       general: "Общий",
@@ -350,6 +348,17 @@
     let messages = [];
     let visitors = [];
     let camMode = "orbit";
+    let cloudAvailable = false;
+
+    const bc = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHAN_NAME) : null;
+    if (bc) {
+      bc.onmessage = (ev) => {
+        if (!ev || !ev.data) return;
+        if (Array.isArray(ev.data.messages)) messages = ev.data.messages;
+        if (Array.isArray(ev.data.visitors)) visitors = ev.data.visitors;
+        renderUI();
+      };
+    }
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
     if (tg) {
@@ -375,7 +384,6 @@
     const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 150);
     camera.position.set(0, 4.5, 14);
 
-    // Освещение
     const ambient = new THREE.AmbientLight(0x93c5fd, 0.9);
     scene.add(ambient);
 
@@ -391,14 +399,14 @@
     mintLight.position.set(7, 3, -5);
     scene.add(mintLight);
 
-    // Объёмная сетка-арена и парящие кольца
     const gridHelper = new THREE.GridHelper(36, 36, 0x3390ec, 0x1e293b);
     gridHelper.position.y = -4.5;
     scene.add(gridHelper);
 
-    const ringGeo = new THREE.TorusGeometry(6.8, 0.04, 16, 100);
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
-    const outerRing = new THREE.Mesh(ringGeo, ringMat);
+    const outerRing = new THREE.Mesh(
+      new THREE.TorusGeometry(6.8, 0.04, 16, 100),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 })
+    );
     outerRing.rotation.x = Math.PI / 2.4;
     scene.add(outerRing);
 
@@ -409,7 +417,6 @@
     innerRing.rotation.x = Math.PI / 3;
     scene.add(innerRing);
 
-    // Звёздная пыль вокруг
     const starCount = 420;
     const starPositions = new Float32Array(starCount * 3);
     for (let i = 0; i < starCount * 3; i += 3) {
@@ -425,7 +432,6 @@
     );
     scene.add(starPoints);
 
-    // Группа 3D-кубов сообщений
     const msgCubesGroup = new THREE.Group();
     scene.add(msgCubesGroup);
 
@@ -435,21 +441,17 @@
       c.height = 256;
       const ctx = c.getContext("2d");
 
-      // Фон плашки
       ctx.fillStyle = isMine ? "#14532d" : "#0f172a";
       ctx.fillRect(0, 0, c.width, c.height);
 
-      // Рамка
       ctx.strokeStyle = isMine ? "#4ade80" : "#38bdf8";
       ctx.lineWidth = 8;
       ctx.strokeRect(10, 10, c.width - 20, c.height - 20);
 
-      // Имя отправителя
       ctx.fillStyle = isMine ? "#86efac" : "#7dd3fc";
       ctx.font = "bold 28px Arial, sans-serif";
       ctx.fillText(String(author || "Участник").slice(0, 22), 28, 56);
 
-      // Текст сообщения (перенос слов)
       ctx.fillStyle = "#ffffff";
       ctx.font = "26px Arial, sans-serif";
       const words = String(text || "").split(" ");
@@ -505,7 +507,6 @@
           metalness: 0.1
         });
 
-        // Порядок граней BoxGeometry: +x, -x, +y, -y, +z, -z
         const materials = [sideMat, sideMat, sideMat, sideMat, faceMat, faceMat];
         const geo = new THREE.BoxGeometry(2.6, 1.35, 0.38);
         const cube = new THREE.Mesh(geo, materials);
@@ -523,7 +524,6 @@
       });
     }
 
-    // Управление камерой мышкой/пальцем
     let isDragging = false;
     let prevX = 0;
     let prevY = 0;
@@ -609,7 +609,7 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // ==================== ЛОГИКА МЕССЕНДЖЕРА И NPOINT.IO ====================
+    // ==================== ХРАНЕНИЕ И СИНХРОНИЗАЦИЯ ====================
     function getNick() {
       const v = (document.getElementById("nickInput").value || "").trim();
       return v || "Дима";
@@ -641,37 +641,85 @@
         .replace(/>/g, "&gt;");
     }
 
-    async function fetchCloud() {
-      try {
-        const r = await fetch(`${API_URL}?_=${Date.now()}`);
-        if (r.ok) {
-          const j = await r.json();
-          const msgs = Array.isArray(j && j.messages) ? j.messages : [];
-          const vis = Array.isArray(j && j.visitors) ? j.visitors : [];
-          try {
-            localStorage.setItem(LS_MSGS, JSON.stringify(msgs));
-          } catch (_) {}
-          return { ok: true, messages: msgs, visitors: vis };
-        }
-      } catch (_) {}
-      let local = [];
-      try {
-        local = JSON.parse(localStorage.getItem(LS_MSGS) || "[]");
-      } catch (_) {}
-      return { ok: false, messages: local, visitors: visitors };
+    function readLocal() {
+      let localMsgs = [];
+      let localVis = [];
+      try { localMsgs = JSON.parse(localStorage.getItem(LS_MSGS) || "[]"); } catch (_) {}
+      try { localVis = JSON.parse(localStorage.getItem(LS_VIS) || "[]"); } catch (_) {}
+      return {
+        messages: Array.isArray(localMsgs) ? localMsgs : [],
+        visitors: Array.isArray(localVis) ? localVis : []
+      };
     }
 
-    async function pushCloud(msgs, vis) {
-      try {
-        const r = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: msgs, visitors: vis })
-        });
-        return r.ok;
-      } catch (_) {
-        return false;
+    function writeLocal(msgs, vis) {
+      try { localStorage.setItem(LS_MSGS, JSON.stringify(msgs)); } catch (_) {}
+      try { localStorage.setItem(LS_VIS, JSON.stringify(vis)); } catch (_) {}
+      if (bc) {
+        try { bc.postMessage({ messages: msgs, visitors: vis }); } catch (_) {}
       }
+    }
+
+    function mergeMessages(cloudArr, localArr) {
+      const map = new Map();
+      [...localArr, ...cloudArr].forEach((m) => {
+        if (!m) return;
+        const key = m.id != null ? String(m.id) : `${m.time || ""}_${m.author || ""}_${m.text || ""}`;
+        map.set(key, m);
+      });
+      return Array.from(map.values())
+        .sort((a, b) => Number(a.id || 0) - Number(b.id || 0))
+        .slice(-150);
+    }
+
+    async function fetchWithTimeout(url, opts, ms) {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), ms || 4500);
+      try {
+        return await fetch(url, { ...(opts || {}), signal: ctrl.signal });
+      } finally {
+        clearTimeout(t);
+      }
+    }
+
+    async function syncCloud(forcePush) {
+      const local = readLocal();
+      messages = mergeMessages(messages, local.messages);
+      visitors = visitors.length ? visitors : local.visitors;
+
+      try {
+        const r = await fetchWithTimeout(`${API_URL}?_=${Date.now()}`, {}, 4500);
+        if (r && r.ok) {
+          const j = await r.json();
+          const cMsgs = Array.isArray(j && j.messages) ? j.messages : [];
+          const cVis = Array.isArray(j && j.visitors) ? j.visitors : [];
+          cloudAvailable = true;
+
+          const mergedMsgs = mergeMessages(cMsgs, messages);
+          const mergedVis = cVis.length >= visitors.length ? cVis : visitors;
+
+          messages = mergedMsgs;
+          visitors = mergedVis;
+          writeLocal(messages, visitors);
+
+          document.getElementById("cloudBadge").textContent = "npoint.io ✓";
+          document.getElementById("dockStatus").textContent = "в облаке";
+
+          if (forcePush) {
+            await fetchWithTimeout(API_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ messages: messages, visitors: visitors })
+            }, 4500).catch(() => {});
+          }
+          return true;
+        }
+      } catch (_) {}
+
+      cloudAvailable = false;
+      document.getElementById("cloudBadge").textContent = "локально ✓";
+      document.getElementById("dockStatus").textContent = "локальный режим";
+      return false;
     }
 
     function renderUI() {
@@ -715,7 +763,7 @@
       saveNick();
 
       const item = {
-        id: Date.now(),
+        id: Date.now() + Math.floor(Math.random() * 100),
         room: currentRoom,
         author: getNick(),
         text: text,
@@ -723,26 +771,16 @@
         date: nowFull()
       };
 
-      messages = [...messages, item].slice(-120);
-      try {
-        localStorage.setItem(LS_MSGS, JSON.stringify(messages));
-      } catch (_) {}
+      messages = [...messages, item].slice(-150);
+      writeLocal(messages, visitors);
       renderUI();
 
-      document.getElementById("dockStatus").textContent = "сохраняю...";
-      fetchCloud()
-        .then((fresh) => {
-          const merged = fresh.ok
-            ? [...fresh.messages.filter((m) => m.id !== item.id), item].slice(-120)
-            : messages;
-          messages = merged;
-          visitors = fresh.visitors;
-          return pushCloud(merged, visitors);
-        })
-        .then((ok) => {
-          document.getElementById("dockStatus").textContent = ok ? "в облаке ✓" : "локально";
-          document.getElementById("cloudBadge").textContent = ok ? "npoint.io ✓" : "офлайн";
-        });
+      document.getElementById("dockStatus").textContent = "сохранено";
+      syncCloud(true).then((ok) => {
+        if (!ok) {
+          document.getElementById("dockStatus").textContent = "сохранено локально ✓";
+        }
+      });
 
       return false;
     }
@@ -762,57 +800,48 @@
 
     async function clearCurrentRoom() {
       if (!confirm(`Очистить сообщения в «${ROOM_NAMES[currentRoom]}»?`)) return;
-      const fresh = await fetchCloud();
-      const rest = fresh.messages.filter((m) => (m.room || m.chat || "general") !== currentRoom);
-      messages = rest;
-      visitors = fresh.visitors;
-      try {
-        localStorage.setItem(LS_MSGS, JSON.stringify(rest));
-      } catch (_) {}
+      messages = messages.filter((m) => (m.room || m.chat || "general") !== currentRoom);
+      writeLocal(messages, visitors);
       renderUI();
-      await pushCloud(rest, visitors);
+      if (cloudAvailable) {
+        await fetchWithTimeout(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: messages, visitors: visitors })
+        }, 4500).catch(() => {});
+      }
     }
 
     async function init() {
       const savedNick = localStorage.getItem(LS_NICK);
       if (savedNick) document.getElementById("nickInput").value = savedNick;
 
-      const fresh = await fetchCloud();
-      messages = fresh.messages;
-      visitors = fresh.visitors;
+      const local = readLocal();
+      messages = local.messages;
+      visitors = local.visitors;
 
-      if (fresh.ok) {
-        document.getElementById("cloudBadge").textContent = "npoint.io ✓";
-        document.getElementById("dockStatus").textContent = "онлайн";
-        if (!sessionStorage.getItem(SS_VISIT)) {
-          sessionStorage.setItem(SS_VISIT, "1");
-          visitors = [
-            {
-              name: getNick(),
-              time: nowFull(),
-              device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? "Телефон" : "Ноутбук"
-            },
-            ...visitors
-          ].slice(0, 60);
-          await pushCloud(messages, visitors);
-        }
-      } else {
-        document.getElementById("cloudBadge").textContent = "офлайн";
-        document.getElementById("dockStatus").textContent = "локально";
+      if (!sessionStorage.getItem(SS_VISIT)) {
+        sessionStorage.setItem(SS_VISIT, "1");
+        visitors = [
+          {
+            name: getNick(),
+            time: nowFull(),
+            device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? "Телефон" : "Ноутбук"
+          },
+          ...visitors
+        ].slice(0, 60);
+        writeLocal(messages, visitors);
       }
 
+      renderUI();
+      await syncCloud(true);
       renderUI();
     }
 
     init();
-    setInterval(async () => {
-      const fresh = await fetchCloud();
-      if (fresh.ok) {
-        messages = fresh.messages;
-        visitors = fresh.visitors;
-        renderUI();
-      }
-    }, 4500);
+    setInterval(() => {
+      syncCloud(false).then(() => renderUI());
+    }, 6000);
   </script>
 </body>
 </html>
